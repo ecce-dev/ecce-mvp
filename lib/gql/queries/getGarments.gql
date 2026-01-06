@@ -1,0 +1,22 @@
+query getGarments {
+  garments {
+    nodes {
+      garmentFields {
+        description
+        designer
+        linkToTiktok
+        material
+        name
+        patternDescription
+        patternPng {
+          node {
+            mediaItemUrl
+          }
+        }
+        rights
+        season
+        version
+      }
+    }
+  }
+}

@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   title: "ecce",
   description: "Discover ecce.",
   icons: {
-    icon: "/favicon/android-chrome-512x512.png",
-    apple: "/favicon/apple-touch-icon.png",
+    icon: "/app-assets/android-chrome-512x512.png",
+    apple: "/app-assets/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
   appleWebApp: {

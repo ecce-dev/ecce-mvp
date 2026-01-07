@@ -8,7 +8,7 @@ export default async function GarmentsWrapper() {
   return (
     <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
       <CanvasWrapper
-        initialCameraPosition={new THREE.Vector3(0, 0, 15)}
+        initialCameraPosition={new THREE.Vector3(0, 0, 19)}
         controls={{
           orbitControls: {
             target: new THREE.Vector3(0, 0, 0),

@@ -61,16 +61,10 @@ export default function Garment({
   return (
     <group position={initPosition} rotation={[0, initialRotationY, 0]}>
       <group ref={groupRef}>
-        <Float
-          speed={1}
-          floatIntensity={4}
-          rotationIntensity={0.5}
-        >
-          <NormalizedGlbModel
-            src={proxiedUrl}
-            targetBoundingBox={targetBoundingBox}
-          />
-        </Float>
+        <NormalizedGlbModel
+          src={proxiedUrl}
+          targetBoundingBox={targetBoundingBox}
+        />
       </group>
     </group>
   )

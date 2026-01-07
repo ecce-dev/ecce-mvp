@@ -7,6 +7,7 @@ import {
   EcceDialogContent,
   EcceActionTrigger,
 } from "@/lib/components/ecce-dialog"
+import { useGarments } from "@/lib/context/GarmentsContext"
 
 /**
  * Main UI Elements component
@@ -17,9 +18,10 @@ import {
  * Interactive elements have pointer-events:auto to remain clickable.
  */
 export default function UIElements({ aboutContent, contactContent }: { aboutContent: string | null, contactContent: string | null }) {
+  const { refreshGarments, isLoading } = useGarments();
+
   const handleExploreClick = () => {
-    // TODO: Implement explore functionality
-    console.log("Explore clicked")
+    refreshGarments();
   }
 
   return (
@@ -52,8 +54,9 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           variant="primary"
           className="pointer-events-auto"
           onAction={handleExploreClick}
+          disabled={isLoading}
         >
-          Explore
+          {isLoading ? "Loading..." : "Explore"}
         </EcceActionTrigger>
 
         <EcceDialogTrigger

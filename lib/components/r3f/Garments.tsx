@@ -30,7 +30,7 @@ const DESKTOP_Y_OFFSET = 0;
 const ORBIT_SPEED = 0.09;
 
 /** Speed of individual garment spin on their own axis (radians per second) */
-const SPIN_SPEED = 0.3;
+const SPIN_SPEED = 0.09;
 
 /** 
  * How garments should face:

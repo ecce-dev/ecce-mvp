@@ -6,6 +6,7 @@ import NormalizedGlbModel, { TargetBoundingBox } from "./NormalizedGlbModel"
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
 import OrbitControlsContext from "./OrbitControlsContext"
 import * as THREE from 'three';
+import { Float } from "@react-three/drei"
 
 
 interface GarmentProps {
@@ -60,10 +61,16 @@ export default function Garment({
   return (
     <group position={initPosition} rotation={[0, initialRotationY, 0]}>
       <group ref={groupRef}>
-        <NormalizedGlbModel 
-          src={proxiedUrl} 
-          targetBoundingBox={targetBoundingBox}
-        />
+        <Float
+          speed={1}
+          floatIntensity={4}
+          rotationIntensity={0.5}
+        >
+          <NormalizedGlbModel
+            src={proxiedUrl}
+            targetBoundingBox={targetBoundingBox}
+          />
+        </Float>
       </group>
     </group>
   )

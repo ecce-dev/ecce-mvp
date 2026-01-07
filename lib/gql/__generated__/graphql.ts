@@ -42,6 +42,15 @@ export type AcfMediaItemConnectionEdge = Edge & MediaItemConnectionEdge & OneToO
   node: MediaItem;
 };
 
+/** Options Page registered by ACF */
+export type AcfOptionsPage = {
+  /** The globally unique ID for the object */
+  id: Scalars['ID']['output'];
+  menuTitle?: Maybe<Scalars['String']['output']>;
+  pageTitle?: Maybe<Scalars['String']['output']>;
+  parentId?: Maybe<Scalars['String']['output']>;
+};
+
 /** Avatars are profile images for users. WordPress by default uses the Gravatar service to host and fetch avatars from. */
 export type Avatar = {
   __typename?: 'Avatar';
@@ -2651,6 +2660,48 @@ export type GeneralSettings = {
   title?: Maybe<Scalars['String']['output']>;
   /** Site URL. */
   url?: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;GlobalSettings&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type GlobalSettings = AcfFieldGroup & AcfFieldGroupFields & GlobalSettings_Fields & {
+  __typename?: 'GlobalSettings';
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  about?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  contact?: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  fieldGroupName?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  passwordConfig?: Maybe<Scalars['String']['output']>;
+};
+
+export type GlobalSettingsPage = AcfOptionsPage & Node & WithAcfGlobalSettings & {
+  __typename?: 'GlobalSettingsPage';
+  /** Fields of the GlobalSettings ACF Field Group */
+  globalSettings?: Maybe<GlobalSettings>;
+  /** The globally unique ID for the object */
+  id: Scalars['ID']['output'];
+  menuTitle?: Maybe<Scalars['String']['output']>;
+  pageTitle?: Maybe<Scalars['String']['output']>;
+  parentId?: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;GlobalSettings&quot; Field Group */
+export type GlobalSettings_Fields = {
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  about?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  contact?: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  fieldGroupName?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  passwordConfig?: Maybe<Scalars['String']['output']>;
 };
 
 /** Saved GraphQL Documents */
@@ -7134,7 +7185,7 @@ export type RootMutationUpdateUserArgs = {
 };
 
 /** The root entry point into the Graph */
-export type RootQuery = {
+export type RootQuery = WithAcfOptionsPageGlobalSettingsPage & {
   __typename?: 'RootQuery';
   /** Entry point to get all settings for the site */
   allSettings?: Maybe<Settings>;
@@ -7173,6 +7224,7 @@ export type RootQuery = {
   gdlSitePublishedSettings?: Maybe<GdlSitePublishedSettings>;
   /** Fields of the &#039;GeneralSettings&#039; settings group */
   generalSettings?: Maybe<GeneralSettings>;
+  globalSettingsPage?: Maybe<GlobalSettingsPage>;
   /** An object of the graphqlDocument Type. Saved GraphQL Documents */
   graphqlDocument?: Maybe<GraphqlDocument>;
   /**
@@ -11282,6 +11334,17 @@ export type WithAcfGarmentFields = {
   garmentFields?: Maybe<GarmentFields>;
 };
 
+/** Provides access to fields of the &quot;GlobalSettings&quot; ACF Field Group via the &quot;globalSettings&quot; field */
+export type WithAcfGlobalSettings = {
+  /** Fields of the GlobalSettings ACF Field Group */
+  globalSettings?: Maybe<GlobalSettings>;
+};
+
+/** Access point for the &quot;GlobalSettingsPage&quot; ACF Options Page */
+export type WithAcfOptionsPageGlobalSettingsPage = {
+  globalSettingsPage?: Maybe<GlobalSettingsPage>;
+};
+
 /** The writing setting type */
 export type WritingSettings = {
   __typename?: 'WritingSettings';
@@ -11297,6 +11360,11 @@ export type GetGarmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', slug?: string | null, garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, designer?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternPngDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
+
+export type GetGlobalSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null } | null } | null };
 
 
 export const GetGarments = gql`
@@ -11333,6 +11401,17 @@ export const GetGarments = gql`
         }
       }
       slug
+    }
+  }
+}
+    `;
+export const GetGlobalSettings = gql`
+    query getGlobalSettings {
+  globalSettingsPage {
+    globalSettings {
+      about
+      contact
+      passwordConfig
     }
   }
 }

@@ -1,0 +1,9 @@
+query getGlobalSettings {
+  globalSettingsPage {
+    globalSettings {
+      about
+      contact
+      passwordConfig
+    }
+  }
+}

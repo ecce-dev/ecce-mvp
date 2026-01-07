@@ -3,6 +3,8 @@ import { IBM_Plex_Mono } from "next/font/google";
 import { zangezi, zangeziCondensed } from "@/lib/fonts/zangezi";
 import "./globals.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
+import { CookieBanner } from "@/lib/components/CookieBanner";
+
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
@@ -53,6 +55,7 @@ export default function RootLayout({
         <div className="safe-area-overlay-bottom" />
         <QueryProvider>
           {children}
+          <CookieBanner />
         </QueryProvider>
       </body>
     </html>

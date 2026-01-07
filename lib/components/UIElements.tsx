@@ -8,6 +8,8 @@ import {
   EcceActionTrigger,
 } from "@/lib/components/ecce-dialog"
 import { useGarments } from "@/lib/context/GarmentsContext"
+import { useDevice } from "../hooks/useDevice";
+import { cn } from "../utils/utils";
 
 /**
  * Main UI Elements component
@@ -19,6 +21,7 @@ import { useGarments } from "@/lib/context/GarmentsContext"
  */
 export default function UIElements({ aboutContent, contactContent }: { aboutContent: string | null, contactContent: string | null }) {
   const { refreshGarments, isLoading } = useGarments();
+  const { deviceType } = useDevice();
 
   const handleExploreClick = () => {
     refreshGarments();
@@ -33,39 +36,42 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         - flex justify-between distributes buttons evenly
         - Order: About → Submit Request → Explore → Contact
       */}
-      <div className="fixed top-6 left-6 right-6 flex justify-between pointer-events-none z-100">
-        <EcceDialogTrigger
-          dialogId="about"
-          variant="primary"
-          className="pointer-events-auto"
-        >
-          About
-        </EcceDialogTrigger>
+      <div className="fixed top-6 left-6 right-6 flex pointer-events-none z-100">
+        <div className={cn("flex flex-row justify-between w-full gap-2", deviceType === "mobile" && "flex-col")}>
+          <EcceDialogTrigger
+            dialogId="about"
+            variant="primary"
+            className="pointer-events-auto w-[180px] md:w-[210px] lg:w-[230px]"
+          >
+            About
+          </EcceDialogTrigger>
 
-        <EcceDialogTrigger
-          dialogId="submit-request"
-          variant="primary"
-          className="pointer-events-auto"
-        >
-          Submit Request
-        </EcceDialogTrigger>
+          <EcceDialogTrigger
+            dialogId="submit-request"
+            variant="primary"
+            className="pointer-events-auto w-[180px] md:w-[210px] lg:w-[230px]"
+          >
+            Submit Request
+          </EcceDialogTrigger>
 
-        <EcceActionTrigger
-          variant="primary"
-          className="pointer-events-auto"
-          onAction={handleExploreClick}
-          disabled={isLoading}
-        >
-          {isLoading ? "Loading..." : "Explore"}
-        </EcceActionTrigger>
+          <EcceActionTrigger
+            variant="primary"
+            className="pointer-events-auto w-[180px] md:w-[210px] lg:w-[230px]"
+            onAction={handleExploreClick}
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : "Explore"}
+          </EcceActionTrigger>
 
-        <EcceDialogTrigger
-          dialogId="contact"
-          variant="primary"
-          className="pointer-events-auto"
-        >
-          Contact
-        </EcceDialogTrigger>
+          <EcceDialogTrigger
+            dialogId="contact"
+            variant="primary"
+            className="pointer-events-auto w-[180px] md:w-[210px] lg:w-[230px]"
+          >
+            Contact
+          </EcceDialogTrigger>
+
+        </div>
       </div>
 
       {/* 
@@ -76,7 +82,10 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         - Wrapper divs maintain layout positions even when dialogs are closed
         - Each content has pointer-events-auto when visible
       */}
-      <div className="fixed top-24 bottom-6 left-6 right-6 flex justify-between items-stretch pointer-events-none z-100">
+      <div
+        id="dialog-content-container"
+        className="fixed top-64 md:top-32 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
+      >
         {/* Left slot: About content */}
         <div className="flex-shrink-0">
           <EcceDialogContent
@@ -87,8 +96,8 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
 
-        {/* Center slot: Submit Request content - vertically centered */}
-        <div className="flex items-center justify-center h-full">
+        {/* Center slot: Submit Request content - vertically centered on tablet/desktop */}
+        <div className="md:flex md:items-center md:justify-center md:h-full">
           <EcceDialogContent
             dialogId="submit-request"
             className="pointer-events-auto"

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/utils"
 import { useEcceDialog } from "./EcceDialogContext"
 
 const ecceDialogTriggerVariants = cva(
-  "px-4 py-2 text-2xl border border-black cursor-pointer transition-colors duration-200 z-100",
+  "px-4 py-2 text-lg md:text-2xl lg:text-2xl border border-black cursor-pointer transition-colors duration-200 z-100",
   {
     variants: {
       variant: {

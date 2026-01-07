@@ -11296,7 +11296,7 @@ export type WritingSettings = {
 export type GetGarmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, designer?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternPngDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
+export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', slug?: string | null, garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, designer?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternPngDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
 
 
 export const GetGarments = gql`
@@ -11332,6 +11332,7 @@ export const GetGarments = gql`
           }
         }
       }
+      slug
     }
   }
 }

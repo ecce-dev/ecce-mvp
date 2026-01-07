@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDevice } from '@/lib/hooks/useDevice';
+import { cn } from '../utils/utils';
 
 export default function PageContainerWrapper({ 
   children,
@@ -30,7 +31,7 @@ export default function PageContainerWrapper({
   return (
     <div 
       data-scroll-container="true"
-      className={`flex ${containerClass} ${safeAreaClass} justify-center max-w-screen min-w-screen ${className}`}
+      className={cn('flex', containerClass, safeAreaClass, 'justify-center max-w-screen min-w-screen', className)}
     >
       {children}
     </div>

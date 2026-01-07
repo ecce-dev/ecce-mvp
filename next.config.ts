@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
     ],
   },
   turbopack: {},
+  async rewrites() {
+    return [
+      {
+        // Proxy WordPress uploads through Next.js to avoid CORS issues with GLB files
+        source: '/wp-content/uploads/:path*',
+        destination: 'https://admin.ecce.ing/wp-content/uploads/:path*',
+      },
+    ];
+  },
 };
 
 const pwaConfig = withPWA({

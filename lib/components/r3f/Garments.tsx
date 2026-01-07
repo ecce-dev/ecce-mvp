@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql";
 import Garment from "./Garment";
 import { useResponsiveScale } from "@/lib/hooks/useResponsiveScale";
+import { useDevice } from "@/lib/hooks/useDevice";
 import { TargetBoundingBox } from "./NormalizedGlbModel";
 import OrbitControlsContext from "./OrbitControlsContext";
 import * as THREE from 'three';
@@ -22,6 +23,10 @@ const DESKTOP_BOUNDING_BOX: TargetBoundingBox = { x: 5, y: 12, z: 5 };
 
 /** Desktop baseline radius of the circular orbit (units) */
 const DESKTOP_ORBIT_RADIUS = 9;
+
+const TABLET_ORBIT_RADIUS = 5;
+
+const MOBILE_ORBIT_RADIUS = 3;
 
 /** Desktop baseline Y position offset for all garments */
 const DESKTOP_Y_OFFSET = 0;
@@ -73,10 +78,24 @@ export default function Garments({ garments }: GarmentsProps) {
   
   // Get responsive scale factor (1.0 at desktop, 0.5 at mobile, interpolated between)
   const responsiveScale = useResponsiveScale();
+  
+  // Get device type for stepped orbit radius
+  const { deviceType } = useDevice();
 
-  // Calculate responsive values
-  const { orbitRadius, yOffset, targetBoundingBox } = useMemo(() => ({
-    orbitRadius: DESKTOP_ORBIT_RADIUS * responsiveScale,
+  // Get orbit radius based on device type (uses specific values per breakpoint)
+  const orbitRadius = useMemo(() => {
+    switch (deviceType) {
+      case 'mobile':
+        return MOBILE_ORBIT_RADIUS;
+      case 'tablet':
+        return TABLET_ORBIT_RADIUS;
+      default:
+        return DESKTOP_ORBIT_RADIUS;
+    }
+  }, [deviceType]);
+
+  // Calculate other responsive values using scale factor
+  const { yOffset, targetBoundingBox } = useMemo(() => ({
     yOffset: DESKTOP_Y_OFFSET * responsiveScale,
     targetBoundingBox: {
       x: DESKTOP_BOUNDING_BOX.x * responsiveScale,

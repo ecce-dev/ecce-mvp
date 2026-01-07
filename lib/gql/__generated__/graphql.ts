@@ -2481,7 +2481,9 @@ export type GarmentConnectionPageInfo = {
 /** The &quot;GarmentFields&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
 export type GarmentFields = AcfFieldGroup & AcfFieldGroupFields & GarmentFields_Fields & {
   __typename?: 'GarmentFields';
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  construction?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   description?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   designer?: Maybe<Scalars['String']['output']>;
@@ -2493,24 +2495,28 @@ export type GarmentFields = AcfFieldGroup & AcfFieldGroupFields & GarmentFields_
   /** Field of the &quot;url&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   linkToTiktok?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  material?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   name?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   patternDescription?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  patternPng?: Maybe<AcfMediaItemConnectionEdge>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  patternPngDownload?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  patternPngPreview?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  provenance?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   rights?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  season?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  threeDFileGlb?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   version?: Maybe<Scalars['String']['output']>;
 };
 
 /** Interface representing fields of the ACF &quot;GarmentFields&quot; Field Group */
 export type GarmentFields_Fields = {
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  construction?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   description?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   designer?: Maybe<Scalars['String']['output']>;
@@ -2522,18 +2528,20 @@ export type GarmentFields_Fields = {
   /** Field of the &quot;url&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   linkToTiktok?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  material?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   name?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   patternDescription?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  patternPng?: Maybe<AcfMediaItemConnectionEdge>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  patternPngDownload?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  patternPngPreview?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  provenance?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   rights?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  season?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  threeDFileGlb?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   version?: Maybe<Scalars['String']['output']>;
 };
 
@@ -4373,7 +4381,7 @@ export type MenuItemNodeIdTypeEnum =
   | 'ID';
 
 /** Deprecated in favor of MenuItemLinkable Interface */
-export type MenuItemObjectUnion = Category | Garment | Page | Post | Tag;
+export type MenuItemObjectUnion = Category | Garment | Page | Post | PostFormat | Tag;
 
 /** Connection between the MenuItem type and the Menu type */
 export type MenuItemToMenuConnectionEdge = Edge & MenuConnectionEdge & OneToOneConnection & {
@@ -4440,14 +4448,8 @@ export type MenuItemToMenuItemLinkableConnectionEdge = Edge & MenuItemLinkableCo
 
 /** Designated areas where navigation menus can be displayed. Represents the named regions in the interface where menus can be assigned. */
 export type MenuLocationEnum =
-  /** Put the menu in the footer-1 location */
-  | 'FOOTER_1'
-  /** Put the menu in the footer-2 location */
-  | 'FOOTER_2'
-  /** Put the menu in the footer-3 location */
-  | 'FOOTER_3'
-  /** Put the menu in the primary location */
-  | 'PRIMARY';
+  /** Empty menu location */
+  | 'EMPTY';
 
 /** Identifier types for retrieving a specific navigation menu. Specifies which property (ID, name, location) is used to locate a particular menu. */
 export type MenuNodeIdTypeEnum =
@@ -4651,6 +4653,10 @@ export type MimeTypeEnum =
   | 'IMAGE_WEBP'
   /** image/x-icon mime type. */
   | 'IMAGE_X_ICON'
+  /** model/gltf-binary mime type. */
+  | 'MODEL_GLTF_BINARY'
+  /** model/gltf+json mime type. */
+  | 'MODEL_GLTF_JSON'
   /** text/calendar mime type. */
   | 'TEXT_CALENDAR'
   /** text/css mime type. */
@@ -5634,7 +5640,7 @@ export type PostConnectionPageInfo = {
 };
 
 /** A standardized classification system for content presentation styles. These formats can be used to display content differently based on type, such as &quot;standard&quot;, &quot;gallery&quot;, &quot;video&quot;, etc. */
-export type PostFormat = DatabaseIdentifier & Node & TermNode & UniformResourceIdentifiable & {
+export type PostFormat = DatabaseIdentifier & MenuItemLinkable & Node & TermNode & UniformResourceIdentifiable & {
   __typename?: 'PostFormat';
   /** Connection between the PostFormat type and the ContentNode type */
   contentNodes?: Maybe<PostFormatToContentNodeConnection>;
@@ -9691,6 +9697,13 @@ export type TaxonomyToTermNodeConnectionPageInfo = PageInfo & TermNodeConnection
   startCursor?: Maybe<Scalars['String']['output']>;
 };
 
+/** The template assigned to the node */
+export type Template_PageNoTitle = ContentTemplate & {
+  __typename?: 'Template_PageNoTitle';
+  /** The name of the template */
+  templateName?: Maybe<Scalars['String']['output']>;
+};
+
 /** Base interface for taxonomy terms such as categories and tags. Terms are used to organize and classify content. */
 export type TermNode = {
   /** The number of objects connected to the object */
@@ -11283,7 +11296,7 @@ export type WritingSettings = {
 export type GetGarmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', garmentFields?: { __typename?: 'GarmentFields', description?: string | null, designer?: string | null, linkToTiktok?: string | null, material?: string | null, name?: string | null, patternDescription?: string | null, rights?: string | null, season?: string | null, version?: string | null, patternPng?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', mediaItemUrl?: string | null } } | null } | null }> } | null };
+export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, designer?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternPngDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
 
 
 export const GetGarments = gql`
@@ -11291,20 +11304,33 @@ export const GetGarments = gql`
   garments {
     nodes {
       garmentFields {
+        construction
         description
         designer
         linkToTiktok
-        material
         name
         patternDescription
-        patternPng {
+        provenance
+        rights
+        version
+        patternPngDownload {
           node {
+            altText
             mediaItemUrl
           }
         }
-        rights
-        season
-        version
+        patternPngPreview {
+          node {
+            altText
+            mediaItemUrl
+          }
+        }
+        threeDFileGlb {
+          node {
+            altText
+            mediaItemUrl
+          }
+        }
       }
     }
   }

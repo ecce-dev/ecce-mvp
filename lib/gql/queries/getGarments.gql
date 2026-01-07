@@ -2,20 +2,33 @@ query getGarments {
   garments {
     nodes {
       garmentFields {
+        construction
         description
         designer
         linkToTiktok
-        material
         name
         patternDescription
-        patternPng {
+        provenance
+        rights
+        version
+        patternPngDownload {
           node {
+            altText
             mediaItemUrl
           }
         }
-        rights
-        season
-        version
+        patternPngPreview {
+          node {
+            altText
+            mediaItemUrl
+          }
+        }
+        threeDFileGlb {
+          node {
+            altText
+            mediaItemUrl
+          }
+        }
       }
     }
   }

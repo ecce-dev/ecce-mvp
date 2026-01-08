@@ -10,6 +10,7 @@ import {
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "../hooks/useDevice";
 import { cn } from "../utils/utils";
+import posthog from "posthog-js";
 
 /**
  * Main UI Elements component
@@ -23,9 +24,14 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
   const { refreshGarments, isLoading } = useGarments();
   const { deviceType } = useDevice();
 
-  const handleExploreClick = () => {
-    refreshGarments();
-  }
+  const handleExploreClick = async () => {
+    const { previous, current } = await refreshGarments();
+    posthog.capture('explore_clicked', {
+      previousGarments: previous,
+      newGarments: current,
+      userType: 'visitor',
+    });
+  };
 
   return (
     <EcceDialogProvider>

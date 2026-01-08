@@ -109,12 +109,21 @@ export async function getGarments(): Promise<GetGarmentsQuery | null> {
  * Get random garments for display
  * 
  * @param count - Number of garments to return (1-10, clamped for safety)
+ * @param excludeSlugs - Optional array of garment slugs to exclude from selection
  * @returns Array of randomly selected garment nodes
  * 
  * Security: Uses cryptographically secure randomization
  * Performance: Leverages cached garment list, only shuffles on each call
+ * 
+ * Exclusion logic:
+ * - First tries to select only from non-excluded garments
+ * - If not enough non-excluded garments available, fills remaining slots
+ *   with shuffled excluded garments to reach the requested count
  */
-export async function getRandomGarments(count: number): Promise<GarmentNode[]> {
+export async function getRandomGarments(
+  count: number,
+  excludeSlugs: string[] = []
+): Promise<GarmentNode[]> {
   // Clamp count to valid range for safety
   const safeCount = Math.max(1, Math.min(10, Math.floor(count)));
   
@@ -133,9 +142,35 @@ export async function getRandomGarments(count: number): Promise<GarmentNode[]> {
     return secureShuffleArray(filteredGarments);
   }
 
-  // Shuffle and take the requested count
-  const shuffled = secureShuffleArray(filteredGarments);
-  return shuffled.slice(0, safeCount);
+  // Create set for O(1) lookup of excluded slugs
+  const excludeSet = new Set(excludeSlugs);
+  
+  // Separate garments into available (not excluded) and excluded
+  const availableGarments: GarmentNode[] = [];
+  const excludedGarments: GarmentNode[] = [];
+  
+  for (const garment of filteredGarments) {
+    if (garment.slug && excludeSet.has(garment.slug)) {
+      excludedGarments.push(garment);
+    } else {
+      availableGarments.push(garment);
+    }
+  }
+
+  // Shuffle both arrays
+  const shuffledAvailable = secureShuffleArray(availableGarments);
+  const shuffledExcluded = secureShuffleArray(excludedGarments);
+
+  // Take as many as possible from available garments
+  const result: GarmentNode[] = shuffledAvailable.slice(0, safeCount);
+
+  // If we don't have enough, fill from excluded garments
+  if (result.length < safeCount) {
+    const remaining = safeCount - result.length;
+    result.push(...shuffledExcluded.slice(0, remaining));
+  }
+
+  return result;
 }
 
 /**

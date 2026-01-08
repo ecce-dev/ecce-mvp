@@ -42,7 +42,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         - flex justify-between distributes buttons evenly
         - Order: About → Submit Request → Explore → Contact
       */}
-      <div className="fixed top-6 left-6 right-6 flex pointer-events-none z-100">
+      <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">
         <div className={cn("flex flex-row justify-between w-full gap-2", deviceType === "mobile" && "flex-col")}>
           <EcceDialogTrigger
             dialogId="about"
@@ -90,7 +90,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
       */}
       <div
         id="dialog-content-container"
-        className="fixed top-48 md:top-32 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
+        className="fixed safe-area-content top-48 md:top-32 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
       >
         {/* Left slot: About content */}
         <div className="flex-shrink-0">

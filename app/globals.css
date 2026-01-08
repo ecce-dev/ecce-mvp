@@ -191,7 +191,7 @@
     left: 0;
     right: 0;
     height: env(safe-area-inset-top, 0px);
-    background-color: var(--background);
+    background-color: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 9999;
@@ -205,7 +205,7 @@
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom, 0px);
-    background-color: var(--background);
+    background-color: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 9999;

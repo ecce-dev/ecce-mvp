@@ -9,6 +9,7 @@ import { useDevice } from "@/lib/hooks/useDevice";
 import { TargetBoundingBox } from "./NormalizedGlbModel";
 import OrbitControlsContext from "./OrbitControlsContext";
 import * as THREE from 'three';
+import { Stage } from "@react-three/drei";
 
 // ============================================
 // CONFIGURATION CONSTANTS (Desktop baseline values)
@@ -75,10 +76,10 @@ function OrbitingGroup({ children, orbitSpeed }: OrbitingGroupProps) {
 
 export default function Garments({ garments }: GarmentsProps) {
   const garmentCount = garments.length;
-  
+
   // Get responsive scale factor (1.0 at desktop, 0.5 at mobile, interpolated between)
   const responsiveScale = useResponsiveScale();
-  
+
   // Get device type for stepped orbit radius
   const { deviceType } = useDevice();
 
@@ -105,32 +106,34 @@ export default function Garments({ garments }: GarmentsProps) {
   }), [responsiveScale]);
 
   return (
-    <OrbitingGroup orbitSpeed={ORBIT_SPEED}>
-      {garments.map((garment, index) => {
-        // Calculate angle for equal spacing around the circle
-        const angle = (2 * Math.PI / garmentCount) * index;
-        
-        // Position on the circle (XZ plane, rotating around Y)
-        const x = orbitRadius * Math.sin(angle);
-        const z = orbitRadius * Math.cos(angle);
-        const initPosition = new THREE.Vector3(x, yOffset, z);
+    <>
+      <OrbitingGroup orbitSpeed={ORBIT_SPEED}>
+        {garments.map((garment, index) => {
+          // Calculate angle for equal spacing around the circle
+          const angle = (2 * Math.PI / garmentCount) * index;
 
-        // Calculate initial rotation based on facing preference
-        const initialRotationY = GARMENT_FACING === 'outward' 
-          ? angle  // Face outward from center
-          : angle + Math.PI / 2;  // Face direction of travel
+          // Position on the circle (XZ plane, rotating around Y)
+          const x = orbitRadius * Math.sin(angle);
+          const z = orbitRadius * Math.cos(angle);
+          const initPosition = new THREE.Vector3(x, yOffset, z);
 
-        return (
-          <Garment
-            key={garment?.slug}
-            garment={garment}
-            initPosition={initPosition}
-            initialRotationY={initialRotationY}
-            spinSpeed={SPIN_SPEED}
-            targetBoundingBox={targetBoundingBox}
-          />
-        );
-      })}
-    </OrbitingGroup>
+          // Calculate initial rotation based on facing preference
+          const initialRotationY = GARMENT_FACING === 'outward'
+            ? angle  // Face outward from center
+            : angle + Math.PI / 2;  // Face direction of travel
+
+          return (
+            <Garment
+              key={garment?.slug}
+              garment={garment}
+              initPosition={initPosition}
+              initialRotationY={initialRotationY}
+              spinSpeed={SPIN_SPEED}
+              targetBoundingBox={targetBoundingBox}
+            />
+          );
+        })}
+      </OrbitingGroup>
+    </>
   );
 }

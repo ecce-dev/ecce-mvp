@@ -12,9 +12,9 @@ export default async function Home() {
   
   return (
     <PageContainer>
-      <Background />
       {/* GarmentsWrapper provides context to both GarmentsClient and UIElements */}
       <GarmentsWrapper>
+      <Background />
         <GarmentsClient />
         <UIElements
           aboutContent={aboutContent ?? null}

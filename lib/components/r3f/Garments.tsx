@@ -24,9 +24,9 @@ const DESKTOP_BOUNDING_BOX: TargetBoundingBox = { x: 5, y: 12, z: 5 };
 /** Desktop baseline radius of the circular orbit (units) */
 const DESKTOP_ORBIT_RADIUS = 9;
 
-const TABLET_ORBIT_RADIUS = 5;
+const TABLET_ORBIT_RADIUS = 4;
 
-const MOBILE_ORBIT_RADIUS = 3;
+const MOBILE_ORBIT_RADIUS = 0;
 
 /** Desktop baseline Y position offset for all garments */
 const DESKTOP_Y_OFFSET = 0;

@@ -19,8 +19,8 @@ const MOBILE_BREAKPOINT = 768;
 const TABLET_BREAKPOINT = 1024;
 
 /** Scale values for each device type */
-const MOBILE_SCALE = 0.8;
-const TABLET_SCALE = 0.9;
+const MOBILE_SCALE = 1.2;
+const TABLET_SCALE = 1.0;
 const DESKTOP_SCALE = 1.0;
 
 // --- Fluid mode configuration ---

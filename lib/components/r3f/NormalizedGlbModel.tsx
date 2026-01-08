@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef } from "react"
+import { useMemo } from "react"
 import { useGLTF } from "@react-three/drei"
 import * as THREE from 'three'
 
@@ -21,18 +21,21 @@ export interface NormalizedGlbModelProps {
  * Loads a GLB model and normalizes it to fit within the target bounding box.
  * The model is scaled uniformly (preserving aspect ratio) based on its largest dimension
  * and centered at the origin.
+ * 
+ * Note: Centering is applied directly during clone to ensure correct positioning
+ * on the first render (avoids useEffect timing issues).
  */
 export default function NormalizedGlbModel({ src, targetBoundingBox }: NormalizedGlbModelProps) {
   const { scene } = useGLTF(src);
-  const groupRef = useRef<THREE.Group>(null!);
-  
-  // Clone the scene to avoid mutating the cached original
-  const clonedScene = useMemo(() => scene.clone(), [scene]);
 
-  // Calculate normalization transforms
-  const { scale, centerOffset } = useMemo(() => {
+  // Clone scene, calculate transforms, and apply centering in one pass
+  // This ensures the model is correctly positioned on the very first render
+  const { clonedScene, scale } = useMemo(() => {
+    // Clone the scene to avoid mutating the cached original
+    const clone = scene.clone();
+    
     // Compute bounding box of the model
-    const bbox = new THREE.Box3().setFromObject(clonedScene);
+    const bbox = new THREE.Box3().setFromObject(clone);
     
     // Get the size of the model in each dimension
     const modelSize = new THREE.Vector3();
@@ -51,26 +54,18 @@ export default function NormalizedGlbModel({ src, targetBoundingBox }: Normalize
     // (uniform scaling to preserve aspect ratio)
     const uniformScale = Math.min(scaleX, scaleY, scaleZ);
 
-    // Calculate center offset to move model center to origin
-    // We need to negate the center and scale it
-    const centerOffset = modelCenter.clone().multiplyScalar(-1);
+    // Apply center offset directly to the clone's position
+    // This moves the model's center to the origin immediately (no useEffect delay)
+    clone.position.set(-modelCenter.x, -modelCenter.y, -modelCenter.z);
 
     return {
-      scale: uniformScale,
-      centerOffset
+      clonedScene: clone,
+      scale: uniformScale
     };
-  }, [clonedScene, targetBoundingBox]);
-
-  // Apply the center offset to the scene's position
-  useEffect(() => {
-    if (groupRef.current) {
-      // The inner group handles centering, outer handles scaling
-      clonedScene.position.copy(centerOffset);
-    }
-  }, [clonedScene, centerOffset]);
+  }, [scene, targetBoundingBox]);
 
   return (
-    <group ref={groupRef} scale={scale}>
+    <group scale={scale}>
       <primitive object={clonedScene} />
     </group>
   );

@@ -6,7 +6,7 @@ import {
   EcceDialogTrigger,
   EcceDialogContent,
   EcceActionTrigger,
-} from "@/lib/components/ecce-dialog"
+} from "@/lib/components/ecce-elements"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "../hooks/useDevice";
 import { cn } from "../utils/utils";

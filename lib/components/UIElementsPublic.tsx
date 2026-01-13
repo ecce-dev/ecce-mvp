@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { EcceDialogProvider } from "@/lib/components/ecce-dialog"
+import { EcceDialogProvider } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import LoginModal from "./LoginModal"

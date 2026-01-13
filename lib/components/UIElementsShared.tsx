@@ -1,6 +1,6 @@
 import { LessThanIcon } from "@phosphor-icons/react"
 import { DeviceType } from "../hooks/useDevice"
-import { EcceActionTrigger, EcceDialogTrigger, EcceDialogContent } from "./ecce-dialog"
+import { EcceActionTrigger, EcceDialogTrigger, EcceDialogContent } from "./ecce-elements"
 import { cn } from "../utils/utils"
 
 // ============================================

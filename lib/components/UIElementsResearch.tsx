@@ -1,6 +1,6 @@
 "use client"
 
-import { EcceDialogProvider, EcceActionTrigger } from "@/lib/components/ecce-dialog"
+import { EcceDialogProvider, EcceActionTrigger } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { MAX_WIDTH_TABLET, useDevice } from "@/lib/hooks/useDevice"
 import posthog from "posthog-js"

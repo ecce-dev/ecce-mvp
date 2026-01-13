@@ -117,11 +117,30 @@ export const createTiktokTrigger = (tiktokUrl: string | null | undefined) => {
 // ============================================
 // Dialog Content Elements
 // ============================================
+
+/**
+ * Creates HTML content for use with EcceUnifiedDialogRenderer
+ * Renders HTML string as React element with proper styling
+ */
+export const createHtmlContent = (htmlContent: string) => {
+  if (!htmlContent) return null
+  return (
+    <div
+      className="text-sm leading-relaxed prose prose-sm"
+      dangerouslySetInnerHTML={{ __html: htmlContent }}
+    />
+  )
+}
+
 interface DialogContentProps {
   title: string
   content: string
 }
 
+/**
+ * @deprecated Use EcceUnifiedDialogRenderer with createHtmlContent instead
+ * This creates independent transitions that can cause layout shifts when switching dialogs
+ */
 export const createDialogContent = (dialogId: string, { title, content }: DialogContentProps) => (
   <div className="max-h-full">
     <EcceDialogContent dialogId={dialogId} className="pointer-events-auto">

@@ -84,16 +84,17 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         Content container:
         - Fixed positioning below triggers
         - pointer-events-none allows clicks to pass through to canvas
-        - flex with justify-between for left/center/right positioning
-        - Wrapper divs maintain layout positions even when dialogs are closed
+        - Mobile: single-column grid where all dialogs occupy the same cell (overlap)
+        - Tablet/Desktop: 3-column grid ensures center slot stays centered
+        - This prevents position shifts during dialog transition animations
         - Each content has pointer-events-auto when visible
       */}
       <div
         id="dialog-content-container"
-        className="fixed safe-area-content top-40 md:top-20 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
+        className="fixed safe-area-content top-40 md:top-20 lg:top-24 bottom-6 left-6 right-6 grid grid-cols-1 md:grid-cols-3 items-stretch pointer-events-none z-100"
       >
-        {/* Left slot: About content */}
-        <div className="flex-shrink-0">
+        {/* Left slot: About content - same cell on mobile, first column on tablet/desktop */}
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-1 max-h-full overflow-hidden">
           <EcceDialogContent
             dialogId="about"
             className="pointer-events-auto"
@@ -102,8 +103,8 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
 
-        {/* Center slot: Submit Request content - vertically centered on tablet/desktop */}
-        <div className="md:flex md:items-center md:justify-center md:h-full">
+        {/* Center slot: Submit Request content - same cell on mobile, centered in second column on tablet/desktop */}
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-2 md:justify-self-center md:self-center max-h-full overflow-hidden">
           <EcceDialogContent
             dialogId="submit-request"
             className="pointer-events-auto"
@@ -117,8 +118,8 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
 
-        {/* Right slot: Contact content */}
-        <div className="flex-shrink-0">
+        {/* Right slot: Contact content - same cell on mobile, third column on tablet/desktop */}
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-3 md:justify-self-end max-h-full overflow-hidden">
           <EcceDialogContent
             dialogId="contact"
             className="pointer-events-auto"

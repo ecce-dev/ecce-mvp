@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { EcceDialogProvider } from "@/lib/components/ecce-elements"
+import { EcceDialogProvider, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import LoginModal from "./LoginModal"
@@ -11,7 +11,7 @@ import {
   publicResearchSwitch,
   descriptionTrigger,
   createTiktokTrigger,
-  createDialogContent,
+  createHtmlContent,
 } from "./UIElementsShared"
 
 /**
@@ -120,14 +120,24 @@ export default function UIElementsPublic() {
         </div>
       </div> */}
 
-      {/* Content container for dialogs */}
-      {/* Bottom values calculated to prevent overlap with ECCE logo (420px + p-8 padding) */}
+      {/* Unified Dialog Renderer - single transition for all dialogs */}
+      {/* CSS Grid ensures content always appears at fixed position, preventing layout shifts */}
       <div
         id="dialog-content-container-public"
-        className="fixed safe-area-content top-36 md:top-44 lg:top-50 min-[1360px]:top-22! bottom-[150px] md:bottom-[180px] left-6 right-6 flex flex-col items-start pointer-events-none z-100"
+        className="fixed safe-area-content top-36 md:top-44 lg:top-50 min-[1360px]:top-22! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100"
       >
-        {/* Description content */}
-        {createDialogContent("description", { title: garmentName, content: description })}
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden">
+          <EcceUnifiedDialogRenderer
+            className="pointer-events-auto"
+            maxHeight="100%"
+            dialogs={{
+              description: {
+                title: garmentName,
+                content: createHtmlContent(description),
+              },
+            }}
+          />
+        </div>
       </div>
     </EcceDialogProvider>
   )

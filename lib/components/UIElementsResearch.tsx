@@ -1,8 +1,8 @@
 "use client"
 
-import { EcceDialogProvider, EcceActionTrigger } from "@/lib/components/ecce-elements"
+import { EcceDialogProvider, EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
-import { MAX_WIDTH_TABLET, useDevice } from "@/lib/hooks/useDevice"
+import { useDevice } from "@/lib/hooks/useDevice"
 import posthog from "posthog-js"
 import {
   BackButtonElement,
@@ -12,7 +12,7 @@ import {
   provenanceTrigger,
   constructionTrigger,
   createTiktokTrigger,
-  createDialogContent,
+  createHtmlContent,
 } from "./UIElementsShared"
 
 /**
@@ -171,20 +171,32 @@ export default function UIElementsResearch() {
         {deviceType === "desktop" && desktopNavbar}
       </div>
 
-      {/* Content container for dialogs */}
-      {/* Bottom values calculated to prevent overlap with ECCE logo (420px + p-8 padding) */}
+      {/* Unified Dialog Renderer - single transition for all dialogs */}
+      {/* CSS Grid ensures content always appears at fixed position, preventing layout shifts */}
       <div
         id="dialog-content-container-research"
-        className={`fixed safe-area-content top-54 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 flex flex-col items-start pointer-events-none z-100`}
+        className={`fixed safe-area-content top-54 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
       >
-        {/* Description content */}
-        {createDialogContent("description", { title: garmentName, content: description })}
-
-        {/* Provenance content */}
-        {createDialogContent("provenance", { title: "Provenance", content: provenance })}
-
-        {/* Construction content */}
-        {createDialogContent("construction", { title: "Construction", content: construction })}
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden">
+          <EcceUnifiedDialogRenderer
+            className="pointer-events-auto"
+            maxHeight="100%"
+            dialogs={{
+              description: {
+                title: garmentName,
+                content: createHtmlContent(description),
+              },
+              provenance: {
+                title: "Provenance",
+                content: createHtmlContent(provenance),
+              },
+              construction: {
+                title: "Construction",
+                content: createHtmlContent(construction),
+              },
+            }}
+          />
+        </div>
       </div>
     </EcceDialogProvider>
   )

@@ -121,9 +121,10 @@ export default function UIElementsPublic() {
       </div> */}
 
       {/* Content container for dialogs */}
+      {/* Bottom values calculated to prevent overlap with ECCE logo (420px + p-8 padding) */}
       <div
         id="dialog-content-container-public"
-        className="fixed safe-area-content top-36 md:top-44 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start pointer-events-none z-100"
+        className="fixed safe-area-content top-36 md:top-44 lg:top-24 bottom-[150px] md:bottom-[180px] left-6 right-6 flex flex-col items-start pointer-events-none z-100"
       >
         {/* Description content */}
         {createDialogContent("description", { title: garmentName, content: description })}

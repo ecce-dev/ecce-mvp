@@ -16,7 +16,7 @@ export type EcceDialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
   bottom?: string
   /** Fixed position from left */
   left?: string
-  /** Max height before content becomes scrollable */
+  /** Max height before content becomes scrollable. Use "full" to inherit from parent container */
   maxHeight?: string
 }
 
@@ -35,7 +35,7 @@ export function EcceDialogContent({
   right,
   bottom,
   left,
-  maxHeight = "70vh",
+  maxHeight = "100%",
   children,
   ...props
 }: EcceDialogContentProps) {

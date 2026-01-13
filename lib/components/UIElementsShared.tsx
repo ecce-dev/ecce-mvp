@@ -123,9 +123,9 @@ interface DialogContentProps {
 }
 
 export const createDialogContent = (dialogId: string, { title, content }: DialogContentProps) => (
-  <div className="flex-shrink-0">
+  <div className="max-h-full">
     <EcceDialogContent dialogId={dialogId} className="pointer-events-auto">
-      <h4 className="font-zangezi uppercase text-xl mb-4">{title}</h4>
+      {/* <h4 className="font-zangezi uppercase text-xl mb-4">{title}</h4> */}
       {content && (
         <div
           className="text-sm leading-relaxed prose prose-sm"

@@ -1,16 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import {
-  EcceDialogProvider,
-  EcceDialogTrigger,
-  EcceDialogContent,
-  EcceActionTrigger,
-} from "@/lib/components/ecce-dialog"
+import { EcceDialogProvider } from "@/lib/components/ecce-dialog"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
-import { cn } from "@/lib/utils/utils"
 import LoginModal from "./LoginModal"
+import {
+  BackButtonElement,
+  garmentNameElement,
+  publicResearchSwitch,
+  descriptionTrigger,
+  createTiktokTrigger,
+  createDialogContent,
+} from "./UIElementsShared"
 
 /**
  * Public UI Elements for garment detail view
@@ -32,12 +34,6 @@ export default function UIElementsPublic() {
   const description = garmentFields?.description ?? ""
   const tiktokUrl = garmentFields?.linkToTiktok
 
-  const handleTiktokClick = () => {
-    if (tiktokUrl) {
-      window.open(tiktokUrl, "_blank", "noopener,noreferrer")
-    }
-  }
-
   const handleResearchClick = () => {
     if (isAuthenticated) {
       setViewMode("research")
@@ -46,69 +42,12 @@ export default function UIElementsPublic() {
     }
   }
 
-
-  const publicRessearchSwitch = <>
-    <div className="fixed top-6 right-6 flex flex-row gap-0">
-      <EcceActionTrigger
-        variant="primary"
-        className={cn(
-          "pointer-events-auto px-3 md:px-4",
-          viewMode === "public"
-            ? "bg-black text-white"
-            : "bg-white/70 text-black hover:bg-white/90"
-        )}
-        onAction={() => setViewMode("public")}
-      >
-        Public
-      </EcceActionTrigger>
-      <EcceActionTrigger
-        variant="primary"
-        className={cn(
-          "pointer-events-auto px-3 md:px-4 -ml-[1px]",
-          viewMode === "research"
-            ? "bg-black text-white"
-            : "bg-white/70 text-black hover:bg-white/90"
-        )}
-        onAction={handleResearchClick}
-      >
-        Research
-      </EcceActionTrigger>
-    </div>
-  </>
-
-  const garmentNameElement = <>
-    <div className="px-4 py-1 md:py-2 pt-1 text-sm md:text-md lg:text-xl border border-black bg-white/70 font-ibm-plex-mono uppercase pointer-events-auto w-full text-center md:w-fit">
-      {garmentName}
-    </div>
-  </>
-
-  const descriptionTrigger = <>
-    <EcceDialogTrigger
-      dialogId="description"
-      variant="secondary"
-      className="pointer-events-auto"
-    >
-      Description
-    </EcceDialogTrigger>
-  </>
-
-
-  const tiktokTrigger = <>
-    {tiktokUrl && (
-      <EcceActionTrigger
-        variant="secondary"
-        className="pointer-events-auto"
-        onAction={handleTiktokClick}
-      >
-        Try via TikTok
-      </EcceActionTrigger>
-    )}
-  </>
+  const tiktokTrigger = createTiktokTrigger(tiktokUrl)
 
   const mobileNavbar = <>
-    {publicRessearchSwitch}
+    {publicResearchSwitch(viewMode, setViewMode)}
     <div className="flex flex-col gap-2 w-full mt-9">
-      {garmentNameElement}
+      {garmentNameElement(garmentName)}
       <div className="grid grid-cols-2 gap-2 w-full justify-center">
         {descriptionTrigger}
         {tiktokTrigger}
@@ -117,11 +56,10 @@ export default function UIElementsPublic() {
     </div>
   </>
   const tabletNavbar = <>
-    {publicRessearchSwitch}
+    {publicResearchSwitch(viewMode, setViewMode)}
     <div className="flex flex-col gap-2 w-full justify-center">
       <div className="mr-48 ml-18 flex flex-col justify-center items-center">
-
-        {garmentNameElement}
+        {garmentNameElement(garmentName)}
       </div>
       <div className="flex flex-col gap-2 w-full md:w-fit mt-2">
         {descriptionTrigger}
@@ -132,9 +70,9 @@ export default function UIElementsPublic() {
     </div>
   </>
   const desktopNavbar = <>
-    {publicRessearchSwitch}
-    <div className="flex flex-row gap-2 w-full justify-center mr-62 ml-18">
-      {garmentNameElement}
+    {publicResearchSwitch(viewMode, setViewMode)}
+    <div className="flex flex-row gap-4 w-full justify-center mr-62 ml-18">
+      {garmentNameElement(garmentName)}
       {descriptionTrigger}
       {tiktokTrigger}
     </div>
@@ -153,16 +91,7 @@ export default function UIElementsPublic() {
       {/* Top navigation bar */}
       <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">
         {/* Left section: Back button */}
-        <div className="fixed top-6 left-6">
-          <EcceActionTrigger
-            variant="secondary"
-            className="pointer-events-auto w-12 md:w-16 text-center"
-            onAction={deselectGarment}
-            aria-label="Go back"
-          >
-            &lt;
-          </EcceActionTrigger>
-        </div>
+        {BackButtonElement(deselectGarment, deviceType)}
         {deviceType === "mobile" && mobileNavbar}
         {deviceType === "tablet" && tabletNavbar}
         {deviceType === "desktop" && desktopNavbar}
@@ -197,17 +126,7 @@ export default function UIElementsPublic() {
         className="fixed safe-area-content top-36 md:top-44 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start pointer-events-none z-100"
       >
         {/* Description content */}
-        <div className="flex-shrink-0">
-          <EcceDialogContent dialogId="description" className="pointer-events-auto">
-            <h4 className="font-zangezi uppercase text-xl mb-4">{garmentName}</h4>
-            {description && (
-              <div
-                className="text-sm leading-relaxed prose prose-sm"
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
-            )}
-          </EcceDialogContent>
-        </div>
+        {createDialogContent("description", { title: garmentName, content: description })}
       </div>
     </EcceDialogProvider>
   )

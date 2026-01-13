@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 
 export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
+export const MAX_WIDTH_MOBILE = 768;
+export const MAX_WIDTH_TABLET = 1360;
+
 interface DeviceInfo {
   deviceType: DeviceType;
   isMobile: boolean;
@@ -17,9 +20,9 @@ const getDeviceType = (): DeviceType => {
 
   const width = window.innerWidth;
   
-  if (width < 768) {
+  if (width < MAX_WIDTH_MOBILE) {
     return 'mobile';
-  } else if (width < 1256) {
+  } else if (width < MAX_WIDTH_TABLET) {
     return 'tablet';
   } else {
     return 'desktop';

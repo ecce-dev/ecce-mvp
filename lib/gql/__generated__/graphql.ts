@@ -655,7 +655,7 @@ export type CommentAuthor = Commenter & DatabaseIdentifier & Node & {
   avatar?: Maybe<Avatar>;
   /** The unique identifier stored in the database */
   databaseId: Scalars['Int']['output'];
-  /** The email for the comment author */
+  /** The email for the comment author. */
   email?: Maybe<Scalars['String']['output']>;
   /** The globally unique identifier for the comment author object */
   id: Scalars['ID']['output'];
@@ -823,7 +823,7 @@ export type CommentToCommenterConnectionEdge = CommenterConnectionEdge & Edge & 
   __typename?: 'CommentToCommenterConnectionEdge';
   /** Opaque reference to the nodes position in the connection. Value can be used with pagination args. */
   cursor?: Maybe<Scalars['String']['output']>;
-  /** The email address representing the author for this particular comment */
+  /** Email address representing the author for this particular comment */
   email?: Maybe<Scalars['String']['output']>;
   /** IP address of the author at the time of making this comment. This field is equivalent to WP_Comment-&gt;comment_author_IP and the value matching the &quot;comment_author_IP&quot; column in SQL. */
   ipAddress?: Maybe<Scalars['String']['output']>;

@@ -3,7 +3,7 @@ import Background from "@/lib/components/Background";
 import GarmentsClient from "@/lib/components/GarmentsClient";
 import GarmentsWrapper from "@/lib/components/GarmentsWrapper";
 import PageContainer from "@/lib/components/PageContainer";
-import UIElements from "@/lib/components/UIElements";
+import UIElementsRouter from "@/lib/components/UIElementsRouter";
 
 
 export default async function Home() {
@@ -12,11 +12,11 @@ export default async function Home() {
   
   return (
     <PageContainer>
-      {/* GarmentsWrapper provides context to both GarmentsClient and UIElements */}
+      {/* GarmentsWrapper provides context to both GarmentsClient and UIElementsRouter */}
       <GarmentsWrapper>
-      <Background />
+        <Background />
         <GarmentsClient />
-        <UIElements
+        <UIElementsRouter
           aboutContent={aboutContent ?? null}
           contactContent={contactContent ?? null}
         />

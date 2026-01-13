@@ -90,7 +90,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
       */}
       <div
         id="dialog-content-container"
-        className="fixed safe-area-content top-48 md:top-32 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
+        className="fixed safe-area-content top-40 md:top-20 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
       >
         {/* Left slot: About content */}
         <div className="flex-shrink-0">

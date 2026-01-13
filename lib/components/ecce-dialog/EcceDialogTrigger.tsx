@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils/utils"
 import { useEcceDialog } from "./EcceDialogContext"
 
 const ecceDialogTriggerVariants = cva(
-  "px-4 pt-1 md:py-2 text-lg md:text-2xl lg:text-2xl border border-black cursor-pointer transition-colors duration-200 z-100",
+  "px-4 py-1 md:py-2 text-sm md:text-md lg:text-xl border border-black cursor-pointer transition-colors duration-200 z-100",
   {
     variants: {
       variant: {
-        primary: "font-zangezi uppercase md:pt-3",
+        primary: "font-zangezi uppercase pt-1 pb-0 md:pt-3 ",
         secondary: "font-ibm-plex-mono",
       },
     },
@@ -79,7 +79,9 @@ export function EcceDialogTrigger({
       data-active={isActive}
       {...props}
     >
-      {children}
+      <span className={cn("inline-block", variant === "primary" ? "translate-y-[0px] md:translate-y-[1px]" : "")}>
+        {children}
+      </span>
     </button>
   )
 }

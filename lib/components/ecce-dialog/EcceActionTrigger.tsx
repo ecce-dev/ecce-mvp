@@ -4,12 +4,12 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils/utils"
 
 const ecceActionTriggerVariants = cva(
-  "px-4 pt-1 md:py-2 text-lg md:text-2xl lg:text-2xl border border-black cursor-pointer transition-colors duration-200 z-100 bg-white/70 text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/70",
+  "px-4 pt-1 md:py-2 text-sm md:text-md lg:text-xl border border-black cursor-pointer transition-colors duration-200 z-100 bg-white/70 text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/70",
   {
     variants: {
       variant: {
-        primary: "font-zangezi uppercase md:pt-3",
-        secondary: "font-ibm-plex-mono",
+        primary: "font-zangezi uppercase",
+        secondary: "font-ibm-plex-mono py-1",
       },
     },
     defaultVariants: {
@@ -54,7 +54,7 @@ export function EcceActionTrigger({
 }: EcceActionTriggerProps) {
   // Only apply fixed positioning if any position prop is provided
   const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
-  
+
   const positionStyles = hasPositionProps
     ? { top, right, bottom, left }
     : undefined
@@ -71,12 +71,14 @@ export function EcceActionTrigger({
       className={cn(
         ecceActionTriggerVariants({ variant }),
         hasPositionProps && "fixed",
-        className
+        className,
       )}
       style={positionStyles}
       {...props}
     >
-      {children}
+      <span className={cn("inline-block", variant === "primary" ? "translate-y-[0px] md:translate-y-[2px]" : "")}>
+        {children}
+      </span>
     </button>
   )
 }

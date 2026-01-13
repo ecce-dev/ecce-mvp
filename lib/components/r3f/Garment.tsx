@@ -1,12 +1,12 @@
 "use client"
 
-import { useRef, useContext } from "react"
-import { useFrame } from "@react-three/fiber"
+import { useRef, useContext, useCallback } from "react"
+import { useFrame, ThreeEvent } from "@react-three/fiber"
 import NormalizedGlbModel, { TargetBoundingBox } from "./NormalizedGlbModel"
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
 import OrbitControlsContext from "./OrbitControlsContext"
 import * as THREE from 'three';
-import { Float } from "@react-three/drei"
+import { useAppModeStore } from "@/lib/stores/appModeStore"
 
 
 interface GarmentProps {
@@ -30,6 +30,7 @@ export default function Garment({
 }: GarmentProps) {
   const groupRef = useRef<THREE.Group>(null!);
   const { isDragging } = useContext(OrbitControlsContext);
+  const selectGarment = useAppModeStore((state) => state.selectGarment);
 
   // Individual spin animation (pauses when orbit controls are dragging)
   useFrame((_, delta) => {
@@ -54,12 +55,41 @@ export default function Garment({
     }
   }
 
+  /**
+   * Handle garment click - select this garment
+   */
+  const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
+    // Stop propagation to prevent multiple garments from being selected
+    event.stopPropagation();
+    selectGarment(garment);
+  }, [garment, selectGarment]);
+
+  /**
+   * Handle pointer enter - show cursor pointer
+   */
+  const handlePointerEnter = useCallback(() => {
+    document.body.style.cursor = "pointer";
+  }, []);
+
+  /**
+   * Handle pointer leave - reset cursor
+   */
+  const handlePointerLeave = useCallback(() => {
+    document.body.style.cursor = "auto";
+  }, []);
+
   const glbUrl = garment.garmentFields?.threeDFileGlb?.node?.mediaItemUrl;
   if (!glbUrl) return null;
   const proxiedUrl = getProxiedUrl(glbUrl);
 
   return (
-    <group position={initPosition} rotation={[0, initialRotationY, 0]}>
+    <group 
+      position={initPosition} 
+      rotation={[0, initialRotationY, 0]}
+      onClick={handleClick}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+    >
       <group ref={groupRef}>
         <NormalizedGlbModel
           src={proxiedUrl}

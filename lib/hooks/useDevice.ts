@@ -19,7 +19,7 @@ const getDeviceType = (): DeviceType => {
   
   if (width < 768) {
     return 'mobile';
-  } else if (width < 1024) {
+  } else if (width < 1256) {
     return 'tablet';
   } else {
     return 'desktop';

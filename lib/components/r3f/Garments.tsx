@@ -58,11 +58,30 @@ const NON_SELECTED_OPACITY = 0.3;
 /** Opacity transition speed (higher = faster) */
 const OPACITY_TRANSITION_SPEED = 3;
 
-/** Camera distance when viewing a selected garment (closer view) */
-const SELECTED_CAMERA_DISTANCE = 12;
+// ============================================
+// CAMERA DISTANCE CONFIGURATION (per device type)
+// ============================================
 
-/** Default camera distance when no garment is selected (from GarmentsClient initial position) */
-const DEFAULT_CAMERA_DISTANCE = 19;
+/** Camera distance when viewing a selected garment (closer view) */
+const SELECTED_CAMERA_DISTANCE = {
+  mobile: 17,
+  tablet: 12,
+  desktop: 11,
+} as const;
+
+/** Camera distance during garment switching animation */
+export const SWITCH_CAMERA_DISTANCE = {
+  mobile: 17,
+  tablet: 12,
+  desktop: 11,
+} as const;
+
+/** Default camera distance when no garment is selected */
+const DEFAULT_CAMERA_DISTANCE = {
+  mobile: 22,
+  tablet: 20,
+  desktop: 19,
+} as const;
 
 // ============================================
 
@@ -159,6 +178,12 @@ export default function Garments({ garments }: GarmentsProps) {
     }
   }), [responsiveScale]);
 
+  // Get camera distances based on device type
+  const { selectedCameraDistance, defaultCameraDistance } = useMemo(() => ({
+    selectedCameraDistance: SELECTED_CAMERA_DISTANCE[deviceType],
+    defaultCameraDistance: DEFAULT_CAMERA_DISTANCE[deviceType],
+  }), [deviceType]);
+
   // Calculate base positions for all garments (their carousel positions)
   const garmentData = useMemo(() => {
     return garments.map((_, index) => {
@@ -206,19 +231,19 @@ export default function Garments({ garments }: GarmentsProps) {
         // Handle distance animation based on transition type:
         if (isEnteringSelection) {
           // Entering selection: immediate distance animation
-          setTargetDistance(SELECTED_CAMERA_DISTANCE);
+          setTargetDistance(selectedCameraDistance);
         } else if (isSwitchingGarments) {
           // Switching garments: queue distance correction AFTER target/azimuth animations complete
           // This prevents distance drift caused by the orbit target animation
-          setQueuedDistanceCorrection(SELECTED_CAMERA_DISTANCE);
+          setQueuedDistanceCorrection(selectedCameraDistance);
         }
       }
     } else if (isExitingSelection) {
       // Exiting selection - return orbit target to origin and camera to default distance
       setTargetOrbitTarget(new THREE.Vector3(0, 0, 0));
-      setTargetDistance(DEFAULT_CAMERA_DISTANCE);
+      setTargetDistance(defaultCameraDistance);
     }
-  }, [selectedIndex, garmentData, hasSelection, setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance, setQueuedDistanceCorrection]);
+  }, [selectedIndex, garmentData, hasSelection, setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance, setQueuedDistanceCorrection, selectedCameraDistance, defaultCameraDistance]);
 
   return (
     <>

@@ -8,6 +8,7 @@ import { RefObject } from "react";
 import * as THREE from 'three'
 import { useSpring } from "@react-spring/three";
 import OrbitControlsContext from "@/lib/components/r3f/OrbitControlsContext";
+import { SWITCH_CAMERA_DISTANCE } from "./Garments";
 
 // ============================================
 // CAMERA ANIMATION CONFIGURATION
@@ -19,13 +20,14 @@ import OrbitControlsContext from "@/lib/components/r3f/OrbitControlsContext";
  * 2 = Smooth: Elegant, flowing motion (default spring feel)
  * 3 = Bouncy: Playful spring with slight overshoot
  * 4 = Swift: Very fast, almost instant
+ * 5 = Gentle: Smooth transition with no bounce (clamped)
  */
-type AnimationCurveOption = 1 | 2 | 3 | 4;
+type AnimationCurveOption = 1 | 2 | 3 | 4 | 5;
 
 /**
  * STEP 1: Orbit Target Animation
  * Animates the point the camera looks at (runs FIRST).
- * Recommended: 4 (Swift) for very fast transition
+ * Recommended: 5 (Gentle) for smooth transition without bounce
  */
 const ORBIT_TARGET_ANIMATION_CURVE: AnimationCurveOption = 4;
 
@@ -41,21 +43,22 @@ const AZIMUTH_ANIMATION_CURVE: AnimationCurveOption = 1;
  * Animates camera distance (runs AFTER azimuth completes).
  * Recommended: 1 (Snappy) for quick adjustment
  */
-const DISTANCE_CORRECTION_CURVE: AnimationCurveOption = 1;
+const DISTANCE_CORRECTION_CURVE: AnimationCurveOption = 3;
 
 /**
  * Immediate Distance Animation (enter/exit selection)
  * Used when entering or exiting selection mode (runs independently).
- * Recommended: 1 (Snappy) for quick zoom response
+ * Recommended: 5 (Gentle) for smooth transition without bounce
  */
-const IMMEDIATE_DISTANCE_CURVE: AnimationCurveOption = 1;
+const IMMEDIATE_DISTANCE_CURVE: AnimationCurveOption = 4;
 
 /** Animation curve configurations for react-spring */
 const ANIMATION_CURVES = {
-  1: { tension: 420, friction: 60 },      // Snappy - quick and responsive
-  2: { tension: 170, friction: 26 },      // Smooth - default spring feel
-  3: { tension: 200, friction: 15 },      // Bouncy - playful with overshoot
-  4: { tension: 600, friction: 40 },      // Swift - very fast
+  1: { tension: 420, friction: 60 },                  // Snappy - quick and responsive
+  2: { tension: 170, friction: 26 },                  // Smooth - default spring feel
+  3: { tension: 200, friction: 15 },                  // Bouncy - playful with overshoot
+  4: { tension: 600, friction: 40 },                  // Swift - very fast
+  5: { tension: 280, friction: 60, clamp: true },    // Gentle - smooth, no bounce
 } as const;
 
 // ============================================
@@ -146,7 +149,7 @@ function CameraRotationAnimator() {
   // React-spring for camera distance (for both immediate and correction)
   const distanceConfigRef = useRef(immediateDistanceConfig);
   const [, distanceApi] = useSpring(() => ({
-    distance: 19,
+    distance: SWITCH_CAMERA_DISTANCE.desktop as number,
     config: distanceConfigRef.current,
     onChange: ({ value }) => {
       if (isAnimatingDistance.current && orbitControlsRef?.current) {

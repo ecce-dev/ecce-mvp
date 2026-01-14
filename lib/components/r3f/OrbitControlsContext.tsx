@@ -15,9 +15,15 @@ type OrbitControlsContextType = {
   /** Target position for OrbitControls to orbit around (null = no animation) */
   targetOrbitTarget: THREE.Vector3 | null
   setTargetOrbitTarget: (target: THREE.Vector3 | null) => void
-  /** Target distance from camera to orbit target (null = no animation) */
+  /** Target distance from camera to orbit target (null = no animation, triggers immediately) */
   targetDistance: number | null
   setTargetDistance: (distance: number | null) => void
+  /** 
+   * Queued distance correction that runs AFTER rotation/target animations complete.
+   * Use this when switching between garments to avoid animation drift.
+   */
+  queuedDistanceCorrection: number | null
+  setQueuedDistanceCorrection: (distance: number | null) => void
 }
 
 const OrbitControlsContext = createContext<OrbitControlsContextType>({
@@ -31,6 +37,8 @@ const OrbitControlsContext = createContext<OrbitControlsContextType>({
   setTargetOrbitTarget: () => {},
   targetDistance: null,
   setTargetDistance: () => {},
+  queuedDistanceCorrection: null,
+  setQueuedDistanceCorrection: () => {},
 });
 
 export default OrbitControlsContext

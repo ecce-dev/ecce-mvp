@@ -121,9 +121,18 @@ export default function Garments({ garments }: GarmentsProps) {
 
   // Track carousel's current rotation for camera positioning
   const carouselRotationRef = useRef(0);
-
+  
+  // Track previous selection state to detect entering/exiting selection vs switching garments
+  const prevHasSelectionRef = useRef(hasSelection);
+  
   // Get context for triggering camera rotation, orbit target, distance, and isDragging state
-  const { setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance, isDragging } = useContext(OrbitControlsContext);
+  const { 
+    setTargetAzimuthalAngle, 
+    setTargetOrbitTarget, 
+    setTargetDistance, 
+    setQueuedDistanceCorrection,
+    isDragging 
+  } = useContext(OrbitControlsContext);
 
   // Get orbit radius based on device type
   const orbitRadius = useMemo(() => {
@@ -165,6 +174,12 @@ export default function Garments({ garments }: GarmentsProps) {
 
   // Trigger camera rotation, orbit target, and distance when a garment is selected
   useEffect(() => {
+    // Detect if selection STATE changed (entering/exiting) vs switching between garments
+    const isEnteringSelection = hasSelection && !prevHasSelectionRef.current;
+    const isExitingSelection = !hasSelection && prevHasSelectionRef.current;
+    const isSwitchingGarments = hasSelection && prevHasSelectionRef.current;
+    prevHasSelectionRef.current = hasSelection;
+
     if (selectedIndex !== -1) {
       const selectedGarmentData = garmentData[selectedIndex];
       if (selectedGarmentData) {
@@ -185,15 +200,22 @@ export default function Garments({ garments }: GarmentsProps) {
         // Set orbit target to the selected garment's world position
         setTargetOrbitTarget(new THREE.Vector3(worldX, localPos.y, worldZ));
         
-        // Zoom in closer to the selected garment
-        setTargetDistance(SELECTED_CAMERA_DISTANCE);
+        // Handle distance animation based on transition type:
+        if (isEnteringSelection) {
+          // Entering selection: immediate distance animation
+          setTargetDistance(SELECTED_CAMERA_DISTANCE);
+        } else if (isSwitchingGarments) {
+          // Switching garments: queue distance correction AFTER target/azimuth animations complete
+          // This prevents distance drift caused by the orbit target animation
+          setQueuedDistanceCorrection(SELECTED_CAMERA_DISTANCE);
+        }
       }
-    } else {
-      // No selection - return orbit target to origin and camera to default distance
+    } else if (isExitingSelection) {
+      // Exiting selection - return orbit target to origin and camera to default distance
       setTargetOrbitTarget(new THREE.Vector3(0, 0, 0));
       setTargetDistance(DEFAULT_CAMERA_DISTANCE);
     }
-  }, [selectedIndex, garmentData, setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance]);
+  }, [selectedIndex, garmentData, hasSelection, setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance, setQueuedDistanceCorrection]);
 
   return (
     <>

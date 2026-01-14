@@ -1,8 +1,8 @@
 "use client"
 
-import { Suspense, useRef, useState, useContext, useEffect } from "react";
+import { Suspense, useRef, useState, useContext, useEffect, useCallback } from "react";
 import { Environment, OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { RefObject } from "react";
 import * as THREE from 'three'
@@ -14,22 +14,48 @@ import OrbitControlsContext from "@/lib/components/r3f/OrbitControlsContext";
 // ============================================
 
 /**
- * Animation curve presets for camera transitions.
- * Change this value (1-4) to switch between different animation feels.
- * 
- * 1 = Snappy: Quick, responsive feel with minimal overshoot
- * 2 = Smooth: Elegant, flowing motion with gentle easing
+ * Animation curve options:
+ * 1 = Snappy: Quick and responsive with minimal overshoot
+ * 2 = Smooth: Elegant, flowing motion (default spring feel)
  * 3 = Bouncy: Playful spring with slight overshoot
- * 4 = Swift: Very fast, almost instant transitions
+ * 4 = Swift: Very fast, almost instant
  */
-const ANIMATION_CURVE: 1 | 2 | 3 | 4 = 1;
+type AnimationCurveOption = 1 | 2 | 3 | 4;
+
+/**
+ * STEP 1: Orbit Target Animation
+ * Animates the point the camera looks at (runs FIRST).
+ * Recommended: 4 (Swift) for very fast transition
+ */
+const ORBIT_TARGET_ANIMATION_CURVE: AnimationCurveOption = 4;
+
+/**
+ * STEP 2: Azimuth (Rotation) Animation
+ * Animates camera rotation around the scene (runs AFTER orbit target completes).
+ * Recommended: 1 (Snappy) for responsive feel
+ */
+const AZIMUTH_ANIMATION_CURVE: AnimationCurveOption = 1;
+
+/**
+ * STEP 3: Distance Correction Animation
+ * Animates camera distance (runs AFTER azimuth completes).
+ * Recommended: 1 (Snappy) for quick adjustment
+ */
+const DISTANCE_CORRECTION_CURVE: AnimationCurveOption = 1;
+
+/**
+ * Immediate Distance Animation (enter/exit selection)
+ * Used when entering or exiting selection mode (runs independently).
+ * Recommended: 1 (Snappy) for quick zoom response
+ */
+const IMMEDIATE_DISTANCE_CURVE: AnimationCurveOption = 1;
 
 /** Animation curve configurations for react-spring */
 const ANIMATION_CURVES = {
-  1: { tension: 280, friction: 60 },      // Snappy - quick and responsive
+  1: { tension: 420, friction: 60 },      // Snappy - quick and responsive
   2: { tension: 170, friction: 26 },      // Smooth - default spring feel
   3: { tension: 200, friction: 15 },      // Bouncy - playful with overshoot
-  4: { tension: 400, friction: 40 },      // Swift - very fast
+  4: { tension: 600, friction: 40 },      // Swift - very fast
 } as const;
 
 // ============================================
@@ -57,10 +83,12 @@ function normalizeAngleDiff(target: number, current: number): number {
  * Component that handles smooth camera animation via OrbitControls.
  * Uses react-spring for physics-based easing with configurable curves.
  * 
- * Animates:
- * - Azimuthal angle (rotation around Y axis)
- * - Orbit target position (what the camera orbits around)
- * - Camera distance (zoom level)
+ * Animation sequence for garment-to-garment switches (sequential queue):
+ * 1. STEP 1: Orbit target animation (very fast)
+ * 2. STEP 2: Azimuth rotation animation (runs AFTER orbit target completes)
+ * 3. STEP 3: Distance correction animation (runs AFTER azimuth completes)
+ * 
+ * For enter/exit selection: Distance animation runs immediately (independent).
  */
 function CameraRotationAnimator() {
   const { 
@@ -68,36 +96,33 @@ function CameraRotationAnimator() {
     targetAzimuthalAngle, 
     targetOrbitTarget,
     targetDistance,
+    queuedDistanceCorrection,
+    setQueuedDistanceCorrection,
   } = useContext(OrbitControlsContext);
   
   const { camera } = useThree();
 
-  // Get selected animation config
-  const springConfig = ANIMATION_CURVES[ANIMATION_CURVE];
+  // Get animation configs for each animation step
+  const orbitTargetConfig = ANIMATION_CURVES[ORBIT_TARGET_ANIMATION_CURVE];
+  const azimuthConfig = ANIMATION_CURVES[AZIMUTH_ANIMATION_CURVE];
+  const distanceCorrectionConfig = ANIMATION_CURVES[DISTANCE_CORRECTION_CURVE];
+  const immediateDistanceConfig = ANIMATION_CURVES[IMMEDIATE_DISTANCE_CURVE];
 
-  // Track if animation is active to prevent onChange from running on mount
-  const isAnimatingAzimuthal = useRef(false);
+  // Track if animations are active
   const isAnimatingTarget = useRef(false);
+  const isAnimatingAzimuthal = useRef(false);
   const isAnimatingDistance = useRef(false);
 
-  // React-spring for azimuthal angle
-  const [, azimuthalApi] = useSpring(() => ({
-    angle: 0,
-    config: springConfig,
-    onChange: ({ value }) => {
-      if (isAnimatingAzimuthal.current && orbitControlsRef?.current) {
-        orbitControlsRef.current.setAzimuthalAngle(value.angle);
-        orbitControlsRef.current.update();
-      }
-    },
-  }));
+  // Queue for pending animations (sequential execution)
+  const pendingAzimuth = useRef<number | null>(null);
+  const pendingDistanceCorrection = useRef<number | null>(null);
 
-  // React-spring for orbit target position
+  // React-spring for orbit target position (STEP 1)
   const [, targetApi] = useSpring(() => ({
     x: 0,
     y: 0,
     z: 0,
-    config: springConfig,
+    config: orbitTargetConfig,
     onChange: ({ value }) => {
       if (isAnimatingTarget.current && orbitControlsRef?.current) {
         orbitControlsRef.current.target.set(value.x, value.y, value.z);
@@ -106,10 +131,23 @@ function CameraRotationAnimator() {
     },
   }));
 
-  // React-spring for camera distance
+  // React-spring for azimuthal angle (STEP 2)
+  const [, azimuthalApi] = useSpring(() => ({
+    angle: 0,
+    config: azimuthConfig,
+    onChange: ({ value }) => {
+      if (isAnimatingAzimuthal.current && orbitControlsRef?.current) {
+        orbitControlsRef.current.setAzimuthalAngle(value.angle);
+        orbitControlsRef.current.update();
+      }
+    },
+  }));
+
+  // React-spring for camera distance (for both immediate and correction)
+  const distanceConfigRef = useRef(immediateDistanceConfig);
   const [, distanceApi] = useSpring(() => ({
     distance: 19,
-    config: springConfig,
+    config: distanceConfigRef.current,
     onChange: ({ value }) => {
       if (isAnimatingDistance.current && orbitControlsRef?.current) {
         const controls = orbitControlsRef.current;
@@ -122,23 +160,61 @@ function CameraRotationAnimator() {
     },
   }));
 
-  // Handle azimuthal angle animation trigger
-  useEffect(() => {
-    if (targetAzimuthalAngle !== null && orbitControlsRef?.current) {
+  // Refs to store latest versions of trigger functions (avoids stale closures in onRest callbacks)
+  const triggerQueuedAzimuthRef = useRef<() => void>(() => {});
+  const triggerQueuedDistanceCorrectionRef = useRef<() => void>(() => {});
+
+  /**
+   * STEP 2 → STEP 3: Trigger the queued distance correction animation.
+   * Called when azimuth animation completes.
+   */
+  triggerQueuedDistanceCorrectionRef.current = useCallback(() => {
+    if (pendingDistanceCorrection.current !== null && orbitControlsRef?.current) {
+      const currentDist = orbitControlsRef.current.getDistance();
+      const targetDist = pendingDistanceCorrection.current;
+      
+      distanceConfigRef.current = distanceCorrectionConfig;
+      
+      isAnimatingDistance.current = true;
+      distanceApi.start({
+        from: { distance: currentDist },
+        to: { distance: targetDist },
+        config: distanceCorrectionConfig,
+        onRest: () => { 
+          isAnimatingDistance.current = false; 
+          pendingDistanceCorrection.current = null;
+        },
+      });
+      
+      setQueuedDistanceCorrection(null);
+    }
+  }, [distanceApi, distanceCorrectionConfig, orbitControlsRef, setQueuedDistanceCorrection]);
+
+  /**
+   * STEP 1 → STEP 2: Trigger the queued azimuth animation.
+   * Called when orbit target animation completes.
+   */
+  triggerQueuedAzimuthRef.current = useCallback(() => {
+    if (pendingAzimuth.current !== null && orbitControlsRef?.current) {
       const currentAngle = orbitControlsRef.current.getAzimuthalAngle();
-      // Normalize the target angle for shortest path rotation
-      const normalizedTarget = normalizeAngleDiff(targetAzimuthalAngle, currentAngle);
+      const normalizedTarget = normalizeAngleDiff(pendingAzimuth.current, currentAngle);
       
       isAnimatingAzimuthal.current = true;
       azimuthalApi.start({
         from: { angle: currentAngle },
         to: { angle: normalizedTarget },
-        onRest: () => { isAnimatingAzimuthal.current = false; },
+        config: azimuthConfig,
+        onRest: () => { 
+          isAnimatingAzimuthal.current = false;
+          pendingAzimuth.current = null;
+          // When azimuth completes, trigger distance correction (STEP 2 → STEP 3)
+          triggerQueuedDistanceCorrectionRef.current();
+        },
       });
     }
-  }, [targetAzimuthalAngle, azimuthalApi, orbitControlsRef]);
+  }, [azimuthalApi, azimuthConfig, orbitControlsRef]);
 
-  // Handle orbit target animation trigger
+  // STEP 1: Handle orbit target animation (starts the sequence)
   useEffect(() => {
     if (targetOrbitTarget !== null && orbitControlsRef?.current) {
       const current = orbitControlsRef.current.target;
@@ -147,24 +223,70 @@ function CameraRotationAnimator() {
       targetApi.start({
         from: { x: current.x, y: current.y, z: current.z },
         to: { x: targetOrbitTarget.x, y: targetOrbitTarget.y, z: targetOrbitTarget.z },
-        onRest: () => { isAnimatingTarget.current = false; },
+        config: orbitTargetConfig,
+        onRest: () => { 
+          isAnimatingTarget.current = false;
+          // When orbit target completes, trigger queued azimuth (STEP 1 → STEP 2)
+          triggerQueuedAzimuthRef.current();
+        },
       });
     }
-  }, [targetOrbitTarget, targetApi, orbitControlsRef]);
+  }, [targetOrbitTarget, targetApi, orbitControlsRef, orbitTargetConfig]);
 
-  // Handle distance animation trigger
+  // STEP 2: Handle azimuthal angle animation (queued or immediate)
+  useEffect(() => {
+    if (targetAzimuthalAngle !== null && orbitControlsRef?.current) {
+      // If orbit target is animating, queue the azimuth animation
+      if (isAnimatingTarget.current) {
+        pendingAzimuth.current = targetAzimuthalAngle;
+      } else {
+        // No orbit target animation running, start azimuth immediately
+        const currentAngle = orbitControlsRef.current.getAzimuthalAngle();
+        const normalizedTarget = normalizeAngleDiff(targetAzimuthalAngle, currentAngle);
+        
+        isAnimatingAzimuthal.current = true;
+        azimuthalApi.start({
+          from: { angle: currentAngle },
+          to: { angle: normalizedTarget },
+          config: azimuthConfig,
+          onRest: () => { 
+            isAnimatingAzimuthal.current = false;
+            // When azimuth completes, trigger distance correction (STEP 2 → STEP 3)
+            triggerQueuedDistanceCorrectionRef.current();
+          },
+        });
+      }
+    }
+  }, [targetAzimuthalAngle, azimuthalApi, orbitControlsRef, azimuthConfig]);
+
+  // STEP 3: Handle queued distance correction (queued for the sequence)
+  useEffect(() => {
+    if (queuedDistanceCorrection !== null) {
+      pendingDistanceCorrection.current = queuedDistanceCorrection;
+      
+      // If no other animations are running, trigger immediately
+      if (!isAnimatingTarget.current && !isAnimatingAzimuthal.current) {
+        triggerQueuedDistanceCorrectionRef.current();
+      }
+    }
+  }, [queuedDistanceCorrection]);
+
+  // Handle immediate distance animation (for enter/exit selection - runs independently)
   useEffect(() => {
     if (targetDistance !== null && orbitControlsRef?.current) {
       const currentDist = orbitControlsRef.current.getDistance();
+      
+      distanceConfigRef.current = immediateDistanceConfig;
       
       isAnimatingDistance.current = true;
       distanceApi.start({
         from: { distance: currentDist },
         to: { distance: targetDistance },
+        config: immediateDistanceConfig,
         onRest: () => { isAnimatingDistance.current = false; },
       });
     }
-  }, [targetDistance, distanceApi, orbitControlsRef]);
+  }, [targetDistance, distanceApi, orbitControlsRef, immediateDistanceConfig]);
 
   return null;
 }
@@ -217,6 +339,7 @@ function CanvasWrapper({
   const [targetAzimuthalAngle, setTargetAzimuthalAngle] = useState<number | null>(null)
   const [targetOrbitTarget, setTargetOrbitTarget] = useState<THREE.Vector3 | null>(null)
   const [targetDistance, setTargetDistance] = useState<number | null>(null)
+  const [queuedDistanceCorrection, setQueuedDistanceCorrection] = useState<number | null>(null)
 
 
   return <>
@@ -230,7 +353,9 @@ function CanvasWrapper({
       targetOrbitTarget,
       setTargetOrbitTarget,
       targetDistance,
-      setTargetDistance
+      setTargetDistance,
+      queuedDistanceCorrection,
+      setQueuedDistanceCorrection,
     }}>
       <Canvas
         shadows

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useMemo, useContext } from "react";
+import { useRef, useMemo, useContext, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql";
 import Garment from "./Garment";
@@ -8,8 +8,8 @@ import { useResponsiveScale } from "@/lib/hooks/useResponsiveScale";
 import { useDevice } from "@/lib/hooks/useDevice";
 import { TargetBoundingBox } from "./NormalizedGlbModel";
 import OrbitControlsContext from "./OrbitControlsContext";
+import { useAppModeStore } from "@/lib/stores/appModeStore";
 import * as THREE from 'three';
-import { Stage } from "@react-three/drei";
 
 // ============================================
 // CONFIGURATION CONSTANTS (Desktop baseline values)
@@ -46,6 +46,22 @@ const SPIN_SPEED = 0.09;
 const GARMENT_FACING: 'outward' | 'direction' = 'outward';
 
 // ============================================
+// SELECTION CONFIGURATION
+// ============================================
+
+/** Opacity for non-selected garments when one is selected */
+const NON_SELECTED_OPACITY = 0.3;
+
+/** Opacity transition speed (higher = faster) */
+const OPACITY_TRANSITION_SPEED = 3;
+
+/** Camera distance when viewing a selected garment (closer view) */
+const SELECTED_CAMERA_DISTANCE = 12;
+
+/** Default camera distance when no garment is selected (from GarmentsClient initial position) */
+const DEFAULT_CAMERA_DISTANCE = 19;
+
+// ============================================
 
 interface GarmentsProps {
   garments: NonNullable<GetGarmentsQuery['garments']>['nodes'];
@@ -54,36 +70,62 @@ interface GarmentsProps {
 interface OrbitingGroupProps {
   children: React.ReactNode;
   orbitSpeed: number;
+  isPaused: boolean;
+  isDragging: boolean;
+  rotationRef: React.MutableRefObject<number>;
 }
 
 /**
  * Rotating carousel group that orbits all garments around the Y-axis.
- * Pauses rotation when orbit controls are being dragged.
+ * Pauses rotation when orbit controls are being dragged or when a garment is selected.
+ * Tracks current rotation in a ref for camera positioning calculations.
  */
-function OrbitingGroup({ children, orbitSpeed }: OrbitingGroupProps) {
+function OrbitingGroup({ children, orbitSpeed, isPaused, isDragging, rotationRef }: OrbitingGroupProps) {
   const groupRef = useRef<THREE.Group>(null!);
-  const { isDragging } = useContext(OrbitControlsContext);
 
   useFrame((_, delta) => {
-    // Only rotate when not dragging with orbit controls
-    if (groupRef.current && !isDragging) {
+    // Only rotate when not dragging and not paused
+    if (groupRef.current && !isDragging && !isPaused) {
       groupRef.current.rotation.y += orbitSpeed * delta;
+      rotationRef.current = groupRef.current.rotation.y;
     }
   });
 
   return <group ref={groupRef}>{children}</group>;
 }
 
+/**
+ * Calculate the index of the selected garment
+ */
+function getSelectedIndex(
+  garments: NonNullable<GetGarmentsQuery['garments']>['nodes'],
+  selectedGarment: NonNullable<GetGarmentsQuery['garments']>['nodes'][0] | null
+): number {
+  if (!selectedGarment) return -1;
+  return garments.findIndex(g => g?.slug === selectedGarment.slug);
+}
+
 export default function Garments({ garments }: GarmentsProps) {
   const garmentCount = garments.length;
 
-  // Get responsive scale factor (1.0 at desktop, 0.5 at mobile, interpolated between)
+  // Get responsive scale factor (1.0 at desktop, scaled at smaller devices)
   const responsiveScale = useResponsiveScale();
 
-  // Get device type for stepped orbit radius
+  // Get device type for stepped values
   const { deviceType } = useDevice();
 
-  // Get orbit radius based on device type (uses specific values per breakpoint)
+  // Get selected garment from store
+  const selectedGarment = useAppModeStore((state) => state.selectedGarment);
+  const selectedIndex = getSelectedIndex(garments, selectedGarment);
+  const hasSelection = selectedIndex !== -1;
+
+  // Track carousel's current rotation for camera positioning
+  const carouselRotationRef = useRef(0);
+
+  // Get context for triggering camera rotation, orbit target, distance, and isDragging state
+  const { setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance, isDragging } = useContext(OrbitControlsContext);
+
+  // Get orbit radius based on device type
   const orbitRadius = useMemo(() => {
     switch (deviceType) {
       case 'mobile':
@@ -95,7 +137,7 @@ export default function Garments({ garments }: GarmentsProps) {
     }
   }, [deviceType]);
 
-  // Calculate other responsive values using scale factor
+  // Calculate responsive values
   const { yOffset, targetBoundingBox } = useMemo(() => ({
     yOffset: DESKTOP_Y_OFFSET * responsiveScale,
     targetBoundingBox: {
@@ -105,34 +147,76 @@ export default function Garments({ garments }: GarmentsProps) {
     }
   }), [responsiveScale]);
 
+  // Calculate base positions for all garments (their carousel positions)
+  const garmentData = useMemo(() => {
+    return garments.map((_, index) => {
+      const baseAngle = (2 * Math.PI / garmentCount) * index;
+      const x = orbitRadius * Math.sin(baseAngle);
+      const z = orbitRadius * Math.cos(baseAngle);
+      const rotationY = GARMENT_FACING === 'outward' ? baseAngle : baseAngle + Math.PI / 2;
+      
+      return {
+        baseAngle,
+        position: new THREE.Vector3(x, yOffset, z),
+        initialRotationY: rotationY,
+      };
+    });
+  }, [garments, garmentCount, orbitRadius, yOffset]);
+
+  // Trigger camera rotation, orbit target, and distance when a garment is selected
+  useEffect(() => {
+    if (selectedIndex !== -1) {
+      const selectedGarmentData = garmentData[selectedIndex];
+      if (selectedGarmentData) {
+        // Calculate world angle: base angle + carousel rotation
+        const worldAngle = selectedGarmentData.baseAngle + carouselRotationRef.current;
+        
+        // Set target azimuthal angle for camera to face this garment
+        setTargetAzimuthalAngle(worldAngle);
+
+        // Calculate world position by rotating the local position by carousel rotation
+        const carouselRotation = carouselRotationRef.current;
+        const localPos = selectedGarmentData.position;
+        
+        // Apply Y-axis rotation to get world position
+        const worldX = localPos.x * Math.cos(carouselRotation) + localPos.z * Math.sin(carouselRotation);
+        const worldZ = -localPos.x * Math.sin(carouselRotation) + localPos.z * Math.cos(carouselRotation);
+        
+        // Set orbit target to the selected garment's world position
+        setTargetOrbitTarget(new THREE.Vector3(worldX, localPos.y, worldZ));
+        
+        // Zoom in closer to the selected garment
+        setTargetDistance(SELECTED_CAMERA_DISTANCE);
+      }
+    } else {
+      // No selection - return orbit target to origin and camera to default distance
+      setTargetOrbitTarget(new THREE.Vector3(0, 0, 0));
+      setTargetDistance(DEFAULT_CAMERA_DISTANCE);
+    }
+  }, [selectedIndex, garmentData, setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance]);
+
   return (
     <>
-      <OrbitingGroup orbitSpeed={ORBIT_SPEED}>
-        {garments.map((garment, index) => {
-          // Calculate angle for equal spacing around the circle
-          const angle = (2 * Math.PI / garmentCount) * index;
-
-          // Position on the circle (XZ plane, rotating around Y)
-          const x = orbitRadius * Math.sin(angle);
-          const z = orbitRadius * Math.cos(angle);
-          const initPosition = new THREE.Vector3(x, yOffset, z);
-
-          // Calculate initial rotation based on facing preference
-          const initialRotationY = GARMENT_FACING === 'outward'
-            ? angle  // Face outward from center
-            : angle + Math.PI / 2;  // Face direction of travel
-
-          return (
-            <Garment
-              key={garment?.slug}
-              garment={garment}
-              initPosition={initPosition}
-              initialRotationY={initialRotationY}
-              spinSpeed={SPIN_SPEED}
-              targetBoundingBox={targetBoundingBox}
-            />
-          );
-        })}
+      <OrbitingGroup 
+        orbitSpeed={ORBIT_SPEED} 
+        isPaused={hasSelection}
+        isDragging={isDragging}
+        rotationRef={carouselRotationRef}
+      >
+        {garments.map((garment, index) => (
+          <Garment
+            key={garment?.slug}
+            garment={garment}
+            initPosition={garmentData[index].position}
+            initialRotationY={garmentData[index].initialRotationY}
+            spinSpeed={hasSelection ? 0 : SPIN_SPEED}
+            targetBoundingBox={targetBoundingBox}
+            isSelected={index === selectedIndex}
+            hasSelection={hasSelection}
+            nonSelectedOpacity={NON_SELECTED_OPACITY}
+            opacityTransitionSpeed={OPACITY_TRANSITION_SPEED}
+          />
+        ))}
       </OrbitingGroup>
     </>
   );

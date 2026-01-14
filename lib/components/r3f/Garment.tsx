@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useContext, useCallback } from "react"
+import { useRef, useContext, useCallback, useState } from "react"
 import { useFrame, ThreeEvent } from "@react-three/fiber"
 import NormalizedGlbModel, { TargetBoundingBox } from "./NormalizedGlbModel"
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
@@ -18,6 +18,14 @@ interface GarmentProps {
   spinSpeed?: number;
   /** Target bounding box for model normalization */
   targetBoundingBox: TargetBoundingBox;
+  /** Whether this garment is currently selected */
+  isSelected: boolean;
+  /** Whether any garment is currently selected */
+  hasSelection: boolean;
+  /** Opacity for non-selected garments (0-1) */
+  nonSelectedOpacity: number;
+  /** Speed of opacity transition (higher = faster) */
+  opacityTransitionSpeed: number;
 }
 
 
@@ -26,16 +34,55 @@ export default function Garment({
   initPosition,
   initialRotationY = 0,
   spinSpeed = 0,
-  targetBoundingBox
+  targetBoundingBox,
+  isSelected,
+  hasSelection,
+  nonSelectedOpacity,
+  opacityTransitionSpeed
 }: GarmentProps) {
   const groupRef = useRef<THREE.Group>(null!);
+  const meshGroupRef = useRef<THREE.Group>(null!);
   const { isDragging } = useContext(OrbitControlsContext);
   const selectGarment = useAppModeStore((state) => state.selectGarment);
 
-  // Individual spin animation (pauses when orbit controls are dragging)
+  // Track current opacity for smooth transitions
+  const [currentOpacity, setCurrentOpacity] = useState(1);
+
+  // Calculate target opacity based on selection state
+  const targetOpacity = hasSelection 
+    ? (isSelected ? 1 : nonSelectedOpacity) 
+    : 1;
+
+  // Individual spin animation (pauses when orbit controls are dragging or any garment is selected)
   useFrame((_, delta) => {
-    if (groupRef.current && spinSpeed !== 0 && !isDragging) {
+    // Spin animation
+    if (groupRef.current && spinSpeed !== 0 && !isDragging && !hasSelection) {
       groupRef.current.rotation.y += spinSpeed * delta;
+    }
+
+    // Opacity animation
+    const diff = targetOpacity - currentOpacity;
+    if (Math.abs(diff) > 0.01) {
+      const newOpacity = THREE.MathUtils.lerp(
+        currentOpacity,
+        targetOpacity,
+        delta * opacityTransitionSpeed
+      );
+      setCurrentOpacity(newOpacity);
+      
+      // Apply opacity to all meshes in the group
+      if (meshGroupRef.current) {
+        meshGroupRef.current.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            const material = child.material as THREE.Material;
+            if ('opacity' in material) {
+              material.transparent = true;
+              material.opacity = newOpacity;
+              material.needsUpdate = true;
+            }
+          }
+        });
+      }
     }
   });
 
@@ -57,19 +104,27 @@ export default function Garment({
 
   /**
    * Handle garment click - select this garment
+   * Allows clicking on any garment, even when another is selected (switches selection)
    */
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
     // Stop propagation to prevent multiple garments from being selected
     event.stopPropagation();
+    
+    // Don't re-select already selected garment
+    if (isSelected) return;
+    
     selectGarment(garment);
-  }, [garment, selectGarment]);
+  }, [garment, selectGarment, isSelected]);
 
   /**
    * Handle pointer enter - show cursor pointer
+   * Shows pointer on all garments except the currently selected one
    */
   const handlePointerEnter = useCallback(() => {
-    document.body.style.cursor = "pointer";
-  }, []);
+    if (!isSelected) {
+      document.body.style.cursor = "pointer";
+    }
+  }, [isSelected]);
 
   /**
    * Handle pointer leave - reset cursor
@@ -84,17 +139,19 @@ export default function Garment({
 
   return (
     <group 
-      position={initPosition} 
+      position={initPosition}
       rotation={[0, initialRotationY, 0]}
       onClick={handleClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >
       <group ref={groupRef}>
-        <NormalizedGlbModel
-          src={proxiedUrl}
-          targetBoundingBox={targetBoundingBox}
-        />
+        <group ref={meshGroupRef}>
+          <NormalizedGlbModel
+            src={proxiedUrl}
+            targetBoundingBox={targetBoundingBox}
+          />
+        </group>
       </group>
     </group>
   )

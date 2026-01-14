@@ -22,6 +22,10 @@ import { useDevice } from "../hooks/useDevice";
  * Shows a loading overlay when:
  * - Garment data is being fetched (isLoading from context)
  * - GLB 3D files are being loaded (active from useProgress)
+ * 
+ * Features:
+ * - Selection animation: Clicking a garment rotates camera to face it
+ * - Opacity fade: Non-selected garments fade out when one is selected
  */
 export default function GarmentsClient() {
   const { garments, isLoading: isDataLoading } = useGarments();
@@ -70,4 +74,3 @@ export default function GarmentsClient() {
     </>
   );
 }
-

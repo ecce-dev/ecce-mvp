@@ -53,10 +53,10 @@ export default function Garment({
     ? (isSelected ? 1 : nonSelectedOpacity) 
     : 1;
 
-  // Individual spin animation (pauses when orbit controls are dragging or any garment is selected)
+  // Individual spin animation (pauses when orbit controls are dragging)
   useFrame((_, delta) => {
-    // Spin animation
-    if (groupRef.current && spinSpeed !== 0 && !isDragging && !hasSelection) {
+    // Spin animation (spinSpeed controls whether to spin - 0 disables, selected garment gets its own speed)
+    if (groupRef.current && spinSpeed !== 0 && !isDragging) {
       groupRef.current.rotation.y += spinSpeed * delta;
     }
 

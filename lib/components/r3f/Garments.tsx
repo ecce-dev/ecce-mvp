@@ -38,6 +38,9 @@ const ORBIT_SPEED = 0.09;
 /** Speed of individual garment spin on their own axis (radians per second) */
 const SPIN_SPEED = 0.09;
 
+/** Speed of selected garment's slow rotation (radians per second) */
+const SELECTED_SPIN_SPEED = 0.15;
+
 /** 
  * How garments should face:
  * - 'outward': Garments face away from the center
@@ -231,7 +234,7 @@ export default function Garments({ garments }: GarmentsProps) {
             garment={garment}
             initPosition={garmentData[index].position}
             initialRotationY={garmentData[index].initialRotationY}
-            spinSpeed={hasSelection ? 0 : SPIN_SPEED}
+            spinSpeed={hasSelection ? (index === selectedIndex ? SELECTED_SPIN_SPEED : 0) : SPIN_SPEED}
             targetBoundingBox={targetBoundingBox}
             isSelected={index === selectedIndex}
             hasSelection={hasSelection}

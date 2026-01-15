@@ -191,11 +191,15 @@
     left: 0;
     right: 0;
     height: env(safe-area-inset-top, 0px);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: oklch(1 0 0 / 70%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 40;
     pointer-events: none;
+  }
+
+  .dark .safe-area-overlay {
+    background-color: oklch(0.145 0 0 / 70%);
   }
 
   /* Safe area overlay for bottom of mobile PWA */
@@ -205,11 +209,15 @@
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom, 0px);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: oklch(1 0 0 / 70%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 40;
     pointer-events: none;
+  }
+
+  .dark .safe-area-overlay-bottom {
+    background-color: oklch(0.145 0 0 / 70%);
   }
 
   /* Ensure content respects safe area and starts below the overlay */

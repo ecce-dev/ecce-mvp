@@ -156,36 +156,36 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
         {analytics && !isLoading && (
           <>
             {/* Interest Meter */}
-            <div className="border border-black/20 p-4 bg-white/50">
+            <div className="border border-foreground/20 p-4 bg-background/70">
               <InterestMeter level={analytics.interestLevel} color={analytics.interestColor} />
             </div>
 
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="border border-black/20 p-3 bg-white/50">
-                <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Views</p>
+              <div className="border border-foreground/20 p-3 bg-background/70">
+                <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Views</p>
                 <p className="text-2xl font-zangezi">{analytics.totalViews}</p>
               </div>
-              <div className="border border-black/20 p-3 bg-white/50">
-                <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Interactions</p>
+              <div className="border border-foreground/20 p-3 bg-background/70">
+                <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Interactions</p>
                 <p className="text-2xl font-zangezi">{totalInteractions}</p>
               </div>
-              <div className="border border-black/20 p-3 bg-white/50">
-                <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Total Time</p>
+              <div className="border border-foreground/20 p-3 bg-background/70">
+                <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Total Time</p>
                 <p className="text-2xl font-zangezi">{formatDuration(analytics.totalTimeSpent)}</p>
               </div>
-              <div className="border border-black/20 p-3 bg-white/50">
-                <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Avg. Time</p>
+              <div className="border border-foreground/20 p-3 bg-background/70">
+                <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Avg. Time</p>
                 <p className="text-2xl font-zangezi">{formatDuration(analytics.avgTimePerView)}</p>
               </div>
             </div>
 
             {/* Top Countries */}
             {analytics.topCountries.length > 0 && (
-              <div className="border border-black/20 p-4 bg-white/50">
+              <div className="border border-foreground/20 p-4 bg-background/70">
                 <div className="flex items-center gap-2 mb-3">
-                  <GlobeIcon size={16} weight="regular" className="text-gray-500" />
-                  <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Top Countries</p>
+                  <GlobeIcon size={16} weight="regular" className="text-foreground/50" />
+                  <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Top Countries</p>
                 </div>
                 <div className="space-y-2">
                   {analytics.topCountries.map((country, index) => (
@@ -193,7 +193,7 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
                       <span className="text-sm font-ibm-plex-mono">
                         {index + 1}. {country.country}
                       </span>
-                      <span className="text-sm font-ibm-plex-mono text-gray-500">
+                      <span className="text-sm font-ibm-plex-mono text-foreground/50">
                         {country.count} views
                       </span>
                     </div>
@@ -204,36 +204,36 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
 
             {/* Action Breakdown */}
             {totalInteractions > 0 && (
-              <div className="border border-black/20 p-4 bg-white/50 w-full">
+              <div className="border border-foreground/20 p-4 bg-background/70 w-full">
                 <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase mb-3">Action Breakdown</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-8 text-sm font-ibm-plex-mono">
                   {analytics.actionBreakdown.description > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Description</span>
+                      <span className="text-foreground">Description</span>
                       <span>{analytics.actionBreakdown.description}</span>
                     </div>
                   )}
                   {analytics.actionBreakdown.tiktok > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">TikTok</span>
+                      <span className="text-foreground">TikTok</span>
                       <span>{analytics.actionBreakdown.tiktok}</span>
                     </div>
                   )}
                   {analytics.actionBreakdown.provenance > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Provenance</span>
+                      <span className="text-foreground">Provenance</span>
                       <span>{analytics.actionBreakdown.provenance}</span>
                     </div>
                   )}
                   {analytics.actionBreakdown.construction > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Construction</span>
+                      <span className="text-foreground">Construction</span>
                       <span>{analytics.actionBreakdown.construction}</span>
                     </div>
                   )}
                   {analytics.actionBreakdown.export > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Export</span>
+                      <span className="text-foreground">Export</span>
                       <span>{analytics.actionBreakdown.export}</span>
                     </div>
                   )}
@@ -336,7 +336,7 @@ export function ExportDialogContent({
                 />
               </div>
               
-              <div className="border border-black/20 bg-white/50 p-2">
+              <div className="border border-foreground/20 bg-background/70 p-2">
                 <img
                   src={previewUrl}
                   alt={previewAlt}
@@ -364,7 +364,7 @@ export function ExportDialogContent({
             <button
               type="button"
               onClick={handleDownload}
-              className="w-full flex items-center justify-center gap-2 p-3 border border-black bg-black text-white hover:bg-gray-800 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 p-3 border border-foreground bg-foreground text-background hover:bg-foreground/90 transition-colors cursor-pointer"
             >
               <DownloadSimpleIcon size={18} weight="bold" />
               <span className="font-ibm-plex-mono text-sm font-medium">Download Pattern PNG</span>

@@ -4,7 +4,9 @@ import { zangezi, zangeziCondensed } from "@/lib/fonts/zangezi";
 import "./globals.css";
 import "./wpAcfWysiwyg.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
+import { ThemeProvider } from "@/lib/providers/theme-provider";
 import { CookieBanner } from "@/lib/components/CookieBanner";
+import { ThemeToggle } from "@/lib/components/ThemeToggle";
 
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -47,17 +49,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${ibmPlexMono.variable} ${zangezi.variable} ${zangeziCondensed.variable} antialiased`}
       >
-        {/* Safe area overlay for mobile PWA */}
-        <div className="safe-area-overlay" />
-        <div className="safe-area-overlay-bottom" />
-        <QueryProvider>
-          {children}
-          <CookieBanner />
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          {/* Safe area overlay for mobile PWA */}
+          <div className="safe-area-overlay" />
+          <div className="safe-area-overlay-bottom" />
+          <QueryProvider>
+            {children}
+            <CookieBanner />
+          </QueryProvider>
+          <ThemeToggle />
+        </ThemeProvider>
       </body>
     </html>
   );

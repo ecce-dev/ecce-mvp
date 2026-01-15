@@ -9,6 +9,13 @@ export type UserRole = "curator" | "designer" | "vc"
 /** View mode for garment details */
 export type ViewMode = "public" | "research"
 
+/** 
+ * Animation mode for garment selection:
+ * - 'camera': Camera animates to view the selected garment (original behavior)
+ * - 'carousel': Camera stays fixed, carousel rotates to bring garment to camera
+ */
+export type SelectionAnimationMode = "camera" | "carousel"
+
 interface AppModeState {
   /** Currently selected garment, null if none */
   selectedGarment: GarmentNode | null
@@ -20,6 +27,8 @@ interface AppModeState {
   userRole: UserRole | null
   /** Whether auth state has been initialized from session */
   isAuthInitialized: boolean
+  /** Animation mode for garment selection */
+  selectionAnimationMode: SelectionAnimationMode
 }
 
 interface AppModeActions {
@@ -37,6 +46,8 @@ interface AppModeActions {
   logout: () => Promise<void>
   /** Initialize state from URL params */
   initializeFromUrl: (garments: GarmentNode[]) => void
+  /** Set the selection animation mode */
+  setSelectionAnimationMode: (mode: SelectionAnimationMode) => void
 }
 
 type AppModeStore = AppModeState & AppModeActions
@@ -78,6 +89,7 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   isAuthenticated: false,
   userRole: null,
   isAuthInitialized: false,
+  selectionAnimationMode: "carousel",
 
   // Actions
   selectGarment: (garment) => {
@@ -161,5 +173,9 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
         }
       }
     }
+  },
+
+  setSelectionAnimationMode: (mode) => {
+    set({ selectionAnimationMode: mode })
   },
 }))

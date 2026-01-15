@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useMemo, useContext, useEffect } from "react";
+import { useRef, useMemo, useContext, useEffect, useCallback } from "react";
 import { useFrame } from "@react-three/fiber";
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql";
 import Garment from "./Garment";
@@ -10,6 +10,10 @@ import { TargetBoundingBox } from "./NormalizedGlbModel";
 import OrbitControlsContext from "./OrbitControlsContext";
 import { useAppModeStore } from "@/lib/stores/appModeStore";
 import * as THREE from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+
+/** Minimum rotation difference (in radians) to trigger an animation */
+const MIN_ROTATION_THRESHOLD = 0.01;
 
 // ============================================
 // CONFIGURATION CONSTANTS (Desktop baseline values)
@@ -95,20 +99,143 @@ interface OrbitingGroupProps {
   isPaused: boolean;
   isDragging: boolean;
   rotationRef: React.MutableRefObject<number>;
+  /** Whether carousel animation mode is active */
+  useCarouselAnimation: boolean;
+  /** 
+   * Base angle of the selected garment in the carousel.
+   * When this changes to a new value, the carousel animates to bring that garment in front of the camera.
+   * null = no selection, carousel auto-rotates
+   */
+  selectedGarmentBaseAngle: number | null;
+  /** Reference to OrbitControls for reading camera angle */
+  orbitControlsRef: React.RefObject<OrbitControlsImpl> | null;
+  /** Callback when carousel animation starts */
+  onAnimationStart?: () => void;
+  /** Callback when carousel animation completes */
+  onAnimationComplete?: () => void;
 }
 
 /**
  * Rotating carousel group that orbits all garments around the Y-axis.
- * Pauses rotation when orbit controls are being dragged or when a garment is selected.
- * Tracks current rotation in a ref for camera positioning calculations.
+ * 
+ * SIMPLIFIED CAROUSEL ANIMATION:
+ * - When selectedGarmentBaseAngle changes to a new value:
+ *   1. Read camera's current azimuthal angle
+ *   2. Calculate target carousel rotation to bring garment in front of camera
+ *   3. Animate carousel rotation (shortest path) using lerp in useFrame
+ * - When selectedGarmentBaseAngle becomes null: resume auto-rotation
  */
-function OrbitingGroup({ children, orbitSpeed, isPaused, isDragging, rotationRef }: OrbitingGroupProps) {
+function OrbitingGroup({ 
+  children, 
+  orbitSpeed, 
+  isPaused, 
+  isDragging, 
+  rotationRef,
+  useCarouselAnimation,
+  selectedGarmentBaseAngle,
+  orbitControlsRef,
+  onAnimationStart,
+  onAnimationComplete,
+}: OrbitingGroupProps) {
   const groupRef = useRef<THREE.Group>(null!);
+  
+  // Animation state
+  const isAnimatingRef = useRef(false);
+  const targetRotationRef = useRef<number | null>(null);
+  const animationStartedRef = useRef(false);
+  
+  // Track previous base angle to detect when selection changes
+  const prevBaseAngleRef = useRef<number | null>(null);
+  
+  // Animation speed (lerp factor per frame, higher = faster)
+  const ANIMATION_SPEED = 0.08;
+  const ANIMATION_THRESHOLD = 0.001; // Close enough to target
 
-  useFrame((_, delta) => {
-    // Only rotate when not dragging and not paused
-    if (groupRef.current && !isDragging && !isPaused) {
-      groupRef.current.rotation.y += orbitSpeed * delta;
+  // Handle carousel animation when a garment is selected
+  useEffect(() => {
+    // Skip if not in carousel mode
+    if (!useCarouselAnimation) {
+      prevBaseAngleRef.current = selectedGarmentBaseAngle;
+      return;
+    }
+    
+    // Check if base angle actually changed (new garment selected)
+    const baseAngleChanged = selectedGarmentBaseAngle !== prevBaseAngleRef.current;
+    prevBaseAngleRef.current = selectedGarmentBaseAngle;
+    
+    // If no selection or base angle didn't change, skip
+    if (selectedGarmentBaseAngle === null || !baseAngleChanged) {
+      return;
+    }
+    
+    // === CALCULATE TARGET ROTATION ===
+    
+    // 1. Read camera's current azimuthal angle
+    const cameraAngle = orbitControlsRef?.current?.getAzimuthalAngle() ?? 0;
+    
+    // 2. Get current carousel rotation
+    const currentRotation = groupRef.current?.rotation.y ?? rotationRef.current;
+    
+    // 3. Calculate garment's current world angle
+    const currentWorldAngle = selectedGarmentBaseAngle + currentRotation;
+    
+    // 4. Calculate rotation delta to bring garment to camera angle
+    let rotationDelta = cameraAngle - currentWorldAngle;
+    
+    // 5. Normalize to shortest path [-π, π]
+    while (rotationDelta > Math.PI) rotationDelta -= 2 * Math.PI;
+    while (rotationDelta < -Math.PI) rotationDelta += 2 * Math.PI;
+    
+    // 6. Calculate final target rotation
+    const targetRotation = currentRotation + rotationDelta;
+    
+    // Skip if already at target (avoid micro-animations)
+    if (Math.abs(rotationDelta) < MIN_ROTATION_THRESHOLD) {
+      return;
+    }
+    
+    // Set target and start animation
+    targetRotationRef.current = targetRotation;
+    isAnimatingRef.current = true;
+    animationStartedRef.current = false; // Will trigger onAnimationStart on first frame
+    
+  }, [selectedGarmentBaseAngle, useCarouselAnimation, orbitControlsRef, rotationRef]);
+
+  // All rotation logic in useFrame for predictable behavior
+  useFrame(() => {
+    if (!groupRef.current) return;
+
+    // Handle carousel animation
+    if (isAnimatingRef.current && targetRotationRef.current !== null) {
+      // Trigger onAnimationStart on first frame
+      if (!animationStartedRef.current) {
+        animationStartedRef.current = true;
+        onAnimationStart?.();
+      }
+      
+      const current = groupRef.current.rotation.y;
+      const target = targetRotationRef.current;
+      const diff = target - current;
+      
+      // Check if close enough to target
+      if (Math.abs(diff) < ANIMATION_THRESHOLD) {
+        // Snap to target and complete animation
+        groupRef.current.rotation.y = target;
+        rotationRef.current = target;
+        isAnimatingRef.current = false;
+        targetRotationRef.current = null;
+        onAnimationComplete?.();
+      } else {
+        // Lerp towards target
+        groupRef.current.rotation.y += diff * ANIMATION_SPEED;
+        rotationRef.current = groupRef.current.rotation.y;
+      }
+      return;
+    }
+
+    // Auto-rotate when not paused, not dragging, and not animating
+    if (!isPaused && !isDragging) {
+      groupRef.current.rotation.y += orbitSpeed * (1/60); // Approximate delta
       rotationRef.current = groupRef.current.rotation.y;
     }
   });
@@ -136,8 +263,9 @@ export default function Garments({ garments }: GarmentsProps) {
   // Get device type for stepped values
   const { deviceType } = useDevice();
 
-  // Get selected garment from store
+  // Get selected garment and animation mode from store
   const selectedGarment = useAppModeStore((state) => state.selectedGarment);
+  const selectionAnimationMode = useAppModeStore((state) => state.selectionAnimationMode);
   const selectedIndex = getSelectedIndex(garments, selectedGarment);
   const hasSelection = selectedIndex !== -1;
 
@@ -153,7 +281,10 @@ export default function Garments({ garments }: GarmentsProps) {
     setTargetOrbitTarget, 
     setTargetDistance, 
     setQueuedDistanceCorrection,
-    isDragging 
+    isDragging,
+    orbitControlsRef,
+    isCarouselAnimating,
+    setIsCarouselAnimating,
   } = useContext(OrbitControlsContext);
 
   // Get orbit radius based on device type
@@ -200,8 +331,15 @@ export default function Garments({ garments }: GarmentsProps) {
     });
   }, [garments, garmentCount, orbitRadius, yOffset]);
 
-  // Trigger camera rotation, orbit target, and distance when a garment is selected
+  // Trigger camera animation when a garment is selected (only for 'camera' animation mode)
+  // For 'carousel' mode, the OrbitingGroup handles animation internally
   useEffect(() => {
+    // Only handle camera mode animations here
+    if (selectionAnimationMode !== 'camera') {
+      prevHasSelectionRef.current = hasSelection;
+      return;
+    }
+    
     // Detect if selection STATE changed (entering/exiting) vs switching between garments
     const isEnteringSelection = hasSelection && !prevHasSelectionRef.current;
     const isExitingSelection = !hasSelection && prevHasSelectionRef.current;
@@ -211,6 +349,8 @@ export default function Garments({ garments }: GarmentsProps) {
     if (selectedIndex !== -1) {
       const selectedGarmentData = garmentData[selectedIndex];
       if (selectedGarmentData) {
+        // CAMERA ANIMATION MODE: Camera animates to view the garment
+        
         // Calculate world angle: base angle + carousel rotation
         const worldAngle = selectedGarmentData.baseAngle + carouselRotationRef.current;
         
@@ -239,11 +379,34 @@ export default function Garments({ garments }: GarmentsProps) {
         }
       }
     } else if (isExitingSelection) {
-      // Exiting selection - return orbit target to origin and camera to default distance
+      // Exiting selection in camera mode - return orbit target to origin and camera to default distance
       setTargetOrbitTarget(new THREE.Vector3(0, 0, 0));
       setTargetDistance(defaultCameraDistance);
     }
-  }, [selectedIndex, garmentData, hasSelection, setTargetAzimuthalAngle, setTargetOrbitTarget, setTargetDistance, setQueuedDistanceCorrection, selectedCameraDistance, defaultCameraDistance]);
+  }, [
+    selectedIndex, 
+    garmentData, 
+    hasSelection, 
+    selectionAnimationMode,
+    setTargetAzimuthalAngle, 
+    setTargetOrbitTarget, 
+    setTargetDistance, 
+    setQueuedDistanceCorrection, 
+    selectedCameraDistance, 
+    defaultCameraDistance,
+  ]);
+
+  // Memoized callbacks to prevent unnecessary effect re-runs in OrbitingGroup
+  const handleAnimationStart = useCallback(() => {
+    setIsCarouselAnimating(true);
+  }, [setIsCarouselAnimating]);
+
+  const handleAnimationComplete = useCallback(() => {
+    setIsCarouselAnimating(false);
+  }, [setIsCarouselAnimating]);
+
+  // Calculate the selected garment's base angle (null if no selection)
+  const selectedBaseAngle = selectedIndex !== -1 ? garmentData[selectedIndex]?.baseAngle ?? null : null;
 
   return (
     <>
@@ -252,6 +415,11 @@ export default function Garments({ garments }: GarmentsProps) {
         isPaused={hasSelection}
         isDragging={isDragging}
         rotationRef={carouselRotationRef}
+        useCarouselAnimation={selectionAnimationMode === 'carousel'}
+        selectedGarmentBaseAngle={selectedBaseAngle}
+        orbitControlsRef={orbitControlsRef}
+        onAnimationStart={handleAnimationStart}
+        onAnimationComplete={handleAnimationComplete}
       >
         {garments.map((garment, index) => (
           <Garment

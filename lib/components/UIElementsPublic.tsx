@@ -78,8 +78,6 @@ export default function UIElementsPublic() {
     </div>
   </>
 
-  console.log('deviceType', deviceType)
-
   return (
     <EcceDialogProvider>
       {/* Login Modal */}

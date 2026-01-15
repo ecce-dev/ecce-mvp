@@ -52,6 +52,13 @@ const DISTANCE_CORRECTION_CURVE: AnimationCurveOption = 3;
  */
 const IMMEDIATE_DISTANCE_CURVE: AnimationCurveOption = 4;
 
+/**
+ * Carousel Rotation Animation
+ * Used when in 'carousel' animation mode - rotates carousel to bring garment to camera.
+ * Recommended: 2 (Smooth) for elegant carousel rotation
+ */
+const CAROUSEL_ROTATION_CURVE: AnimationCurveOption = 2;
+
 /** Animation curve configurations for react-spring */
 const ANIMATION_CURVES = {
   1: { tension: 420, friction: 60 },                  // Snappy - quick and responsive
@@ -294,6 +301,9 @@ function CameraRotationAnimator() {
   return null;
 }
 
+// CarouselRotationAnimator has been removed - animation is now handled directly in OrbitingGroup
+// This simplifies the architecture by eliminating state synchronization between components
+
 
 export type CanvasWrapperProps = {
   environmentFilePath?: string | string[]
@@ -333,16 +343,19 @@ function CanvasWrapper({
   },
   ...props
 }: React.PropsWithChildren<CanvasWrapperProps>) {
-  /**
-   * Refs and State
-   */
-  const orbitRef = useRef<OrbitControlsImpl>(null!)
-  const [orbitControlsRef, setOrbitControlsRef] = useState<RefObject<OrbitControlsImpl>>(orbitRef)
-  const [isDragging, setIsDragging] = useState(false)
-  const [targetAzimuthalAngle, setTargetAzimuthalAngle] = useState<number | null>(null)
-  const [targetOrbitTarget, setTargetOrbitTarget] = useState<THREE.Vector3 | null>(null)
-  const [targetDistance, setTargetDistance] = useState<number | null>(null)
-  const [queuedDistanceCorrection, setQueuedDistanceCorrection] = useState<number | null>(null)
+/**
+ * Refs and State
+ */
+const orbitRef = useRef<OrbitControlsImpl>(null!)
+const [orbitControlsRef, setOrbitControlsRef] = useState<RefObject<OrbitControlsImpl>>(orbitRef)
+const [isDragging, setIsDragging] = useState(false)
+const [targetAzimuthalAngle, setTargetAzimuthalAngle] = useState<number | null>(null)
+const [targetOrbitTarget, setTargetOrbitTarget] = useState<THREE.Vector3 | null>(null)
+const [targetDistance, setTargetDistance] = useState<number | null>(null)
+const [queuedDistanceCorrection, setQueuedDistanceCorrection] = useState<number | null>(null)
+
+// Carousel animation state (only need this flag to disable orbit controls during animation)
+const [isCarouselAnimating, setIsCarouselAnimating] = useState(false)
 
 
   return <>
@@ -359,6 +372,8 @@ function CanvasWrapper({
       setTargetDistance,
       queuedDistanceCorrection,
       setQueuedDistanceCorrection,
+      isCarouselAnimating,
+      setIsCarouselAnimating,
     }}>
       <Canvas
         shadows
@@ -391,7 +406,8 @@ function CanvasWrapper({
           minPolarAngle={controls.orbitControls.minPolarAngle ?? 0}
           enableZoom={controls.orbitControls.enableZoom ?? false}
           enablePan={controls.orbitControls.enablePan ?? false}
-          enableRotate={controls.orbitControls.enableRotate ?? true}
+          // Disable rotation during carousel animation to prevent user interference
+          enableRotate={isCarouselAnimating ? false : (controls.orbitControls.enableRotate ?? true)}
           enableDamping={true}
           onStart={() => { setIsDragging(true) }}
           onEnd={() => { setIsDragging(false) }}

@@ -24,6 +24,10 @@ type OrbitControlsContextType = {
    */
   queuedDistanceCorrection: number | null
   setQueuedDistanceCorrection: (distance: number | null) => void
+  
+  /** Whether carousel animation is currently active (used to lock user interaction) */
+  isCarouselAnimating: boolean
+  setIsCarouselAnimating: (animating: boolean) => void
 }
 
 const OrbitControlsContext = createContext<OrbitControlsContextType>({
@@ -39,6 +43,8 @@ const OrbitControlsContext = createContext<OrbitControlsContextType>({
   setTargetDistance: () => {},
   queuedDistanceCorrection: null,
   setQueuedDistanceCorrection: () => {},
+  isCarouselAnimating: false,
+  setIsCarouselAnimating: () => {},
 });
 
 export default OrbitControlsContext

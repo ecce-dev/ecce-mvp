@@ -128,6 +128,7 @@ export default function UIElementsPublic() {
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"
+            contentKey={selectedGarment.slug ?? ""}
             dialogs={{
               description: {
                 title: garmentName,

@@ -76,7 +76,7 @@ export function EcceDialogContent({
           >
             <XIcon className="size-5" size={20} />
           </button> */}
-          <div className="pr-8">{children}</div>
+          <div className="">{children}</div>
         </animated.div>
       )
   )

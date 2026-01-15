@@ -29,6 +29,8 @@ export type EcceUnifiedDialogRendererProps = {
   left?: string
   /** Max height before content becomes scrollable */
   maxHeight?: string
+  /** Optional key to force content refresh (e.g., garment slug) */
+  contentKey?: string
 }
 
 /**
@@ -50,23 +52,36 @@ export function EcceUnifiedDialogRenderer({
   bottom,
   left,
   maxHeight = "100%",
+  contentKey,
 }: EcceUnifiedDialogRendererProps) {
   const { openDialogId, closeDialog } = useEcceDialog()
 
   // Only apply fixed positioning if any position prop is provided
   const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
 
+  // Combine dialogId with contentKey to force re-render when content changes
+  // This ensures the dialog content updates when switching garments
+  const transitionKey = openDialogId ? (contentKey ? `${openDialogId}-${contentKey}` : openDialogId) : null
+
   // Single transition that manages ALL dialogs
-  // The key is the dialogId - when it changes, exit current, then enter new
-  const transitions = useTransition(openDialogId, transitionConfig)
+  // The key includes contentKey so changing garments triggers a re-render
+  const transitions = useTransition(transitionKey, transitionConfig)
 
   const positionStyles = hasPositionProps
     ? { top, right, bottom, left, maxHeight }
     : { maxHeight }
 
-  return transitions((styles, dialogId) => {
-    // Don't render if no dialog is open or dialog doesn't exist
-    if (!dialogId || !dialogs[dialogId]) return null
+  return transitions((styles, compositeKey) => {
+    // Don't render if no dialog is open
+    if (!compositeKey) return null
+
+    // Extract the dialogId from the composite key (format: "dialogId" or "dialogId-contentKey")
+    const dialogId = contentKey && compositeKey.includes("-") 
+      ? compositeKey.split("-")[0] 
+      : compositeKey
+
+    // Don't render if dialog doesn't exist
+    if (!dialogs[dialogId]) return null
 
     const dialog = dialogs[dialogId]
 
@@ -92,7 +107,7 @@ export function EcceUnifiedDialogRenderer({
         >
           <XIcon className="size-5" />
         </button> */}
-        <div className="pr-8">{dialog.content}</div>
+        <div className="">{dialog.content}</div>
       </animated.div>
     )
   })

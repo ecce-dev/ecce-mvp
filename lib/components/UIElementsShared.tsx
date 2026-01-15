@@ -1,7 +1,10 @@
-import { LessThanIcon } from "@phosphor-icons/react"
+import { useState } from "react"
+import { LessThanIcon, DownloadSimpleIcon, ChartLineIcon } from "@phosphor-icons/react"
 import { DeviceType } from "../hooks/useDevice"
 import { EcceActionTrigger, EcceDialogTrigger, EcceDialogContent } from "./ecce-elements"
+import { Switch } from "./ui/switch"
 import { cn } from "../utils/utils"
+import posthog from "posthog-js"
 
 // ============================================
 // Garment Name Element
@@ -154,3 +157,202 @@ export const createDialogContent = (dialogId: string, { title, content }: Dialog
     </EcceDialogContent>
   </div>
 )
+
+// ============================================
+// Analytics Dialog Content
+// ============================================
+interface AnalyticsDialogContentProps {
+  garmentSlug: string
+  garmentName: string
+  userRole: string | null
+}
+
+/**
+ * Analytics dialog content for Research mode
+ * Displays garment engagement metrics and tracking data
+ */
+export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: AnalyticsDialogContentProps) {
+  // Track analytics view
+  posthog.capture("research_analytics_viewed", {
+    garmentSlug,
+    garmentName,
+    userRole,
+  })
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <ChartLineIcon size={20} weight="regular" />
+        <h4 className="font-zangezi uppercase text-lg">Analytics</h4>
+      </div>
+      
+      <div className="space-y-4">
+        <p className="text-sm text-gray-600 font-ibm-plex-mono">
+          Engagement metrics for <span className="font-medium">{garmentName}</span>
+        </p>
+
+        {/* Placeholder metrics - to be replaced with real data */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="border border-black/20 p-3 bg-white/50">
+            <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Views</p>
+            <p className="text-2xl font-zangezi">—</p>
+          </div>
+          <div className="border border-black/20 p-3 bg-white/50">
+            <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Interactions</p>
+            <p className="text-2xl font-zangezi">—</p>
+          </div>
+          <div className="border border-black/20 p-3 bg-white/50">
+            <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Avg. Time</p>
+            <p className="text-2xl font-zangezi">—</p>
+          </div>
+          <div className="border border-black/20 p-3 bg-white/50">
+            <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">TikTok Clicks</p>
+            <p className="text-2xl font-zangezi">—</p>
+          </div>
+        </div>
+
+        <p className="text-xs font-ibm-plex-mono text-gray-400 italic">
+          Analytics data coming soon
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// Export Dialog Content
+// ============================================
+interface PatternMediaItem {
+  node?: {
+    altText?: string | null
+    mediaItemUrl?: string | null
+  } | null
+}
+
+interface ExportDialogContentProps {
+  garmentSlug: string
+  garmentName: string
+  userRole: string | null
+  patternDescription?: string | null
+  patternPngDownload?: PatternMediaItem | null
+  patternPngPreview?: PatternMediaItem | null
+}
+
+/**
+ * Export dialog content for Research mode
+ * Displays pattern preview and provides download functionality
+ */
+export function ExportDialogContent({
+  garmentSlug,
+  garmentName,
+  userRole,
+  patternDescription,
+  patternPngDownload,
+  patternPngPreview,
+}: ExportDialogContentProps) {
+  const previewUrl = patternPngPreview?.node?.mediaItemUrl
+  const previewAlt = patternPngPreview?.node?.altText ?? `Pattern preview for ${garmentName}`
+  const downloadUrl = patternPngDownload?.node?.mediaItemUrl
+
+  const [isInverted, setIsInverted] = useState(false)
+
+  const handleDownload = () => {
+    if (!downloadUrl) return
+
+    posthog.capture("research_export_initiated", {
+      garmentSlug,
+      garmentName,
+      userRole,
+      exportFormat: "pattern_png",
+    })
+
+    // Trigger download
+    const link = document.createElement("a")
+    link.href = downloadUrl
+    link.download = `${garmentSlug}-pattern.png`
+    link.target = "_blank"
+    link.rel = "noopener noreferrer"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const hasPattern = previewUrl || downloadUrl || patternDescription
+
+  return (
+    <div className="space-y-6">
+      {/* <div className="flex items-center gap-2">
+        <DownloadSimpleIcon size={20} weight="regular" />
+        <h4 className="font-zangezi uppercase text-lg">Export</h4>
+      </div> */}
+
+      {hasPattern ? (
+        <div className="space-y-4">
+          {/* Pattern Preview Image */}
+          {previewUrl && (
+            <div className="space-y-2">
+              {/* Invert Switch */}
+              <div className="flex items-center justify-end gap-2">
+                <label 
+                  htmlFor="invert-switch" 
+                  className="text-xs font-ibm-plex-mono text-gray-600 cursor-pointer"
+                >
+                  Invert Colors
+                </label>
+                <Switch
+                  id="invert-switch"
+                  checked={isInverted}
+                  onCheckedChange={setIsInverted}
+                />
+              </div>
+              
+              <div className="border border-black/20 bg-white/50 p-2">
+                <img
+                  src={previewUrl}
+                  alt={previewAlt}
+                  className={cn(
+                    "w-full h-auto max-h-[420px] object-contain transition-all duration-200",
+                    isInverted && "invert"
+                  )}
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
+
+
+          {/* Pattern Description */}
+          {patternDescription && (
+            <div className="space-y-2">
+              {/* <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase">Pattern Description</p> */}
+              <p className="text-sm font-ibm-plex-mono text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: patternDescription }} />
+            </div>
+          )}
+
+          
+          {/* Download Button */}
+          {downloadUrl ? (
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="w-full flex items-center justify-center gap-2 p-3 border border-black bg-black text-white hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              <DownloadSimpleIcon size={18} weight="bold" />
+              <span className="font-ibm-plex-mono text-sm font-medium">Download Pattern PNG</span>
+            </button>
+          ) : (
+            <p className="text-xs font-ibm-plex-mono text-gray-400 italic text-center">
+              No download file available
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-4">
+          <p className="text-sm font-ibm-plex-mono text-gray-500">
+            No pattern data available for this garment
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}

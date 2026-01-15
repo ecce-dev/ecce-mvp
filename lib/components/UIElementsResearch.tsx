@@ -1,9 +1,8 @@
 "use client"
 
-import { EcceDialogProvider, EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
+import { EcceDialogProvider, EcceActionTrigger, EcceDialogTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
-import posthog from "posthog-js"
 import {
   BackButtonElement,
   garmentNameElement,
@@ -13,6 +12,8 @@ import {
   constructionTrigger,
   createTiktokTrigger,
   createHtmlContent,
+  AnalyticsDialogContent,
+  ExportDialogContent,
 } from "./UIElementsShared"
 
 /**
@@ -42,47 +43,30 @@ export default function UIElementsResearch() {
   const provenance = garmentFields?.provenance ?? ""
   const construction = garmentFields?.construction ?? ""
   const tiktokUrl = garmentFields?.linkToTiktok
-
-  const handleAnalyticsClick = () => {
-    posthog.capture("research_analytics_viewed", {
-      garmentSlug: selectedGarment.slug,
-      garmentName,
-      userRole,
-    })
-    // TODO: Open analytics modal/panel
-    console.log("Analytics clicked for:", garmentName)
-  }
-
-  const handleExportClick = () => {
-    posthog.capture("research_export_initiated", {
-      garmentSlug: selectedGarment.slug,
-      garmentName,
-      userRole,
-    })
-    // TODO: Implement export functionality
-    console.log("Export clicked for:", garmentName)
-  }
+  const patternDescription = garmentFields?.patternDescription
+  const patternPngDownload = garmentFields?.patternPngDownload
+  const patternPngPreview = garmentFields?.patternPngPreview
 
   const tiktokTrigger = createTiktokTrigger(tiktokUrl)
 
   const analyticsTrigger = (
-    <EcceActionTrigger
+    <EcceDialogTrigger
+      dialogId="analytics"
       variant="secondary"
       className="pointer-events-auto"
-      onAction={handleAnalyticsClick}
     >
       Analytics
-    </EcceActionTrigger>
+    </EcceDialogTrigger>
   )
 
   const exportTrigger = (
-    <EcceActionTrigger
+    <EcceDialogTrigger
+      dialogId="export"
       variant="secondary"
       className="pointer-events-auto"
-      onAction={handleExportClick}
     >
       Export
-    </EcceActionTrigger>
+    </EcceDialogTrigger>
   )
 
   {/* Hidden logout button - kept for future use */}
@@ -181,6 +165,7 @@ export default function UIElementsResearch() {
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"
+            contentKey={selectedGarment.slug ?? ""}
             dialogs={{
               description: {
                 title: garmentName,
@@ -193,6 +178,29 @@ export default function UIElementsResearch() {
               construction: {
                 title: "Construction",
                 content: createHtmlContent(construction),
+              },
+              analytics: {
+                title: "Analytics",
+                content: (
+                  <AnalyticsDialogContent
+                    garmentSlug={selectedGarment.slug ?? ""}
+                    garmentName={garmentName}
+                    userRole={userRole}
+                  />
+                ),
+              },
+              export: {
+                title: "Export",
+                content: (
+                  <ExportDialogContent
+                    garmentSlug={selectedGarment.slug ?? ""}
+                    garmentName={garmentName}
+                    userRole={userRole}
+                    patternDescription={patternDescription}
+                    patternPngDownload={patternPngDownload}
+                    patternPngPreview={patternPngPreview}
+                  />
+                ),
               },
             }}
           />

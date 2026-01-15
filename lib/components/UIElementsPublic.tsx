@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { EcceDialogProvider, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
@@ -24,9 +23,16 @@ import {
  * - Top Right: Mode switch (Public/Research)
  */
 export default function UIElementsPublic() {
-  const { selectedGarment, deselectGarment, viewMode, setViewMode, isAuthenticated, userRole } = useAppModeStore()
+  const { 
+    selectedGarment, 
+    deselectGarment, 
+    viewMode, 
+    setViewMode, 
+    isAuthenticated, 
+    userRole,
+    setLoginModalOpen 
+  } = useAppModeStore()
   const { deviceType } = useDevice()
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   // Track garment session (selection and time spent)
   useGarmentSessionTracking()
@@ -43,7 +49,7 @@ export default function UIElementsPublic() {
     if (isAuthenticated) {
       setViewMode("research")
     } else {
-      setIsLoginModalOpen(true)
+      setLoginModalOpen(true)
     }
   }
 
@@ -108,10 +114,7 @@ export default function UIElementsPublic() {
   return (
     <EcceDialogProvider>
       {/* Login Modal */}
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
+      <LoginModal />
 
       {/* Top navigation bar */}
       <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">

@@ -5,6 +5,7 @@ import { ContactShadows, Environment, useProgress } from "@react-three/drei";
 import CanvasWrapper from "./r3f/CanvasWrapper";
 import Garments from "./r3f/Garments";
 import LoadingScreen from "./LoadingScreen";
+import { BlurredOverlay } from "./BlurredOverlay";
 import * as THREE from 'three';
 import { useDevice } from "../hooks/useDevice";
 
@@ -40,6 +41,7 @@ export default function GarmentsClient() {
   return (
     <>
       <LoadingScreen isLoading={isLoading} />
+      <BlurredOverlay />
 
       <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
         <CanvasWrapper

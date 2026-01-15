@@ -9,6 +9,7 @@ import { useDevice } from "@/lib/hooks/useDevice";
 import { TargetBoundingBox } from "./NormalizedGlbModel";
 import OrbitControlsContext from "./OrbitControlsContext";
 import { useAppModeStore } from "@/lib/stores/appModeStore";
+import { useEcceDialog } from "@/lib/components/ecce-elements";
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
@@ -269,6 +270,10 @@ export default function Garments({ garments }: GarmentsProps) {
   const selectedIndex = getSelectedIndex(garments, selectedGarment);
   const hasSelection = selectedIndex !== -1;
 
+  // Get submit request dialog state from context
+  const { isDialogOpen } = useEcceDialog();
+  const isSubmitRequestOpen = isDialogOpen("submit-request");
+
   // Track carousel's current rotation for camera positioning
   const carouselRotationRef = useRef(0);
   
@@ -412,7 +417,7 @@ export default function Garments({ garments }: GarmentsProps) {
     <>
       <OrbitingGroup 
         orbitSpeed={ORBIT_SPEED} 
-        isPaused={hasSelection}
+        isPaused={hasSelection || isSubmitRequestOpen}
         isDragging={isDragging}
         rotationRef={carouselRotationRef}
         useCarouselAnimation={selectionAnimationMode === 'carousel'}

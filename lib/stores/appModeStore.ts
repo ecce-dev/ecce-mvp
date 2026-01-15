@@ -29,6 +29,8 @@ interface AppModeState {
   isAuthInitialized: boolean
   /** Animation mode for garment selection */
   selectionAnimationMode: SelectionAnimationMode
+  /** Whether the login modal is open */
+  isLoginModalOpen: boolean
 }
 
 interface AppModeActions {
@@ -48,6 +50,8 @@ interface AppModeActions {
   initializeFromUrl: (garments: GarmentNode[]) => void
   /** Set the selection animation mode */
   setSelectionAnimationMode: (mode: SelectionAnimationMode) => void
+  /** Open/close the login modal */
+  setLoginModalOpen: (open: boolean) => void
 }
 
 type AppModeStore = AppModeState & AppModeActions
@@ -90,6 +94,7 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   userRole: null,
   isAuthInitialized: false,
   selectionAnimationMode: "carousel",
+  isLoginModalOpen: false,
 
   // Actions
   selectGarment: (garment) => {
@@ -177,5 +182,9 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
 
   setSelectionAnimationMode: (mode) => {
     set({ selectionAnimationMode: mode })
+  },
+
+  setLoginModalOpen: (open) => {
+    set({ isLoginModalOpen: open })
   },
 }))

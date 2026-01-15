@@ -9,6 +9,7 @@ export {
   trackGarmentSelected,
   trackGarmentSessionEnded,
   trackGarmentActionClicked,
+  trackRequestSubmitted,
   startGarmentSession,
   endGarmentSession,
   type AnalyticsMode,

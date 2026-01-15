@@ -1,12 +1,11 @@
 "use client"
 
-import { Button } from "@/lib/components/ui/button"
 import {
-  EcceDialogProvider,
   EcceDialogTrigger,
   EcceDialogContent,
   EcceActionTrigger,
 } from "@/lib/components/ecce-elements"
+import { SubmitRequestForm } from "@/lib/components/SubmitRequestForm"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "../hooks/useDevice";
 import { cn } from "../utils/utils";
@@ -34,7 +33,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
   };
 
   return (
-    <EcceDialogProvider>
+    <>
       {/* 
         Trigger container: 
         - Fixed positioning spans the top of the screen
@@ -104,17 +103,13 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         </div>
 
         {/* Center slot: Submit Request content - same cell on mobile, centered in second column on tablet/desktop */}
-        <div className="col-start-1 row-start-1 justify-self-start md:col-start-2 md:justify-self-center md:self-center max-h-full overflow-hidden">
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-2 md:justify-self-center md:self-center max-h-full w-full overflow-hidden flex items-center justify-center">
           <EcceDialogContent
             dialogId="submit-request"
-            className="pointer-events-auto"
+            className="pointer-events-auto p-0 border-0 bg-transparent"
           >
-            <h4 className="mb-4">Submit Request</h4>
-            <div className="space-y-4">
-              {/* Empty div for future form content */}
-              <div className="min-h-[100px]" />
-              <Button className="w-full">Send</Button>
-            </div>
+            {/* <h4 className="mb-4">Submit Request</h4> */}
+            <SubmitRequestForm />
           </EcceDialogContent>
         </div>
 
@@ -128,6 +123,6 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
       </div>
-    </EcceDialogProvider>
+    </>
   )
 }

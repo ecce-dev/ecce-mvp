@@ -62,7 +62,7 @@ export function EcceDialogContent({
           }}
           className={cn(
             // Base styles
-            "z-100 max-w-[420px] bg-white/70 border border-black p-8 overflow-y-auto",
+            "z-100 max-w-[420px] bg-white/70 border border-black p-8 overflow-y-auto w-full",
             hasPositionProps && "fixed",
             className
           )}

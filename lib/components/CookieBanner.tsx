@@ -58,8 +58,8 @@ export function CookieBanner() {
         className={cn(
           "mx-auto max-w-xl",
           "bg-popover/95 backdrop-blur-md",
-          "border border-border/50",
-          "rounded-lg shadow-lg",
+          "border border-foreground/50",
+          "rounded-none shadow-lg",
           "p-4 sm:p-6",
           "space-y-4"
         )}
@@ -75,7 +75,7 @@ export function CookieBanner() {
 
           </div>
           <p className="text-sm text-popover-foreground/90 leading-relaxed">
-            To continously improve the experience, cookies are used. Your consent is required.
+            To continously improve the experience, cookies are used.
           </p>
           {/* <p className="text-xs text-popover-foreground/80">
             By clicking "Accept all cookies", you consent to our use of analytics cookies. 
@@ -93,7 +93,7 @@ export function CookieBanner() {
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
           <Button
             type="button"
-            variant="outline"
+            variant="eccePrimary"
             size="default"
             onClick={handleDeclineCookies}
             className="w-full sm:w-auto"
@@ -102,7 +102,7 @@ export function CookieBanner() {
           </Button>
           <Button
             type="button"
-            variant="default"
+            variant="ecceSecondary"
             size="default"
             onClick={handleAcceptCookies}
             className="w-full sm:w-auto"

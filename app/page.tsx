@@ -1,5 +1,6 @@
 import { getAboutContent, getContactContent } from "@/lib/actions/getGlobalSettings";
 import Background from "@/lib/components/Background";
+import { EcceDialogWrapper } from "@/lib/components/EcceDialogWrapper";
 import GarmentsClient from "@/lib/components/GarmentsClient";
 import GarmentsWrapper from "@/lib/components/GarmentsWrapper";
 import PageContainer from "@/lib/components/PageContainer";
@@ -14,12 +15,15 @@ export default async function Home() {
     <PageContainer>
       {/* GarmentsWrapper provides context to both GarmentsClient and UIElementsRouter */}
       <GarmentsWrapper>
-        <Background />
-        <GarmentsClient />
-        <UIElementsRouter
-          aboutContent={aboutContent ?? null}
-          contactContent={contactContent ?? null}
-        />
+        {/* EcceDialogWrapper provides dialog context to canvas and UI components */}
+        <EcceDialogWrapper>
+          <Background />
+          <GarmentsClient />
+          <UIElementsRouter
+            aboutContent={aboutContent ?? null}
+            contactContent={contactContent ?? null}
+          />
+        </EcceDialogWrapper>
       </GarmentsWrapper>
     </PageContainer>
   );

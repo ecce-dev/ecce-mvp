@@ -149,6 +149,34 @@ export function trackGarmentActionClicked(
 }
 
 // ============================================
+// REQUEST SUBMISSION TRACKING
+// ============================================
+
+/**
+ * Properties for request_submitted event
+ */
+interface RequestSubmittedProperties {
+  message: string
+  source: "submit_request_dialog"
+}
+
+/**
+ * Track when a user submits a request through the Submit Request dialog
+ * 
+ * @param message - The request message content
+ * 
+ * View submissions in PostHog: Activity → Events → filter by "request_submitted"
+ */
+export function trackRequestSubmitted(message: string): void {
+  const properties: RequestSubmittedProperties = {
+    message,
+    source: "submit_request_dialog",
+  }
+  
+  posthog.capture("request_submitted", properties)
+}
+
+// ============================================
 // SESSION TIMING UTILITIES
 // ============================================
 

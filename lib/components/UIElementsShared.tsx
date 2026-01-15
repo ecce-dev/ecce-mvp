@@ -1,14 +1,14 @@
 import { LessThanIcon } from "@phosphor-icons/react"
 import { DeviceType } from "../hooks/useDevice"
 import { EcceActionTrigger, EcceDialogTrigger } from "./ecce-elements"
-import { cn } from "../utils/utils"
+import { cn, addTargetBlankToLinks } from "../utils/utils"
 import posthog from "posthog-js"
 
 // ============================================
 // Garment Name Element
 // ============================================
 export const garmentNameElement = (garmentName: string) => (
-  <div className="px-4 py-1 md:py-2 pt-1 text-sm md:text-md lg:text-xl border border-black bg-white/70 font-zangezi uppercase pointer-events-auto w-full text-center md:w-fit">
+  <div className="px-4 py-1 md:py-2 pt-1 text-sm md:text-md lg:text-xl border border-foreground bg-background/70 font-zangezi uppercase pointer-events-auto w-full text-center md:w-fit">
     <span className="inline-block translate-y-[2px]">{garmentName}</span>
   </div>
 )
@@ -57,8 +57,8 @@ export const publicResearchSwitch = (
       className={cn(
         "pointer-events-auto px-3 md:px-4",
         viewMode === "public"
-          ? "bg-black text-white"
-          : "bg-white/70 text-black0"
+          ? "bg-foreground text-background"
+          : "bg-background/70 text-foreground"
       )}
       onAction={() => setViewMode("public")}
     >
@@ -69,8 +69,8 @@ export const publicResearchSwitch = (
       className={cn(
         "pointer-events-auto px-3 md:px-4 -ml-[1px]",
         viewMode === "research"
-          ? "bg-black text-white"
-          : "bg-white/70 text-black"
+          ? "bg-foreground text-background"
+          : "bg-background/70 text-foreground"
       )}
       onAction={onResearchClick ?? (() => setViewMode("research"))}
     >
@@ -83,7 +83,7 @@ export const publicResearchSwitch = (
 // Tracked Dialog Trigger Elements (with analytics)
 // ============================================
 
-type TrackedDialogId = "description" | "provenance" | "construction" | "analytics" | "export"
+type TrackedDialogId = "description" | "provenance" | "construction" | "analytics" | "export" | "licensed"
 
 /** User role type for analytics tracking */
 type UserRoleType = "curator" | "designer" | "vc" | null
@@ -193,8 +193,8 @@ export const createHtmlContent = (htmlContent: string) => {
   if (!htmlContent) return null
   return (
     <div
-      className="text-sm leading-relaxed prose prose-sm"
-      dangerouslySetInnerHTML={{ __html: htmlContent }}
+      className="text-sm leading-relaxed prose prose-sm wpAcfWysiwyg"
+      dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(htmlContent) }}
     />
   )
 }

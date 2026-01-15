@@ -61,7 +61,7 @@ export default function LoadingScreen({
       className={`
         fixed inset-0 z-50
         flex items-center justify-center
-        bg-black/20 backdrop-blur-md
+        bg-foreground/20 backdrop-blur-md
         transition-opacity duration-500 ease-out
         ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}
@@ -75,7 +75,7 @@ export default function LoadingScreen({
             font-ibm-plex-mono
             text-2xl md:text-3xl lg:text-4xl
             font-normal tracking-[0.3em] uppercase
-            text-white/90
+            text-background/90
             animate-pulse
             drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]
           "

@@ -120,7 +120,7 @@ export function SubmitRequestForm() {
                       <FormControl>
                         <Textarea
                           placeholder="Type your request here..."
-                          className="min-h-[120px] resize-none w-full max-h-[240px] overflow-hidden overflow-y-auto rounded-none border-black text-black placeholder:text-black bg-background/70 shadow-none"
+                          className="min-h-[120px] resize-none w-full max-h-[240px] overflow-hidden overflow-y-auto rounded-none border-foreground text-foreground placeholder:text-foreground bg-background/70 shadow-none"
                           {...field}
                         />
                       </FormControl>
@@ -134,7 +134,9 @@ export function SubmitRequestForm() {
                   variant="ecceSecondary"
                   disabled={submitMutation.isPending}
                 >
-                  {submitMutation.isPending ? "Sending..." : "Send Request"}
+                  <span className="font-zangezi translate-y-[1px]">
+                    {submitMutation.isPending ? "Sending..." : "SEND REQUEST"}
+                  </span>
                 </Button>
 
                 <TurnstileWidget />

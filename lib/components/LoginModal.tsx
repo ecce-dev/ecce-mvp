@@ -16,7 +16,7 @@ import {
 import { Input } from "@/lib/components/ui/input"
 import { Button } from "@/lib/components/ui/button"
 import { useAppModeStore, type UserRole } from "@/lib/stores/appModeStore"
-import { Eye, EyeSlash } from "@phosphor-icons/react"
+import { Eye, EyeIcon, EyeSlash, EyeSlashIcon } from "@phosphor-icons/react"
 import TurnstileWidget from "./TurnstileWidget"
 
 /**
@@ -36,11 +36,11 @@ type LoginFormValues = z.infer<typeof loginFormSchema>
  * Sets HttpOnly session cookie on successful login
  */
 export default function LoginModal() {
-  const { 
-    isLoginModalOpen, 
-    setLoginModalOpen, 
-    setAuthenticated, 
-    setViewMode 
+  const {
+    isLoginModalOpen,
+    setLoginModalOpen,
+    setAuthenticated,
+    setViewMode
   } = useAppModeStore()
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -115,8 +115,8 @@ export default function LoginModal() {
         >
           <div className="bg-transparent p-0">
             <Form {...form}>
-              <form 
-                onSubmit={form.handleSubmit(onSubmit)} 
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4 w-full bg-transparent flex flex-col items-end justify-center"
               >
                 <FormField
@@ -129,7 +129,7 @@ export default function LoginModal() {
                           <Input
                             type={isPasswordVisible ? "text" : "password"}
                             placeholder="Enter password..."
-                            className="w-full rounded-none border-black text-black placeholder:text-black bg-background/70 shadow-none h-12 pr-12"
+                            className="w-full rounded-none border-foreground text-foreground placeholder:text-foreground bg-background/70 shadow-none h-12 pr-12"
                             autoFocus
                             disabled={loginMutation.isPending}
                             {...field}
@@ -137,13 +137,13 @@ export default function LoginModal() {
                           <button
                             type="button"
                             onClick={() => setIsPasswordVisible((prev) => !prev)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-black/70 transition-colors"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground hover:text-foreground/70 transition-colors"
                             aria-label={isPasswordVisible ? "Hide password" : "Show password"}
                           >
                             {isPasswordVisible ? (
-                              <EyeSlash size={20} weight="regular" />
+                              <EyeSlashIcon size={20} weight="regular" />
                             ) : (
-                              <Eye size={20} weight="regular" />
+                              <EyeIcon size={20} weight="regular" />
                             )}
                           </button>
                         </div>
@@ -164,7 +164,10 @@ export default function LoginModal() {
                   variant="ecceSecondary"
                   disabled={loginMutation.isPending}
                 >
-                  {loginMutation.isPending ? "Verifying..." : "Submit"}
+                  <span className="font-zangezi translate-y-[1px]">
+                    {loginMutation.isPending ? "Verifying..." : "SUBMIT"}
+
+                  </span>
                 </Button>
 
                 <TurnstileWidget />

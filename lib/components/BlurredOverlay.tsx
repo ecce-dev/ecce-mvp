@@ -38,7 +38,7 @@ export function BlurredOverlay() {
       className={cn(
         "fixed inset-0 z-75 transition-all duration-300",
         isVisible
-          ? "opacity-100 backdrop-blur-sm bg-white/30 dark:bg-black/30 pointer-events-auto cursor-pointer"
+          ? "opacity-100 backdrop-blur-sm bg-background/70 pointer-events-auto cursor-pointer"
           : "opacity-0 pointer-events-none"
       )}
       onClick={handleClick}

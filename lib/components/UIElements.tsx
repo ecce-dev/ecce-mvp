@@ -10,7 +10,7 @@ import { SubmitRequestForm } from "@/lib/components/SubmitRequestForm"
 import { CountdownProgress } from "@/lib/components/CountdownProgress"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "../hooks/useDevice";
-import { cn } from "../utils/utils";
+import { cn, addTargetBlankToLinks } from "../utils/utils";
 import posthog from "posthog-js";
 
 /**
@@ -127,7 +127,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
             dialogId="about"
             className="pointer-events-auto"
           >
-            <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: aboutContent ?? '' }} />
+            <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(aboutContent ?? '') }} />
           </EcceDialogContent>
         </div>
 
@@ -148,7 +148,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
             dialogId="contact"
             className="pointer-events-auto"
           >
-            <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: contactContent ?? '' }} />
+            <p className="text-sm leading-relaxed wpAcfWysiwyg" dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(contactContent ?? '') }} />
           </EcceDialogContent>
         </div>
       </div>

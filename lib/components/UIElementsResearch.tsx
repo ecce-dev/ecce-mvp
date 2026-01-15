@@ -12,6 +12,7 @@ import {
   TikTokTrigger,
   createHtmlContent,
 } from "./UIElementsShared"
+import { addTargetBlankToLinks } from "../utils/utils"
 import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
 
 /**
@@ -44,6 +45,8 @@ export default function UIElementsResearch() {
   const description = garmentFields?.description ?? ""
   const provenance = garmentFields?.provenance ?? ""
   const construction = garmentFields?.construction ?? ""
+  const version = garmentFields?.version ?? ""
+  const rights = garmentFields?.rights ?? ""
   const tiktokUrl = garmentFields?.linkToTiktok
   const patternDescription = garmentFields?.patternDescription
   const patternPngDownload = garmentFields?.patternPngDownload
@@ -105,6 +108,27 @@ export default function UIElementsResearch() {
     />
   )
 
+  const licensedTrigger = (
+    <TrackedDialogTrigger
+      dialogId="licensed"
+      label="licensed"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
+  )
+
+  // Version display element (no action, just displays content)
+  const versionElement = version ? (
+    <EcceActionTrigger
+      variant="secondary"
+      className="pointer-events-auto cursor-default max-w-20"
+    >
+      <span dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(version) }} className="" />
+    </EcceActionTrigger>
+  ) : null
+
   // Tracked TikTok trigger
   const tiktokTrigger = tiktokUrl ? (
     <TikTokTrigger
@@ -116,7 +140,7 @@ export default function UIElementsResearch() {
     />
   ) : null
 
-  {/* Hidden logout button - kept for future use */}
+  {/* Hidden logout button - kept for future use */ }
   const logoutButton = (
     <EcceActionTrigger
       variant="secondary"
@@ -133,12 +157,17 @@ export default function UIElementsResearch() {
     <>
       {publicResearchSwitch(viewMode, setViewMode)}
       <div className="flex flex-col gap-2 w-full mt-9">
-        {garmentNameElement(garmentName)}
+        <div className="flex flex-row justify-between items-center gap-2">
+          {garmentNameElement(garmentName)}
+          {versionElement}
+
+        </div>
         <div className="flex flex-row flex-wrap gap-2 w-full max-w-[370px]">
           {descriptionTrigger}
           {tiktokTrigger}
           {provenanceTrigger}
           {constructionTrigger}
+          {licensedTrigger}
           {analyticsTrigger}
           {exportTrigger}
         </div>
@@ -153,13 +182,22 @@ export default function UIElementsResearch() {
         <div className="mr-48 ml-18 flex flex-col justify-center items-center">
           {garmentNameElement(garmentName)}
         </div>
-        <div className="flex flex-col flex-wrap gap-2 w-fit mt-2">
-          {descriptionTrigger}
-          {tiktokTrigger}
-          {provenanceTrigger}
-          {constructionTrigger}
-          {analyticsTrigger}
-          {exportTrigger}
+        <div className="flex w-full justify-between">
+
+          <div className="flex flex-col flex-wrap gap-2 w-fit mt-2">
+            {descriptionTrigger}
+            {tiktokTrigger}
+            {provenanceTrigger}
+            {constructionTrigger}
+            {analyticsTrigger}
+            {exportTrigger}
+          </div>
+          <div className="flex flex-col items-end"></div>
+          <div className="flex flex-col items-end gap-2">
+          {versionElement}
+          {licensedTrigger}
+
+          </div>
         </div>
       </div>
     </>
@@ -176,16 +214,19 @@ export default function UIElementsResearch() {
           {tiktokTrigger}
           {provenanceTrigger}
           {constructionTrigger}
+
           {analyticsTrigger}
           {exportTrigger}
         </div>
         {/* Second row: research-specific fields */}
-        <div className="flex flex-row">
-          {/* {provenanceTrigger}
-          {constructionTrigger}
-          {analyticsTrigger}
-          {exportTrigger} */}
-          {garmentNameElement(garmentName)}
+        <div className="flex flex-row justify-between">
+          <div>
+            {garmentNameElement(garmentName)}
+          </div>
+          <div className="flex flex-col gap-2 justify-center items-end">
+            {versionElement}
+            {licensedTrigger}
+          </div>
         </div>
       </div>
     </>
@@ -248,6 +289,10 @@ export default function UIElementsResearch() {
                     patternPngPreview={patternPngPreview}
                   />
                 ),
+              },
+              licensed: {
+                title: "Licensed",
+                content: createHtmlContent(rights),
               },
             }}
           />

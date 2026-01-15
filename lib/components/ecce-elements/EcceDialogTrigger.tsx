@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/utils"
 import { useEcceDialog } from "./EcceDialogContext"
 
 const ecceDialogTriggerVariants = cva(
-  "px-4 py-1 md:py-2 text-sm md:text-md lg:text-xl border border-black cursor-pointer transition-colors duration-200 z-100",
+  "px-4 py-1 md:py-2 text-sm md:text-md lg:text-xl border border-foreground cursor-pointer transition-colors duration-200 z-100 text-foreground",
   {
     variants: {
       variant: {
@@ -81,8 +81,8 @@ export function EcceDialogTrigger({
         ecceDialogTriggerVariants({ variant }),
         hasPositionProps && "fixed",
         isActive
-          ? "bg-black text-white"
-          : "bg-white/70 text-black hover:bg-white/90",
+          ? "bg-foreground text-background"
+          : "bg-background/70 text-foreground hover:bg-background/90",
         className
       )}
       style={positionStyles}

@@ -1,20 +1,18 @@
 "use client"
 
-import { EcceDialogProvider, EcceActionTrigger, EcceDialogTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
+import { EcceDialogProvider, EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
+import { useGarmentSessionTracking } from "@/lib/analytics"
 import {
   BackButtonElement,
   garmentNameElement,
   publicResearchSwitch,
-  descriptionTrigger,
-  provenanceTrigger,
-  constructionTrigger,
-  createTiktokTrigger,
+  TrackedDialogTrigger,
+  TikTokTrigger,
   createHtmlContent,
-  AnalyticsDialogContent,
-  ExportDialogContent,
 } from "./UIElementsShared"
+import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
 
 /**
  * Research UI Elements for garment detail view
@@ -35,8 +33,12 @@ export default function UIElementsResearch() {
   const { selectedGarment, deselectGarment, viewMode, setViewMode, userRole, logout } = useAppModeStore()
   const { deviceType } = useDevice()
 
+  // Track garment session (selection and time spent)
+  useGarmentSessionTracking()
+
   if (!selectedGarment) return null
 
+  const garmentSlug = selectedGarment.slug ?? ""
   const garmentFields = selectedGarment.garmentFields
   const garmentName = garmentFields?.name ?? "Untitled Garment"
   const description = garmentFields?.description ?? ""
@@ -47,27 +49,72 @@ export default function UIElementsResearch() {
   const patternPngDownload = garmentFields?.patternPngDownload
   const patternPngPreview = garmentFields?.patternPngPreview
 
-  const tiktokTrigger = createTiktokTrigger(tiktokUrl)
+  // Tracked dialog triggers with userRole for identifying authenticated user type
+  const descriptionTrigger = (
+    <TrackedDialogTrigger
+      dialogId="description"
+      label="Description"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
+  )
+
+  const provenanceTrigger = (
+    <TrackedDialogTrigger
+      dialogId="provenance"
+      label="Provenance"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
+  )
+
+  const constructionTrigger = (
+    <TrackedDialogTrigger
+      dialogId="construction"
+      label="Construction"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
+  )
 
   const analyticsTrigger = (
-    <EcceDialogTrigger
+    <TrackedDialogTrigger
       dialogId="analytics"
-      variant="secondary"
-      className="pointer-events-auto"
-    >
-      Analytics
-    </EcceDialogTrigger>
+      label="Analytics"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
   )
 
   const exportTrigger = (
-    <EcceDialogTrigger
+    <TrackedDialogTrigger
       dialogId="export"
-      variant="secondary"
-      className="pointer-events-auto"
-    >
-      Export
-    </EcceDialogTrigger>
+      label="Export"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
   )
+
+  // Tracked TikTok trigger
+  const tiktokTrigger = tiktokUrl ? (
+    <TikTokTrigger
+      tiktokUrl={tiktokUrl}
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="research"
+      userRole={userRole}
+    />
+  ) : null
 
   {/* Hidden logout button - kept for future use */}
   const logoutButton = (
@@ -161,7 +208,7 @@ export default function UIElementsResearch() {
         id="dialog-content-container-research"
         className={`fixed safe-area-content top-54 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
       >
-        <div className="col-start-1 row-start-1 max-h-full overflow-hidden">
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full">
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"

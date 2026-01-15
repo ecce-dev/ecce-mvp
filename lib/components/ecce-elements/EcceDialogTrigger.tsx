@@ -19,7 +19,7 @@ const ecceDialogTriggerVariants = cva(
   }
 )
 
-export type EcceDialogTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+export type EcceDialogTriggerProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> &
   VariantProps<typeof ecceDialogTriggerVariants> & {
     /** Unique ID to link this trigger to its content */
     dialogId: string
@@ -31,6 +31,8 @@ export type EcceDialogTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElemen
     bottom?: string
     /** Fixed position from left */
     left?: string
+    /** Optional callback when trigger is clicked (in addition to toggle) */
+    onClick?: () => void
   }
 
 /**
@@ -50,6 +52,7 @@ export function EcceDialogTrigger({
   right,
   bottom,
   left,
+  onClick,
   children,
   ...props
 }: EcceDialogTriggerProps) {
@@ -63,10 +66,17 @@ export function EcceDialogTrigger({
     ? { top, right, bottom, left }
     : undefined
 
+  const handleClick = () => {
+    // Call optional onClick callback first (for analytics, etc.)
+    onClick?.()
+    // Then toggle the dialog
+    toggleDialog(dialogId)
+  }
+
   return (
     <button
       type="button"
-      onClick={() => toggleDialog(dialogId)}
+      onClick={handleClick}
       className={cn(
         ecceDialogTriggerVariants({ variant }),
         hasPositionProps && "fixed",

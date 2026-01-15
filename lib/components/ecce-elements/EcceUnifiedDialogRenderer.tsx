@@ -92,7 +92,7 @@ export function EcceUnifiedDialogRenderer({
           ...positionStyles,
         }}
         className={cn(
-          "z-100 max-w-[420px] bg-white/70 border border-black p-8 overflow-y-auto",
+          "z-100 max-w-[420px] w-full bg-white/70 border border-black p-8 overflow-y-auto",
           hasPositionProps && "fixed",
           className
         )}
@@ -107,7 +107,7 @@ export function EcceUnifiedDialogRenderer({
         >
           <XIcon className="size-5" />
         </button> */}
-        <div className="">{dialog.content}</div>
+        <div className="w-full">{dialog.content}</div>
       </animated.div>
     )
   })

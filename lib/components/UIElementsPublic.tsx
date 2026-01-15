@@ -4,13 +4,14 @@ import { useState } from "react"
 import { EcceDialogProvider, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
+import { useGarmentSessionTracking } from "@/lib/analytics"
 import LoginModal from "./LoginModal"
 import {
   BackButtonElement,
   garmentNameElement,
   publicResearchSwitch,
-  descriptionTrigger,
-  createTiktokTrigger,
+  TrackedDialogTrigger,
+  TikTokTrigger,
   createHtmlContent,
 } from "./UIElementsShared"
 
@@ -23,12 +24,16 @@ import {
  * - Top Right: Mode switch (Public/Research)
  */
 export default function UIElementsPublic() {
-  const { selectedGarment, deselectGarment, viewMode, setViewMode, isAuthenticated } = useAppModeStore()
+  const { selectedGarment, deselectGarment, viewMode, setViewMode, isAuthenticated, userRole } = useAppModeStore()
   const { deviceType } = useDevice()
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
+  // Track garment session (selection and time spent)
+  useGarmentSessionTracking()
+
   if (!selectedGarment) return null
 
+  const garmentSlug = selectedGarment.slug ?? ""
   const garmentFields = selectedGarment.garmentFields
   const garmentName = garmentFields?.name ?? "Untitled Garment"
   const description = garmentFields?.description ?? ""
@@ -42,10 +47,32 @@ export default function UIElementsPublic() {
     }
   }
 
-  const tiktokTrigger = createTiktokTrigger(tiktokUrl)
+  // Tracked dialog trigger for description
+  // In public mode, userRole is passed but will typically be null
+  const descriptionTrigger = (
+    <TrackedDialogTrigger
+      dialogId="description"
+      label="Description"
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="public"
+      userRole={userRole}
+    />
+  )
+
+  // Tracked TikTok trigger
+  const tiktokTrigger = tiktokUrl ? (
+    <TikTokTrigger
+      tiktokUrl={tiktokUrl}
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode="public"
+      userRole={userRole}
+    />
+  ) : null
 
   const mobileNavbar = <>
-    {publicResearchSwitch(viewMode, setViewMode)}
+    {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
     <div className="flex flex-col gap-2 w-full mt-9">
       {garmentNameElement(garmentName)}
       <div className="grid grid-cols-2 gap-2 w-full justify-center">
@@ -56,7 +83,7 @@ export default function UIElementsPublic() {
     </div>
   </>
   const tabletNavbar = <>
-    {publicResearchSwitch(viewMode, setViewMode)}
+    {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
     <div className="flex flex-col gap-2 w-full justify-center">
       <div className="mr-48 ml-18 flex flex-col justify-center items-center">
         {garmentNameElement(garmentName)}
@@ -70,7 +97,7 @@ export default function UIElementsPublic() {
     </div>
   </>
   const desktopNavbar = <>
-    {publicResearchSwitch(viewMode, setViewMode)}
+    {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
     <div className="flex flex-row gap-4 w-full justify-center mr-62 ml-18">
       {garmentNameElement(garmentName)}
       {descriptionTrigger}

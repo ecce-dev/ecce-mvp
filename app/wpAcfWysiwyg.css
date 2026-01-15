@@ -13,8 +13,8 @@
 /* Paragraphs */
 .wpAcfWysiwyg p {
   margin: 1.5rem 0;
-  font-size: 1.125rem;
-  color: var(--muted-foreground);
+  /* font-size: 1.125rem; */
+  color: var(--foreground);
 }
 
 .wpAcfWysiwyg p:first-child {

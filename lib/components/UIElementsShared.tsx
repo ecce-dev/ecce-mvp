@@ -1,7 +1,7 @@
 import { LessThanIcon } from "@phosphor-icons/react"
 import { DeviceType } from "../hooks/useDevice"
 import { EcceActionTrigger, EcceDialogTrigger } from "./ecce-elements"
-import { cn } from "../utils/utils"
+import { cn, addTargetBlankToLinks } from "../utils/utils"
 import posthog from "posthog-js"
 
 // ============================================
@@ -194,7 +194,7 @@ export const createHtmlContent = (htmlContent: string) => {
   return (
     <div
       className="text-sm leading-relaxed prose prose-sm wpAcfWysiwyg"
-      dangerouslySetInnerHTML={{ __html: htmlContent }}
+      dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(htmlContent) }}
     />
   )
 }

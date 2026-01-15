@@ -10,7 +10,7 @@ export default function Background() {
           width={420}
           height={420}
         />
-
+        
       </div>
     </div>
   )

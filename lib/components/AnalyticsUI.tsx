@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { ChartLineIcon, GlobeIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
 import { Switch } from "./ui/switch"
-import { cn } from "../utils/utils"
+import { cn, addTargetBlankToLinks } from "../utils/utils"
 import posthog from "posthog-js"
 import { getGarmentAnalytics, type GarmentAnalytics, type InterestLevel } from "@/lib/actions/getGarmentAnalytics"
 
@@ -354,7 +354,7 @@ export function ExportDialogContent({
           {/* Pattern Description */}
           {patternDescription && (
             <div className="space-y-2">
-              <p className="text-sm font-ibm-plex-mono text-gray-700 leading-relaxed wpAcfWysiwyg" dangerouslySetInnerHTML={{ __html: patternDescription }} />
+              <p className="text-sm font-ibm-plex-mono text-gray-700 leading-relaxed wpAcfWysiwyg" dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(patternDescription) }} />
             </div>
           )}
 

@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Switch } from "@/lib/components/ui/switch";
+import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
@@ -26,14 +27,20 @@ export function ThemeToggle() {
   const isDark = theme === "dark";
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-card/80 px-3 py-2 shadow-lg backdrop-blur-sm border border-border">
-      <span className="text-xs text-muted-foreground">Light</span>
-      <Switch
+    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full px-3 py-2">
+      {/* <span className="text-xs text-muted-foreground">Light</span> */}
+      {/* <Switch
         checked={isDark}
         onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
         aria-label="Toggle dark mode"
-      />
-      <span className="text-xs text-muted-foreground">Dark</span>
+      /> */}
+      <div
+        onClick={() => setTheme(isDark ? "light" : "dark")}
+        className="cursor-pointer"
+      >
+        {isDark ? <MoonIcon /> : <SunIcon />}
+      </div>
+      {/* <span className="text-xs text-muted-foreground">Dark</span> */}
     </div>
   );
 }

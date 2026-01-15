@@ -2,10 +2,14 @@
 
 import { useGarments } from "@/lib/context/GarmentsContext";
 import { ContactShadows, Environment, useProgress } from "@react-three/drei";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import CanvasWrapper from "./r3f/CanvasWrapper";
 import Garments from "./r3f/Garments";
 import LoadingScreen from "./LoadingScreen";
 import { BlurredOverlay } from "./BlurredOverlay";
+import { DarkModeEffects } from "./r3f/DarkModeEffects";
+import { DARK_MODE_EFFECTS, ENVIRONMENT_CONFIG } from "./r3f/darkModeEffectsConfig";
 import * as THREE from 'three';
 import { useDevice } from "../hooks/useDevice";
 
@@ -32,11 +36,27 @@ export default function GarmentsClient() {
   const { garments, isLoading: isDataLoading } = useGarments();
   const { active: isAssetsLoading } = useProgress();
   const { deviceType } = useDevice();
+  
+  // Theme detection for dark mode effects
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Determine if dark mode is active (default to light during SSR)
+  const isDarkMode = mounted && resolvedTheme === "dark";
 
   // Combined loading state: data fetching OR GLB files loading
   const isLoading = isDataLoading || isAssetsLoading;
 
   const shadowRadius = deviceType === 'desktop' ? 21 : deviceType === 'tablet' ? 15 : 8;
+
+  // Select environment preset based on theme
+  const environmentPreset = isDarkMode && DARK_MODE_EFFECTS.ENABLE_ENVIRONMENT_SWITCH
+    ? ENVIRONMENT_CONFIG.darkModePreset
+    : ENVIRONMENT_CONFIG.lightModePreset;
 
   return (
     <>
@@ -67,8 +87,11 @@ export default function GarmentsClient() {
           }}
         >
           <Environment
-            preset="studio"
+            preset={environmentPreset}
+            background={isDarkMode ? false : undefined}
           />
+          {/* Dark mode visual effects */}
+          <DarkModeEffects isDarkMode={isDarkMode} />
           <ContactShadows scale={shadowRadius * 4} position={[0, -5, 0]} far={shadowRadius} blur={2} />
           <Garments garments={garments} />
         </CanvasWrapper>

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import { zangezi, zangeziCondensed } from "@/lib/fonts/zangezi";
 import "./globals.css";
+import "./wpAcfWysiwyg.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
 import { CookieBanner } from "@/lib/components/CookieBanner";
 

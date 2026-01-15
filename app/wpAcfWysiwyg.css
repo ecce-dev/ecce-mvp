@@ -1,0 +1,269 @@
+/* Case Study Content Styles */
+/* Uses CSS variables from globals.css for consistent theming */
+
+/* sections */
+.wpAcfWysiwyg section {
+  margin-bottom: 3rem;
+}
+
+.wpAcfWysiwyg section:last-child {
+  margin-bottom: 0;
+}
+
+/* Paragraphs */
+.wpAcfWysiwyg p {
+  margin: 1.5rem 0;
+  font-size: 1.125rem;
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg p:first-child {
+  margin-top: 0;
+}
+
+.wpAcfWysiwyg p:last-child {
+  margin-bottom: 0;
+}
+
+/* Spans with font-weight styling */
+.wpAcfWysiwyg p span {
+  font-weight: inherit;
+  color: inherit;
+}
+
+.wpAcfWysiwyg li span {
+  font-weight: inherit;
+  color: inherit;
+}
+
+/* Bold text within spans */
+.wpAcfWysiwyg p b {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Bold text in general */
+.wpAcfWysiwyg b {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Blockquotes */
+.wpAcfWysiwyg blockquote {
+  padding: 1.5rem 2rem;
+  background: var(--muted);
+  border-left: 4px solid var(--border);
+  border-radius: 0;
+  position: relative;
+}
+
+.wpAcfWysiwyg blockquote p {
+  margin: 0;
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--foreground);
+  position: relative;
+  z-index: 1;
+}
+
+.wpAcfWysiwyg blockquote p:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+/* Lists */
+.wpAcfWysiwyg ul {
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
+  list-style: disc;
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg ol {
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
+  list-style: decimal;
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg li {
+  margin: 0.75rem 0;
+  padding: 0;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg li b {
+  color: var(--foreground);
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+/* Nested lists */
+.wpAcfWysiwyg li ul,
+.wpAcfWysiwyg li ol {
+  margin: 0.75rem 0 0.75rem 1.5rem;
+  padding-left: 1.5rem;
+}
+
+/* List items with bold text at start */
+.wpAcfWysiwyg li > b:first-child {
+  margin-right: 0.25rem;
+}
+
+/* Italic text in lists */
+.wpAcfWysiwyg li i {
+  font-style: italic;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.wpAcfWysiwyg li i span {
+  font-style: inherit;
+  color: inherit;
+  font-weight: inherit;
+}
+
+/* Emphasis/Italic text */
+.wpAcfWysiwyg em {
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg em span {
+  font-style: inherit;
+  color: inherit;
+}
+
+/* Italic text (i tag) */
+.wpAcfWysiwyg i {
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg i span {
+  font-style: inherit;
+  color: inherit;
+}
+
+.wpAcfWysiwyg p i {
+  font-weight: 500;
+}
+
+/* Strong/Bold text */
+.wpAcfWysiwyg strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Links - simple underline style (with !important to override prose) */
+.wpAcfWysiwyg a {
+  color: var(--foreground) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+.wpAcfWysiwyg a:hover {
+  color: var(--muted-foreground) !important;
+}
+
+.wpAcfWysiwyg a.decorated-link {
+  color: var(--foreground) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+.wpAcfWysiwyg a.decorated-link:hover {
+  color: var(--muted-foreground) !important;
+}
+
+/* Headings */
+.wpAcfWysiwyg h1,
+.wpAcfWysiwyg h2,
+.wpAcfWysiwyg h3,
+.wpAcfWysiwyg h4,
+.wpAcfWysiwyg h5,
+.wpAcfWysiwyg h6 {
+  margin: 2rem 0 1rem 0;
+  color: var(--foreground);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.wpAcfWysiwyg h1 {
+  font-size: 2rem;
+}
+
+.wpAcfWysiwyg h2 {
+  font-size: 1.75rem;
+}
+
+.wpAcfWysiwyg h3 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.wpAcfWysiwyg h4 {
+  font-size: 1.25rem;
+}
+
+.wpAcfWysiwyg h5 {
+  font-size: 1.125rem;
+}
+
+.wpAcfWysiwyg h6 {
+  font-size: 1rem;
+}
+
+.wpAcfWysiwyg h3:first-child,
+.wpAcfWysiwyg h2:first-child,
+.wpAcfWysiwyg h1:first-child {
+  margin-top: 0;
+}
+
+/* Horizontal Rules */
+.wpAcfWysiwyg hr {
+  margin: 2.5rem 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: none;
+  height: 1px;
+}
+
+/* Article elements */
+.wpAcfWysiwyg article {
+  margin: 0;
+  padding: 0;
+}
+
+/* Div elements - reset nested divs */
+.wpAcfWysiwyg div {
+  margin: 0;
+  padding: 0;
+}
+
+/* Div wrapper with spacing (for privacy/terms pages) */
+.wpAcfWysiwyg > div {
+  color: var(--muted-foreground);
+}
+
+.wpAcfWysiwyg > div > *:first-child {
+  margin-top: 0;
+}
+
+.wpAcfWysiwyg > div > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Line breaks */
+.wpAcfWysiwyg br {
+  line-height: 1.5;
+}
+
+/* Print Styles */
+@media print {
+  .wpAcfWysiwyg {
+    color: #000;
+    background: #fff;
+  }
+}

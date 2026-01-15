@@ -354,7 +354,7 @@ export function ExportDialogContent({
           {/* Pattern Description */}
           {patternDescription && (
             <div className="space-y-2">
-              <p className="text-sm font-ibm-plex-mono text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: patternDescription }} />
+              <p className="text-sm font-ibm-plex-mono text-gray-700 leading-relaxed wpAcfWysiwyg" dangerouslySetInnerHTML={{ __html: patternDescription }} />
             </div>
           )}
 

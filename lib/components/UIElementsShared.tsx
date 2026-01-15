@@ -83,7 +83,7 @@ export const publicResearchSwitch = (
 // Tracked Dialog Trigger Elements (with analytics)
 // ============================================
 
-type TrackedDialogId = "description" | "provenance" | "construction" | "analytics" | "export"
+type TrackedDialogId = "description" | "provenance" | "construction" | "analytics" | "export" | "licensed"
 
 /** User role type for analytics tracking */
 type UserRoleType = "curator" | "designer" | "vc" | null
@@ -193,7 +193,7 @@ export const createHtmlContent = (htmlContent: string) => {
   if (!htmlContent) return null
   return (
     <div
-      className="text-sm leading-relaxed prose prose-sm"
+      className="text-sm leading-relaxed prose prose-sm wpAcfWysiwyg"
       dangerouslySetInnerHTML={{ __html: htmlContent }}
     />
   )

@@ -148,7 +148,7 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
             dialogId="contact"
             className="pointer-events-auto"
           >
-            <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: contactContent ?? '' }} />
+            <p className="text-sm leading-relaxed wpAcfWysiwyg" dangerouslySetInnerHTML={{ __html: contactContent ?? '' }} />
           </EcceDialogContent>
         </div>
       </div>

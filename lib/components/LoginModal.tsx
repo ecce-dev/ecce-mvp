@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -16,6 +16,8 @@ import {
 import { Input } from "@/lib/components/ui/input"
 import { Button } from "@/lib/components/ui/button"
 import { useAppModeStore, type UserRole } from "@/lib/stores/appModeStore"
+import { Eye, EyeSlash } from "@phosphor-icons/react"
+import TurnstileWidget from "./TurnstileWidget"
 
 /**
  * Form validation schema
@@ -40,6 +42,8 @@ export default function LoginModal() {
     setAuthenticated, 
     setViewMode 
   } = useAppModeStore()
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -77,6 +81,7 @@ export default function LoginModal() {
   const handleClose = useCallback(() => {
     form.reset()
     loginMutation.reset()
+    setIsPasswordVisible(false)
     setLoginModalOpen(false)
   }, [form, loginMutation, setLoginModalOpen])
 
@@ -120,14 +125,28 @@ export default function LoginModal() {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter password..."
-                          className="w-full rounded-none border-black text-black placeholder:text-black bg-background/70 shadow-none h-12"
-                          autoFocus
-                          disabled={loginMutation.isPending}
-                          {...field}
-                        />
+                        <div className="relative w-full">
+                          <Input
+                            type={isPasswordVisible ? "text" : "password"}
+                            placeholder="Enter password..."
+                            className="w-full rounded-none border-black text-black placeholder:text-black bg-background/70 shadow-none h-12 pr-12"
+                            autoFocus
+                            disabled={loginMutation.isPending}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setIsPasswordVisible((prev) => !prev)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-black/70 transition-colors"
+                            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                          >
+                            {isPasswordVisible ? (
+                              <EyeSlash size={20} weight="regular" />
+                            ) : (
+                              <Eye size={20} weight="regular" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -147,6 +166,8 @@ export default function LoginModal() {
                 >
                   {loginMutation.isPending ? "Verifying..." : "Submit"}
                 </Button>
+
+                <TurnstileWidget />
               </form>
             </Form>
           </div>

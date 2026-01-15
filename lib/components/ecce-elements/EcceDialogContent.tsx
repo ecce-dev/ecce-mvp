@@ -1,9 +1,10 @@
 "use client"
 
-import { useTransition, animated, config } from "@react-spring/web"
+import { useTransition, animated } from "@react-spring/web"
 import { XIcon } from "lucide-react"
 import { cn } from "@/lib/utils/utils"
 import { useEcceDialog } from "./EcceDialogContext"
+import { transitionConfig } from "./transition-config"
 
 export type EcceDialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Unique ID to link this content to its trigger */
@@ -16,7 +17,7 @@ export type EcceDialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
   bottom?: string
   /** Fixed position from left */
   left?: string
-  /** Max height before content becomes scrollable */
+  /** Max height before content becomes scrollable. Use "full" to inherit from parent container */
   maxHeight?: string
 }
 
@@ -35,7 +36,7 @@ export function EcceDialogContent({
   right,
   bottom,
   left,
-  maxHeight = "70vh",
+  maxHeight = "100%",
   children,
   ...props
 }: EcceDialogContentProps) {
@@ -45,12 +46,7 @@ export function EcceDialogContent({
   // Only apply fixed positioning if any position prop is provided
   const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
 
-  const transitions = useTransition(isOpen, {
-    from: { opacity: 0, transform: "scale(0.95) translateY(-10px)" },
-    enter: { opacity: 1, transform: "scale(1) translateY(0px)" },
-    leave: { opacity: 0, transform: "scale(0.95) translateY(-10px)" },
-    config: config.gentle,
-  })
+  const transitions = useTransition(isOpen, transitionConfig)
 
   const positionStyles = hasPositionProps
     ? { top, right, bottom, left, maxHeight }
@@ -60,23 +56,27 @@ export function EcceDialogContent({
     (styles, item) =>
       item && (
         <animated.div
-          style={{ ...styles, ...positionStyles }}
+          style={{ 
+            ...styles, 
+            ...positionStyles,
+          }}
           className={cn(
-            "z-100 max-w-[420px] bg-white/70 border border-black p-8 overflow-y-auto",
+            // Base styles
+            "z-100 max-w-[420px] bg-white/70 border border-black p-8 overflow-y-auto w-full",
             hasPositionProps && "fixed",
             className
           )}
           {...props}
         >
-          <button
+          {/* <button
             type="button"
             onClick={() => closeDialog(dialogId)}
             className="absolute top-4 right-4 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
             aria-label="Close"
           >
-            <XIcon className="size-5" />
-          </button>
-          <div className="pr-8">{children}</div>
+            <XIcon className="size-5" size={20} />
+          </button> */}
+          <div className="">{children}</div>
         </animated.div>
       )
   )

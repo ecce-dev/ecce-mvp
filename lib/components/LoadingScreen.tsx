@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { EcceLogoBlack } from "./ecce-dialog/EcceLogoSVG"
-import EcceLoadingLottie from "./ecce-dialog/EcceLoadingLottie"
+import { EcceLogoBlack } from "./ecce-elements/EcceLogoSVG"
+import EcceLoadingLottie from "./ecce-elements/EcceLoadingLottie"
 
 interface LoadingScreenProps {
   /** Whether loading is in progress */

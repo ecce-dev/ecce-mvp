@@ -1,0 +1,7 @@
+---
+alwaysApply: false
+---
+
+Refactor the staged changes. Is there anything that can be improved in terms of security, performance, and in general best practices for software engineering, such as no code duplication, make use of composability. Simple solutions are always better than complex ones if they yield the same result, unless the architecture has an impact on a long-term foundation and will serve for future features. Make sure to be critical when analysing the current changes, while also not over-engineering already working and implemented solutions.
+
+MAKE SURE TO ONLY CONSIDER THE STAGED CHANGES!

@@ -5,6 +5,7 @@ import { ContactShadows, Environment, useProgress } from "@react-three/drei";
 import CanvasWrapper from "./r3f/CanvasWrapper";
 import Garments from "./r3f/Garments";
 import LoadingScreen from "./LoadingScreen";
+import { BlurredOverlay } from "./BlurredOverlay";
 import * as THREE from 'three';
 import { useDevice } from "../hooks/useDevice";
 
@@ -22,6 +23,10 @@ import { useDevice } from "../hooks/useDevice";
  * Shows a loading overlay when:
  * - Garment data is being fetched (isLoading from context)
  * - GLB 3D files are being loaded (active from useProgress)
+ * 
+ * Features:
+ * - Selection animation: Clicking a garment rotates camera to face it
+ * - Opacity fade: Non-selected garments fade out when one is selected
  */
 export default function GarmentsClient() {
   const { garments, isLoading: isDataLoading } = useGarments();
@@ -36,6 +41,7 @@ export default function GarmentsClient() {
   return (
     <>
       <LoadingScreen isLoading={isLoading} />
+      <BlurredOverlay />
 
       <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
         <CanvasWrapper
@@ -70,4 +76,3 @@ export default function GarmentsClient() {
     </>
   );
 }
-

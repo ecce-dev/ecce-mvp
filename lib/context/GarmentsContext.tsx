@@ -60,6 +60,14 @@ function extractSlugs(garments: GarmentNode[]): string[] {
 }
 
 /**
+ * Check if any new garments overlap with already shown garments
+ * Used to detect when we've cycled through all available garments
+ */
+function hasOverlap(newSlugs: string[], shownSlugs: Set<string>): boolean {
+  return newSlugs.some((slug) => shownSlugs.has(slug));
+}
+
+/**
  * Provider component for garments state management
  * 
  * Handles:
@@ -67,7 +75,7 @@ function extractSlugs(garments: GarmentNode[]): string[] {
  * - Random garment refresh via server action
  * - Loading states during transitions
  * - Tracking of previous garments for analytics
- * - Exclusion of previous garments from new selections (when possible)
+ * - Memory of all shown garments to prevent repetition until all have been shown
  */
 export function GarmentsProvider({ children, initialGarments }: GarmentsProviderProps) {
   const { deviceType } = useDevice();
@@ -76,22 +84,31 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
   const [isPending, startTransition] = useTransition();
   const [isInitialized, setIsInitialized] = useState(false);
   
-  // Use ref to track current garment slugs for exclusion without causing re-renders
-  const currentSlugsRef = useRef<string[]>(extractSlugs(initialGarments));
+  // Track all shown garment slugs to implement "deck shuffle" behavior
+  // Uses Set for O(1) lookup performance and useRef to avoid re-renders
+  const shownSlugsRef = useRef<Set<string>>(new Set(extractSlugs(initialGarments)));
 
   // Calculate target garment count based on device
   const targetCount = GARMENT_COUNT_BY_DEVICE[deviceType];
 
   /**
-   * Fetch new random garments from server, excluding current garments when possible
+   * Fetch new random garments from server, excluding all previously shown garments
    * Uses React transition for non-blocking updates
+   * 
+   * Memory behavior (deck shuffle without replacement):
+   * - Excludes all garments that have been shown since last reset
+   * - When new garments include already-shown ones, the deck has cycled through
+   * - Memory resets to only the new garments when a cycle is detected
+   * 
    * @param count - Number of garments to fetch
-   * @param excludeSlugs - Slugs to exclude from selection
+   * @param excludeSlugs - All slugs to exclude from selection
+   * @param shouldUpdateMemory - Whether to update shown garments memory (false for device changes)
    * @returns Promise with previous and current tracking data
    */
   const fetchGarments = useCallback(async (
     count: number,
-    excludeSlugs: string[] = []
+    excludeSlugs: string[] = [],
+    shouldUpdateMemory: boolean = true
   ): Promise<{ previous: GarmentTrackingData[]; current: GarmentTrackingData[] }> => {
     // Capture previous state before transition
     const previousTrackingData = extractTrackingData(garments);
@@ -100,9 +117,24 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
       startTransition(async () => {
         try {
           const newGarments = await getRandomGarments(count, excludeSlugs);
+          const newSlugs = extractSlugs(newGarments);
+          
           setGarments(newGarments);
           setPreviousGarments(previousTrackingData);
-          currentSlugsRef.current = extractSlugs(newGarments);
+          
+          // Update memory if this is a user-initiated refresh
+          if (shouldUpdateMemory) {
+            const currentShown = shownSlugsRef.current;
+            
+            // Check if any new garments were already shown (cycle completed)
+            if (hasOverlap(newSlugs, currentShown)) {
+              // Reset memory - start fresh with only the new garments
+              shownSlugsRef.current = new Set(newSlugs);
+            } else {
+              // Add new garments to memory
+              newSlugs.forEach((slug) => currentShown.add(slug));
+            }
+          }
           
           resolve({
             previous: previousTrackingData,
@@ -121,19 +153,24 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
   }, [garments]);
 
   /**
-   * Refresh garments with new random selection
-   * Excludes currently displayed garments to ensure variety
+   * Refresh garments with new random selection (deck shuffle behavior)
+   * 
+   * Excludes all previously shown garments to ensure no garment repeats
+   * until all available garments have been displayed once.
+   * 
    * Called when user clicks "Explore" button
    * @returns Promise with previous and current tracking data for analytics
    */
   const refreshGarments = useCallback(async (): Promise<{ previous: GarmentTrackingData[]; current: GarmentTrackingData[] }> => {
-    return fetchGarments(targetCount, currentSlugsRef.current);
+    // Convert Set to array for the server action
+    const excludeSlugs = Array.from(shownSlugsRef.current);
+    return fetchGarments(targetCount, excludeSlugs, true);
   }, [fetchGarments, targetCount]);
 
   /**
    * Adjust garment count when device type changes
    * Only runs after initial hydration to prevent SSR mismatch
-   * Note: Device change doesn't exclude current garments as it's not user-initiated
+   * Note: Device change doesn't update shown memory as it's not user-initiated
    */
   useEffect(() => {
     // Skip first effect to prevent SSR hydration mismatch
@@ -144,8 +181,8 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
 
     // Adjust garments if count differs from target
     if (garments.length !== targetCount) {
-      // Don't exclude on device change - just adjust count
-      fetchGarments(targetCount, []);
+      // Don't exclude or update memory on device change - just adjust count
+      fetchGarments(targetCount, [], false);
     }
   }, [targetCount, isInitialized, garments.length, fetchGarments]);
 

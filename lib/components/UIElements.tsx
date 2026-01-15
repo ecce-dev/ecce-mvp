@@ -1,12 +1,13 @@
 "use client"
 
-import { Button } from "@/lib/components/ui/button"
+import { useState, useCallback } from "react"
 import {
-  EcceDialogProvider,
   EcceDialogTrigger,
   EcceDialogContent,
   EcceActionTrigger,
-} from "@/lib/components/ecce-dialog"
+} from "@/lib/components/ecce-elements"
+import { SubmitRequestForm } from "@/lib/components/SubmitRequestForm"
+import { CountdownProgress } from "@/lib/components/CountdownProgress"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "../hooks/useDevice";
 import { cn } from "../utils/utils";
@@ -19,22 +20,49 @@ import posthog from "posthog-js";
  * Both triggers and content use flex containers with pointer-events:none
  * to allow canvas interaction while handling layout.
  * Interactive elements have pointer-events:auto to remain clickable.
+ * 
+ * Includes auto-refresh functionality that loads new garments every 30s.
  */
 export default function UIElements({ aboutContent, contactContent }: { aboutContent: string | null, contactContent: string | null }) {
   const { refreshGarments, isLoading } = useGarments();
   const { deviceType } = useDevice();
+  
+  // Trigger to reset countdown when user manually explores
+  const [manualRefreshCount, setManualRefreshCount] = useState(0);
 
-  const handleExploreClick = async () => {
+  /**
+   * Handle manual explore click
+   * Resets the auto-refresh countdown and tracks analytics
+   */
+  const handleExploreClick = useCallback(async () => {
+    // Reset countdown timer immediately
+    setManualRefreshCount((prev) => prev + 1);
+    
     const { previous, current } = await refreshGarments();
     posthog.capture('explore_clicked', {
       previousGarments: previous,
       newGarments: current,
       userType: 'visitor',
+      trigger: 'manual',
     });
-  };
+  }, [refreshGarments]);
+
+  /**
+   * Handle auto-refresh from countdown timer
+   * Tracks analytics with different trigger type
+   */
+  const handleAutoRefresh = useCallback(async () => {
+    const { previous, current } = await refreshGarments();
+    posthog.capture('explore_clicked', {
+      previousGarments: previous,
+      newGarments: current,
+      userType: 'visitor',
+      trigger: 'auto',
+    });
+  }, [refreshGarments]);
 
   return (
-    <EcceDialogProvider>
+    <>
       {/* 
         Trigger container: 
         - Fixed positioning spans the top of the screen
@@ -84,16 +112,17 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         Content container:
         - Fixed positioning below triggers
         - pointer-events-none allows clicks to pass through to canvas
-        - flex with justify-between for left/center/right positioning
-        - Wrapper divs maintain layout positions even when dialogs are closed
+        - Mobile: single-column grid where all dialogs occupy the same cell (overlap)
+        - Tablet/Desktop: 3-column grid ensures center slot stays centered
+        - This prevents position shifts during dialog transition animations
         - Each content has pointer-events-auto when visible
       */}
       <div
         id="dialog-content-container"
-        className="fixed safe-area-content top-48 md:top-32 lg:top-24 bottom-6 left-6 right-6 flex flex-col items-start md:flex-row md:justify-between md:items-stretch pointer-events-none z-100"
+        className="fixed safe-area-content top-40 md:top-20 lg:top-24 bottom-6 left-6 right-6 grid grid-cols-1 md:grid-cols-3 items-stretch pointer-events-none z-100"
       >
-        {/* Left slot: About content */}
-        <div className="flex-shrink-0">
+        {/* Left slot: About content - same cell on mobile, first column on tablet/desktop */}
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-1 max-h-full overflow-hidden">
           <EcceDialogContent
             dialogId="about"
             className="pointer-events-auto"
@@ -102,23 +131,19 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
 
-        {/* Center slot: Submit Request content - vertically centered on tablet/desktop */}
-        <div className="md:flex md:items-center md:justify-center md:h-full">
+        {/* Center slot: Submit Request content - same cell on mobile, centered in second column on tablet/desktop */}
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-2 md:justify-self-center md:self-center max-h-full w-full overflow-hidden flex items-center justify-center">
           <EcceDialogContent
             dialogId="submit-request"
-            className="pointer-events-auto"
+            className="pointer-events-auto p-0 border-0 bg-transparent"
           >
-            <h4 className="mb-4">Submit Request</h4>
-            <div className="space-y-4">
-              {/* Empty div for future form content */}
-              <div className="min-h-[100px]" />
-              <Button className="w-full">Send</Button>
-            </div>
+            {/* <h4 className="mb-4">Submit Request</h4> */}
+            <SubmitRequestForm />
           </EcceDialogContent>
         </div>
 
-        {/* Right slot: Contact content */}
-        <div className="flex-shrink-0">
+        {/* Right slot: Contact content - same cell on mobile, third column on tablet/desktop */}
+        <div className="col-start-1 row-start-1 justify-self-start md:col-start-3 md:justify-self-end max-h-full overflow-hidden">
           <EcceDialogContent
             dialogId="contact"
             className="pointer-events-auto"
@@ -127,6 +152,13 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
       </div>
-    </EcceDialogProvider>
+
+      {/* Auto-refresh countdown indicator */}
+      <CountdownProgress
+        onComplete={handleAutoRefresh}
+        resetTrigger={manualRefreshCount}
+        isPaused={isLoading}
+      />
+    </>
   )
 }

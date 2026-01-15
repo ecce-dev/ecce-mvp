@@ -7,6 +7,7 @@ import { QueryProvider } from "@/lib/providers/query-provider";
 import { ThemeProvider } from "@/lib/providers/theme-provider";
 import { CookieBanner } from "@/lib/components/CookieBanner";
 import { ThemeToggle } from "@/lib/components/ThemeToggle";
+import { AnimationToggle } from "@/lib/components/AnimationToggle";
 
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -67,6 +68,7 @@ export default function RootLayout({
             <CookieBanner />
           </QueryProvider>
           <ThemeToggle />
+          <AnimationToggle />
         </ThemeProvider>
       </body>
     </html>

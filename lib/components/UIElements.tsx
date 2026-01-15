@@ -1,11 +1,13 @@
 "use client"
 
+import { useState, useCallback } from "react"
 import {
   EcceDialogTrigger,
   EcceDialogContent,
   EcceActionTrigger,
 } from "@/lib/components/ecce-elements"
 import { SubmitRequestForm } from "@/lib/components/SubmitRequestForm"
+import { CountdownProgress } from "@/lib/components/CountdownProgress"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "../hooks/useDevice";
 import { cn } from "../utils/utils";
@@ -18,19 +20,46 @@ import posthog from "posthog-js";
  * Both triggers and content use flex containers with pointer-events:none
  * to allow canvas interaction while handling layout.
  * Interactive elements have pointer-events:auto to remain clickable.
+ * 
+ * Includes auto-refresh functionality that loads new garments every 30s.
  */
 export default function UIElements({ aboutContent, contactContent }: { aboutContent: string | null, contactContent: string | null }) {
   const { refreshGarments, isLoading } = useGarments();
   const { deviceType } = useDevice();
+  
+  // Trigger to reset countdown when user manually explores
+  const [manualRefreshCount, setManualRefreshCount] = useState(0);
 
-  const handleExploreClick = async () => {
+  /**
+   * Handle manual explore click
+   * Resets the auto-refresh countdown and tracks analytics
+   */
+  const handleExploreClick = useCallback(async () => {
+    // Reset countdown timer immediately
+    setManualRefreshCount((prev) => prev + 1);
+    
     const { previous, current } = await refreshGarments();
     posthog.capture('explore_clicked', {
       previousGarments: previous,
       newGarments: current,
       userType: 'visitor',
+      trigger: 'manual',
     });
-  };
+  }, [refreshGarments]);
+
+  /**
+   * Handle auto-refresh from countdown timer
+   * Tracks analytics with different trigger type
+   */
+  const handleAutoRefresh = useCallback(async () => {
+    const { previous, current } = await refreshGarments();
+    posthog.capture('explore_clicked', {
+      previousGarments: previous,
+      newGarments: current,
+      userType: 'visitor',
+      trigger: 'auto',
+    });
+  }, [refreshGarments]);
 
   return (
     <>
@@ -123,6 +152,13 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
       </div>
+
+      {/* Auto-refresh countdown indicator */}
+      <CountdownProgress
+        onComplete={handleAutoRefresh}
+        resetTrigger={manualRefreshCount}
+        isPaused={isLoading}
+      />
     </>
   )
 }

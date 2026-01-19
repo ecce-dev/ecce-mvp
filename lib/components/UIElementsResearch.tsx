@@ -143,7 +143,7 @@ export default function UIElementsResearch() {
         </div>
         <div className="flex flex-row flex-wrap gap-2 w-full max-w-[370px]">
           {descriptionTrigger}
-          {tiktokTrigger}
+          {/* {tiktokTrigger} */}
           {provenanceTrigger}
           {constructionTrigger}
           {licensedTrigger(garmentSlug, garmentName, userRole)}
@@ -164,7 +164,7 @@ export default function UIElementsResearch() {
         <div className="flex w-full justify-between">
           <div className="flex flex-col flex-wrap gap-2 w-fit mt-2">
             {descriptionTrigger}
-            {tiktokTrigger}
+            {/* {tiktokTrigger} */}
             {provenanceTrigger}
             {constructionTrigger}
             {analyticsTrigger}
@@ -188,7 +188,7 @@ export default function UIElementsResearch() {
         <div className="flex flex-row gap-2 2xl:gap-4 justify-center mr-62 ml-19">
           {/* {garmentNameElement(garmentName)} */}
           {descriptionTrigger}
-          {tiktokTrigger}
+          {/* {tiktokTrigger} */}
           {provenanceTrigger}
           {constructionTrigger}
 

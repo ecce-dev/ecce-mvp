@@ -57,6 +57,17 @@ interface AppModeActions {
 type AppModeStore = AppModeState & AppModeActions
 
 /**
+ * Clear the dialog query parameter from URL
+ */
+function clearDialogUrlParam() {
+  if (typeof window === "undefined") return
+
+  const url = new URL(window.location.href)
+  url.searchParams.delete("dialog")
+  window.history.replaceState({}, "", url.toString())
+}
+
+/**
  * Update URL query parameters without page reload
  */
 function updateUrlParams(garmentSlug: string | null, mode: ViewMode | null) {
@@ -104,11 +115,15 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
     
     set({ selectedGarment: garment, viewMode: effectiveMode })
     updateUrlParams(garment.slug ?? null, effectiveMode)
+    // Reset dialog param when selecting a new garment
+    clearDialogUrlParam()
   },
 
   deselectGarment: () => {
     set({ selectedGarment: null })
     updateUrlParams(null, null)
+    // Clear dialog param when deselecting garment
+    clearDialogUrlParam()
   },
 
   setViewMode: (mode) => {

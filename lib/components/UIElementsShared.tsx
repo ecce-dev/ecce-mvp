@@ -8,8 +8,8 @@ import posthog from "posthog-js"
 // Garment Name Element
 // ============================================
 export const garmentNameElement = (garmentName: string) => (
-  <div className="px-4 py-1 md:py-2 pt-1 text-sm md:text-md lg:text-xl border border-foreground bg-background/70 font-zangezi uppercase pointer-events-auto w-full text-center md:w-fit">
-    <span className="inline-block translate-y-[2px]">{garmentName}</span>
+  <div className="text-nowrap overflow-hidden text-ellipsis px-4 py-1 md:py-2 pt-1 max-[420px]:text-xs max-[420px]:py-1.5 text-sm md:text-md lg:text-xl border border-foreground bg-background/70 font-zangezi uppercase pointer-events-auto w-full text-center md:max-w-md lg:max-w-lg xl:max-w-xl">
+    <span className="inline-block max-[420px]:translate-y-[2px] translate-y-[2px]">{garmentName}</span>
   </div>
 )
 
@@ -62,7 +62,7 @@ export const publicResearchSwitch = (
       )}
       onAction={() => setViewMode("public")}
     >
-      Public
+      Encounter
     </EcceActionTrigger>
     <EcceActionTrigger
       variant="primary"
@@ -74,7 +74,7 @@ export const publicResearchSwitch = (
       )}
       onAction={onResearchClick ?? (() => setViewMode("research"))}
     >
-      Research
+      Engage
     </EcceActionTrigger>
   </div>
 )
@@ -198,3 +198,31 @@ export const createHtmlContent = (htmlContent: string) => {
     />
   )
 }
+
+
+export const licensedTrigger = (
+  garmentSlug: string,
+  garmentName: string,
+  userRole: UserRoleType,
+) => (
+  <TrackedDialogTrigger
+    dialogId="licensed"
+    label="licensed"
+    garmentSlug={garmentSlug}
+    garmentName={garmentName}
+    mode="research"
+    userRole={userRole}
+  />
+)
+
+
+// Version display element (no action, just displays content)
+export const versionElement = (version: string) => (
+  version ? (
+  <EcceActionTrigger
+    variant="secondary"
+    className="pointer-events-auto cursor-default max-w-20"
+  >
+    <span dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(version) }} className="" />
+  </EcceActionTrigger>
+) : null)

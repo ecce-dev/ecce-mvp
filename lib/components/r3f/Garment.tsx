@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useContext, useCallback, useState } from "react"
-import { useFrame, ThreeEvent } from "@react-three/fiber"
+import { useFrame, ThreeEvent, ThreeElements } from "@react-three/fiber"
 import NormalizedGlbModel, { TargetBoundingBox } from "./NormalizedGlbModel"
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
 import OrbitControlsContext from "./OrbitControlsContext"
@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 
 
-interface GarmentProps {
+type GarmentProps = {
   garment: NonNullable<GetGarmentsQuery['garments']>['nodes'][0];
   initPosition: THREE.Vector3;
   /** Initial Y-axis rotation for facing direction (radians) */
@@ -26,7 +26,7 @@ interface GarmentProps {
   nonSelectedOpacity: number;
   /** Speed of opacity transition (higher = faster) */
   opacityTransitionSpeed: number;
-}
+} & ThreeElements['group']
 
 
 export default function Garment({
@@ -38,7 +38,8 @@ export default function Garment({
   isSelected,
   hasSelection,
   nonSelectedOpacity,
-  opacityTransitionSpeed
+  opacityTransitionSpeed,
+  ...props
 }: GarmentProps) {
   const groupRef = useRef<THREE.Group>(null!);
   const meshGroupRef = useRef<THREE.Group>(null!);
@@ -144,6 +145,7 @@ export default function Garment({
       onClick={handleClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
+      {...props}
     >
       <group ref={groupRef}>
         <group ref={meshGroupRef}>

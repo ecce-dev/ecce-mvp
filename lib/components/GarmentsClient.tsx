@@ -3,7 +3,7 @@
 import { useGarments } from "@/lib/context/GarmentsContext";
 import { ContactShadows, Environment, useProgress } from "@react-three/drei";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CanvasWrapper from "./r3f/CanvasWrapper";
 import Garments from "./r3f/Garments";
 import LoadingScreen from "./LoadingScreen";
@@ -12,6 +12,14 @@ import { DarkModeEffects } from "./r3f/DarkModeEffects";
 import { DARK_MODE_EFFECTS, ENVIRONMENT_CONFIG } from "./r3f/darkModeEffectsConfig";
 import * as THREE from 'three';
 import { useDevice } from "../hooks/useDevice";
+import { CountdownProgress } from "./CountdownProgress";
+import posthog from "posthog-js";
+import { ThemeToggle } from "./ThemeToggle";
+import { AnimationToggle } from "./AnimationToggle";
+import { useAppModeStore } from "../stores/appModeStore";
+import LogoutButton from "./LogoutButton";
+import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
+import { useSpring, animated } from "@react-spring/web";
 
 /**
  * Client component that renders the 3D garments canvas
@@ -33,14 +41,20 @@ import { useDevice } from "../hooks/useDevice";
  * - Opacity fade: Non-selected garments fade out when one is selected
  */
 export default function GarmentsClient() {
-  const { garments, isLoading: isDataLoading } = useGarments();
+  const { viewMode, selectedGarment } = useAppModeStore()
+
+  const { garments, isLoading: isDataLoading, refreshGarments } = useGarments();
   const { active: isAssetsLoading } = useProgress();
   const { deviceType } = useDevice();
-  
+  const { openDialogId } = useEcceDialog()
+
+  // Trigger to reset countdown when user manually explores
+  const [manualRefreshCount, setManualRefreshCount] = useState(0);
+
   // Theme detection for dark mode effects
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -58,10 +72,50 @@ export default function GarmentsClient() {
     ? ENVIRONMENT_CONFIG.darkModePreset
     : ENVIRONMENT_CONFIG.lightModePreset;
 
+
+  /**
+ * Handle auto-refresh from countdown timer
+ * Tracks analytics with different trigger type
+ */
+  const handleAutoRefresh = useCallback(async () => {
+    if (selectedGarment) return;
+    const { previous, current } = await refreshGarments();
+    posthog.capture('explore_clicked', {
+      previousGarments: previous,
+      newGarments: current,
+      userType: 'visitor',
+      trigger: 'auto',
+    });
+  }, [refreshGarments]);
+
+
+  
+  const opacitySpring = useSpring({
+    opacity: openDialogId ? 0 : 1,
+    config: { tension: 2100, friction: 210 },
+  })
   return (
     <>
       <LoadingScreen isLoading={isLoading} />
       <BlurredOverlay />
+
+      {/* Auto-refresh countdown indicator */}
+      {!isLoading && (
+        <>
+          {selectedGarment ? null : (
+          <CountdownProgress
+              onComplete={handleAutoRefresh}
+              resetTrigger={manualRefreshCount}
+              isPaused={isLoading}
+            />
+          )}
+          <animated.div style={opacitySpring}>
+            <ThemeToggle />
+            <AnimationToggle />
+            {viewMode === "research" && <LogoutButton />}
+          </animated.div>
+        </>
+      )}
 
       <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
         <CanvasWrapper
@@ -77,8 +131,8 @@ export default function GarmentsClient() {
               enableZoom: true,
               enablePan: true,
               enableRotate: true,
-              maxPolarAngle: Math.PI / 2,
-              minPolarAngle: 0,
+              // maxPolarAngle: Math.PI / 2,
+              // minPolarAngle: 0,
             }
           }}
           enableLights={{

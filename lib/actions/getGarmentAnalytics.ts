@@ -17,7 +17,7 @@ export type InterestLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7
 export interface CountryEngagement {
   country: string
   countryCode: string
-  count: number
+  // count: number
 }
 
 /**
@@ -36,22 +36,22 @@ export interface ActionBreakdown {
  * Complete analytics data for a garment
  */
 export interface GarmentAnalytics {
-  /** Normalized interest score (0-1) */
+  /** Normalized interest score (0-100) for percentage */
   interestScore: number
   /** Interest level on 7-step scale */
   interestLevel: InterestLevel
   /** Color hex code for the interest level */
-  interestColor: string
+  // interestColor: string
   /** Total number of garment selections/views */
-  totalViews: number
+  // totalViews: number
   /** Total time spent viewing this garment (seconds) */
-  totalTimeSpent: number
+  // totalTimeSpent: number
   /** Average time per view (seconds) */
-  avgTimePerView: number
+  // avgTimePerView: number
   /** Top 3 countries by engagement */
   topCountries: CountryEngagement[]
   /** Breakdown of actions by type */
-  actionBreakdown: ActionBreakdown
+  // actionBreakdown: ActionBreakdown
   /** Data freshness timestamp */
   lastUpdated: string
 }
@@ -69,7 +69,8 @@ interface GlobalMetrics {
 // ============================================
 
 const POSTHOG_API_HOST = "https://us.posthog.com"
-const CACHE_REVALIDATION_SECONDS = 300 // 5 minutes
+const CACHE_REVALIDATION_SECONDS = 2520 // 42 minutes - aggressive caching to reduce API calls
+const MAX_RETRY_ATTEMPTS = 3 // Maximum number of retry attempts for rate-limited requests
 
 /**
  * Interest level color mapping (1-7 scale)
@@ -103,7 +104,59 @@ function calculateInterestLevel(score: number): InterestLevel {
 }
 
 /**
- * Execute a HogQL query against PostHog API
+ * Sleep for a specified number of seconds
+ */
+function sleep(seconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+}
+
+/**
+ * Execute a fetch request with retry logic for rate limiting
+ * Handles 429 errors by reading retry-after header and waiting before retrying
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  attempt: number = 1
+): Promise<Response> {
+  const response = await fetch(url, options)
+
+  // Handle rate limiting (429) with retry-after header
+  if (response.status === 429 && attempt < MAX_RETRY_ATTEMPTS) {
+    const retryAfterHeader = response.headers.get("retry-after")
+    const retryAfterSeconds = retryAfterHeader
+      ? parseInt(retryAfterHeader, 10)
+      : 60 // Default to 60 seconds if header is missing or invalid
+
+    if (isNaN(retryAfterSeconds) || retryAfterSeconds <= 0) {
+      console.warn(
+        `PostHog rate limited (429) but invalid retry-after header: "${retryAfterHeader}". Using default 60s.`
+      )
+    }
+
+    const waitTime = isNaN(retryAfterSeconds) || retryAfterSeconds <= 0 ? 60 : retryAfterSeconds
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `PostHog rate limited (429). Waiting ${waitTime}s before retry (attempt ${attempt}/${MAX_RETRY_ATTEMPTS})...`
+      )
+    }
+
+    // Wait for the specified retry-after duration
+    await sleep(waitTime)
+
+    // Retry the request
+    return fetchWithRetry(url, options, attempt + 1)
+  }
+
+  return response
+}
+
+/**
+ * Execute a HogQL query against PostHog API with retry logic for rate limiting
+ * 
+ * @param query - HogQL query string
+ * @returns Query result or null if failed
  */
 async function executeHogQLQuery<T>(query: string): Promise<T | null> {
   const apiKey = process.env.POSTHOG_PERSONAL_API_KEY
@@ -114,30 +167,44 @@ async function executeHogQLQuery<T>(query: string): Promise<T | null> {
     return null
   }
 
-  try {
-    const response = await fetch(`${POSTHOG_API_HOST}/api/projects/${projectId}/query/`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+  const url = `${POSTHOG_API_HOST}/api/projects/${projectId}/query/`
+  const options: RequestInit = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: {
+        kind: "HogQLQuery",
+        query,
       },
-      body: JSON.stringify({
-        query: {
-          kind: "HogQLQuery",
-          query,
-        },
-      }),
-    })
+    }),
+  }
 
+  try {
+    const response = await fetchWithRetry(url, options)
+
+    // Handle non-429 errors
     if (!response.ok) {
-      console.error(`PostHog API error: ${response.status} ${response.statusText}`)
+      const errorText = await response.text().catch(() => response.statusText)
+      
+      if (response.status === 429) {
+        console.error(
+          `PostHog API rate limited (429) after ${MAX_RETRY_ATTEMPTS} attempts. Retry-After: ${response.headers.get("retry-after") || "unknown"}`
+        )
+      } else {
+        console.error(
+          `PostHog API error: ${response.status} ${response.statusText}. ${errorText.substring(0, 200)}`
+        )
+      }
       return null
     }
 
     const data = await response.json()
     return data as T
   } catch (error) {
-    console.error("PostHog query failed:", error)
+    console.error("PostHog query failed:", error instanceof Error ? error.message : error)
     return null
   }
 }
@@ -176,7 +243,7 @@ const getGlobalMetricsCached = unstable_cache(
     }
 
     const result = await executeHogQLQuery<QueryResult>(query)
-    
+
     if (!result?.results?.[0]) {
       return { maxViews: 1, maxTimeSpent: 1 } // Avoid division by zero
     }
@@ -244,6 +311,39 @@ const getGarmentMetricsCached = unstable_cache(
       GROUP BY action_type
     `
 
+       // Query for views and time spent
+       const topClicksQuery = `
+        WITH garment_clicks AS (
+          SELECT 
+              properties.garment_slug AS garment_slug,
+              count() AS clicks
+          FROM events
+        WHERE 
+            event = 'garment_selected'
+            AND timestamp >= now() - INTERVAL 90 DAY
+            AND timestamp < now()
+            AND properties.garment_slug IS NOT NULL
+        GROUP BY properties.garment_slug
+        ),
+        max_clicks AS (
+            SELECT max(clicks) AS top_clicks
+            FROM garment_clicks
+        )
+        SELECT 
+            garment_slug AS 'Garment Slug',
+            clicks AS 'Total Clicks',
+            round((clicks / top_clicks) * 100, 1) AS 'Percent of Top'
+          FROM garment_clicks
+        CROSS JOIN max_clicks
+        ORDER BY clicks DESC
+        LIMIT 25
+        `
+    
+ 
+     interface topClicksQueryResultType {
+       results?: Array<[string, number | null, number | null]>
+     }
+
     interface MetricsResult {
       results?: Array<[number | null, number | null, number | null]>
     }
@@ -257,18 +357,25 @@ const getGarmentMetricsCached = unstable_cache(
     }
 
     // Execute all queries in parallel
-    const [metricsResult, countriesResult, actionsResult] = await Promise.all([
-      executeHogQLQuery<MetricsResult>(metricsQuery),
+    const [
+      // metricsResult,
+      countriesResult,
+      // actionsResult,
+      topClicksResult
+    ] = await Promise.all([
+      // executeHogQLQuery<MetricsResult>(metricsQuery),
       executeHogQLQuery<CountriesResult>(countriesQuery),
-      executeHogQLQuery<ActionsResult>(actionsQuery),
+      // executeHogQLQuery<ActionsResult>(actionsQuery),
+      executeHogQLQuery<topClicksQueryResultType>(topClicksQuery),
     ])
 
     // Parse metrics
-    const [viewCount, totalTime, avgTime] = metricsResult?.results?.[0] ?? [0, 0, 0]
+    const topClicksPercentage = topClicksResult?.results?.find(([slug]) => slug === garmentSlug)?.[2] ?? 0
+    // const [viewCount, totalTime, avgTime] = metricsResult?.results?.[0] ?? [0, 0, 0]
 
     // Parse countries
     const topCountries: CountryEngagement[] = (countriesResult?.results ?? [])
-      .filter((row): row is [string, string, number] => 
+      .filter((row): row is [string, string, number] =>
         row[0] !== null && row[1] !== null && row[2] !== null
       )
       .map(([country, countryCode, count]) => ({
@@ -277,32 +384,101 @@ const getGarmentMetricsCached = unstable_cache(
         count,
       }))
 
-    // Parse action breakdown
-    const actionBreakdown: ActionBreakdown = {
-      description: 0,
-      tiktok: 0,
-      provenance: 0,
-      construction: 0,
-      analytics: 0,
-      export: 0,
-    }
+    // // Parse action breakdown
+    // const actionBreakdown: ActionBreakdown = {
+    //   description: 0,
+    //   tiktok: 0,
+    //   provenance: 0,
+    //   construction: 0,
+    //   analytics: 0,
+    //   export: 0,
+    // }
 
-    for (const row of actionsResult?.results ?? []) {
-      const [actionType, count] = row
-      if (actionType && count && actionType in actionBreakdown) {
-        actionBreakdown[actionType as keyof ActionBreakdown] = count
-      }
-    }
+    // for (const row of actionsResult?.results ?? []) {
+    //   const [actionType, count] = row
+    //   if (actionType && count && actionType in actionBreakdown) {
+    //     actionBreakdown[actionType as keyof ActionBreakdown] = count
+    //   }
+    // }
 
     return {
-      totalViews: viewCount ?? 0,
-      totalTimeSpent: totalTime ?? 0,
-      avgTimePerView: avgTime ?? 0,
-      topCountries,
-      actionBreakdown,
+      // totalViews: viewCount ?? 0,
+      // totalTimeSpent: totalTime ?? 0,
+      // avgTimePerView: avgTime ?? 0,
+      topCountries:  topCountries.map((country) => ({
+        country: country.country,
+        countryCode: country.countryCode,
+      })),
+      // actionBreakdown,
+      topClicksPercentage
     }
   },
   ["garment-metrics"],
+  {
+    revalidate: CACHE_REVALIDATION_SECONDS,
+    tags: ["analytics"],
+  }
+)
+
+
+/**
+ * Get analytics for a specific garment (cached)
+ */
+export const getGarmentTopClicksCached = unstable_cache(
+  async () => {
+    // Query for views and time spent
+    const query = `
+      WITH garment_clicks AS (
+    SELECT 
+        properties.garment_slug AS garment_slug,
+        count() AS clicks
+    FROM events
+    WHERE 
+        event = 'garment_selected'
+        AND timestamp >= now() - INTERVAL 90 DAY
+        AND timestamp < now()
+        AND properties.garment_slug IS NOT NULL
+    GROUP BY properties.garment_slug
+),
+max_clicks AS (
+    SELECT max(clicks) AS top_clicks
+    FROM garment_clicks
+)
+SELECT 
+    garment_slug AS 'Garment Slug',
+    clicks AS 'Total Clicks',
+    round((clicks / top_clicks) * 100, 1) AS 'Percent of Top'
+  FROM garment_clicks
+CROSS JOIN max_clicks
+ORDER BY clicks DESC
+LIMIT 25
+    `
+
+
+
+    interface queryResultType {
+      results?: Array<[string | null, number | null, number | null]>
+    }
+
+    // Execute all queries in parallel
+    const [result] = await Promise.all([
+      executeHogQLQuery<queryResultType>(query),
+    ])
+
+    // Parse metrics
+    const results = result?.results ?? []
+
+    const initialValue: Record<string, number> = {}
+    const topClicksPercentages = results.reduce((acc, curr): Record<string, number> => {
+      acc[curr[0] as string] = curr[2] ?? 0
+      return acc
+    }, initialValue)
+
+    return {
+      topClicksPercentages,
+    }
+  },
+  ["garment-top-clicks"],
   {
     revalidate: CACHE_REVALIDATION_SECONDS,
     tags: ["analytics"],
@@ -321,33 +497,30 @@ const getGarmentMetricsCached = unstable_cache(
  */
 export async function getGarmentAnalytics(garmentSlug: string): Promise<GarmentAnalytics> {
   // Fetch data in parallel
-  const [globalMetrics, garmentMetrics] = await Promise.all([
-    getGlobalMetricsCached(),
-    getGarmentMetricsCached(garmentSlug),
-  ])
+  const garmentMetrics = await getGarmentMetricsCached(garmentSlug)
 
-  // Calculate normalized interest score
-  // Weight: 40% views, 60% time spent (time indicates deeper engagement)
-  const normalizedViews = garmentMetrics.totalViews / globalMetrics.maxViews
-  const normalizedTime = garmentMetrics.totalTimeSpent / globalMetrics.maxTimeSpent
-  const interestScore = normalizedViews * 0.4 + normalizedTime * 0.6
+  // // Calculate normalized interest score
+  // // Weight: 40% views, 60% time spent (time indicates deeper engagement)
+  // const normalizedViews = garmentMetrics.totalViews / globalMetrics.maxViews
+  // const normalizedTime = garmentMetrics.totalTimeSpent / globalMetrics.maxTimeSpent
+  // const interestScore = normalizedViews * 0.4 + normalizedTime * 0.6
 
-  // Clamp to 0-1 range
-  const clampedScore = Math.max(0, Math.min(1, interestScore))
+  // // Clamp to 0-1 range
+  // const clampedScore = Math.max(0, Math.min(1, interestScore))
 
-  // Calculate interest level
-  const interestLevel = calculateInterestLevel(clampedScore)
-  const interestColor = INTEREST_COLORS[interestLevel]
+  // // Calculate interest level
+  // const interestLevel = calculateInterestLevel(clampedScore)
+//   const interestColor = INTEREST_COLORS[interestLevel]
 
   return {
-    interestScore: Math.round(clampedScore * 100) / 100,
-    interestLevel,
-    interestColor,
-    totalViews: garmentMetrics.totalViews,
-    totalTimeSpent: Math.round(garmentMetrics.totalTimeSpent),
-    avgTimePerView: Math.round(garmentMetrics.avgTimePerView),
+    interestScore: garmentMetrics.topClicksPercentage,
+    interestLevel: calculateInterestLevel(garmentMetrics.topClicksPercentage / 100),
+  //   interestColor,
+  //   totalViews: garmentMetrics.totalViews,
+  //   totalTimeSpent: Math.round(garmentMetrics.totalTimeSpent),
+  //   avgTimePerView: Math.round(garmentMetrics.avgTimePerView),
     topCountries: garmentMetrics.topCountries,
-    actionBreakdown: garmentMetrics.actionBreakdown,
+  //   actionBreakdown: garmentMetrics.actionBreakdown,
     lastUpdated: new Date().toISOString(),
   }
 }

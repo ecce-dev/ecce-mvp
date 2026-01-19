@@ -83,7 +83,7 @@ export function CountdownProgress({
   return (
     <div 
       className={cn(
-        "fixed top-6 right-6 md:top-auto md:bottom-6 md:left-6 flex items-center gap-2 pointer-events-none z-100",
+        "fixed bottom-40 md:bottom-6 left-6 flex gap-2 pointer-events-none z-100",
         "safe-area-content",
         // "bottom-[180px]",
         className
@@ -116,7 +116,7 @@ export function CountdownProgress({
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
+            strokeLinecap="butt"
             className="text-foreground/60 transition-[stroke-dashoffset] duration-100 ease-linear"
           />
         </svg>

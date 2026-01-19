@@ -1,6 +1,6 @@
 "use client"
 
-import { EcceDialogProvider, EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
+import { EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import { useGarmentSessionTracking } from "@/lib/analytics"
@@ -11,8 +11,9 @@ import {
   TrackedDialogTrigger,
   TikTokTrigger,
   createHtmlContent,
+  licensedTrigger,
+  versionElement,
 } from "./UIElementsShared"
-import { addTargetBlankToLinks } from "../utils/utils"
 import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
 
 /**
@@ -31,7 +32,7 @@ import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
  * - Mobile/Tablet: Wrapped flex row with all triggers
  */
 export default function UIElementsResearch() {
-  const { selectedGarment, deselectGarment, viewMode, setViewMode, userRole, logout } = useAppModeStore()
+  const { selectedGarment, deselectGarment, viewMode, setViewMode, userRole } = useAppModeStore()
   const { deviceType } = useDevice()
 
   // Track garment session (selection and time spent)
@@ -108,50 +109,6 @@ export default function UIElementsResearch() {
     />
   )
 
-  const licensedTrigger = (
-    <TrackedDialogTrigger
-      dialogId="licensed"
-      label="licensed"
-      garmentSlug={garmentSlug}
-      garmentName={garmentName}
-      mode="research"
-      userRole={userRole}
-    />
-  )
-
-  // Version display element (no action, just displays content)
-  const versionElement = version ? (
-    <EcceActionTrigger
-      variant="secondary"
-      className="pointer-events-auto cursor-default max-w-20"
-    >
-      <span dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(version) }} className="" />
-    </EcceActionTrigger>
-  ) : null
-
-  // Tracked TikTok trigger
-  const tiktokTrigger = tiktokUrl ? (
-    <TikTokTrigger
-      tiktokUrl={tiktokUrl}
-      garmentSlug={garmentSlug}
-      garmentName={garmentName}
-      mode="research"
-      userRole={userRole}
-    />
-  ) : null
-
-  {/* Hidden logout button - kept for future use */ }
-  const logoutButton = (
-    <EcceActionTrigger
-      variant="secondary"
-      className="pointer-events-auto px-3 md:px-4 text-sm hidden"
-      onAction={() => logout()}
-      title={`Logged in as ${userRole}`}
-    >
-      Logout
-    </EcceActionTrigger>
-  )
-
   // Device-specific layouts
   const mobileNavbar = (
     <>
@@ -159,17 +116,16 @@ export default function UIElementsResearch() {
       <div className="flex flex-col gap-2 w-full mt-9">
         <div className="flex flex-row justify-between items-center gap-2">
           {garmentNameElement(garmentName)}
-          {versionElement}
-
+          {versionElement(version)}
         </div>
-        <div className="flex flex-row flex-wrap gap-2 w-full max-w-[370px]">
+        <div className="flex flex-col flex-wrap gap-2 w-fit max-w-[370px]">
           {descriptionTrigger}
-          {tiktokTrigger}
+          {/* {tiktokTrigger} */}
           {provenanceTrigger}
           {constructionTrigger}
-          {licensedTrigger}
           {analyticsTrigger}
           {exportTrigger}
+          {licensedTrigger(garmentSlug, garmentName, userRole)}
         </div>
       </div>
     </>
@@ -183,10 +139,9 @@ export default function UIElementsResearch() {
           {garmentNameElement(garmentName)}
         </div>
         <div className="flex w-full justify-between">
-
           <div className="flex flex-col flex-wrap gap-2 w-fit mt-2">
             {descriptionTrigger}
-            {tiktokTrigger}
+            {/* {tiktokTrigger} */}
             {provenanceTrigger}
             {constructionTrigger}
             {analyticsTrigger}
@@ -194,9 +149,8 @@ export default function UIElementsResearch() {
           </div>
           <div className="flex flex-col items-end"></div>
           <div className="flex flex-col items-end gap-2">
-          {versionElement}
-          {licensedTrigger}
-
+            {versionElement(version)}
+            {licensedTrigger(garmentSlug, garmentName, userRole)}
           </div>
         </div>
       </div>
@@ -211,7 +165,7 @@ export default function UIElementsResearch() {
         <div className="flex flex-row gap-2 2xl:gap-4 justify-center mr-62 ml-19">
           {/* {garmentNameElement(garmentName)} */}
           {descriptionTrigger}
-          {tiktokTrigger}
+          {/* {tiktokTrigger} */}
           {provenanceTrigger}
           {constructionTrigger}
 
@@ -224,8 +178,8 @@ export default function UIElementsResearch() {
             {garmentNameElement(garmentName)}
           </div>
           <div className="flex flex-col gap-2 justify-center items-end">
-            {versionElement}
-            {licensedTrigger}
+            {versionElement(version)}
+            {licensedTrigger(garmentSlug, garmentName, userRole)}
           </div>
         </div>
       </div>
@@ -233,7 +187,7 @@ export default function UIElementsResearch() {
   )
 
   return (
-    <EcceDialogProvider>
+    <>
       {/* Top navigation bar */}
       <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">
         {/* Left section: Back button */}
@@ -247,9 +201,9 @@ export default function UIElementsResearch() {
       {/* CSS Grid ensures content always appears at fixed position, preventing layout shifts */}
       <div
         id="dialog-content-container-research"
-        className={`fixed safe-area-content top-54 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
+        className={`fixed safe-area-content top-82 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
       >
-        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full">
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"
@@ -290,6 +244,21 @@ export default function UIElementsResearch() {
                   />
                 ),
               },
+            }}
+          />
+
+        </div>
+      </div>
+      <div
+        id="dialog-content-container-research-right"
+        className={`fixed safe-area-content top-82 md:top-42 lg:top-48 min-[1360px]:top-48! 2xl:top-50! bottom-[150px] md:bottom-[180px] left-6 md:left-auto right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
+      >
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
+          <EcceUnifiedDialogRenderer
+            className="pointer-events-auto"
+            maxHeight="100%"
+            contentKey={selectedGarment.slug ?? ""}
+            dialogs={{
               licensed: {
                 title: "Licensed",
                 content: createHtmlContent(rights),
@@ -298,6 +267,6 @@ export default function UIElementsResearch() {
           />
         </div>
       </div>
-    </EcceDialogProvider>
+    </>
   )
 }

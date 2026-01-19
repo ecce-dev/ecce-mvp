@@ -11,21 +11,21 @@ export const DARK_MODE_EFFECTS = {
    * Adds point lights positioned around the scene to create edge highlights
    * on dark garments, making their silhouettes more visible.
    */
-  ENABLE_RIM_LIGHTING: true,
+  ENABLE_RIM_LIGHTING: false,
 
   /**
    * 2. SWITCH ENVIRONMENT PRESET
    * Changes the HDR environment from "studio" to a brighter/more contrasting
    * preset in dark mode for better garment visibility.
    */
-  ENABLE_ENVIRONMENT_SWITCH: true,
+  ENABLE_ENVIRONMENT_SWITCH: false,
 
   /**
    * 3. SUBTLE GLOW/BLOOM POST-PROCESSING
    * Adds a bloom effect that makes highlights on garments "pop" more,
    * improving visibility of specular/metallic materials.
    */
-  ENABLE_BLOOM: true,
+  ENABLE_BLOOM: false,
 } as const;
 
 // ============================================

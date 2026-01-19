@@ -1,6 +1,6 @@
 "use client"
 
-import { EcceDialogProvider, EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
+import { EcceActionTrigger, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import { useGarmentSessionTracking } from "@/lib/analytics"
@@ -123,9 +123,9 @@ export default function UIElementsResearch() {
           {/* {tiktokTrigger} */}
           {provenanceTrigger}
           {constructionTrigger}
-          {licensedTrigger(garmentSlug, garmentName, userRole)}
           {analyticsTrigger}
           {exportTrigger}
+          {licensedTrigger(garmentSlug, garmentName, userRole)}
         </div>
       </div>
     </>
@@ -187,7 +187,7 @@ export default function UIElementsResearch() {
   )
 
   return (
-    <EcceDialogProvider>
+    <>
       {/* Top navigation bar */}
       <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">
         {/* Left section: Back button */}
@@ -267,6 +267,6 @@ export default function UIElementsResearch() {
           />
         </div>
       </div>
-    </EcceDialogProvider>
+    </>
   )
 }

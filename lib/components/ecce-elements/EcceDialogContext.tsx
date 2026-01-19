@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { useDialogUrlSync } from "./useDialogUrlSync"
 
 type EcceDialogContextType = {
   /** Currently open dialog ID, null if none open */
@@ -20,6 +21,7 @@ const EcceDialogContext = createContext<EcceDialogContextType | null>(null)
 /**
  * Provider for managing ECCE dialog state
  * Ensures only one dialog can be open at a time
+ * Automatically syncs dialog state with URL query parameters
  */
 export function EcceDialogProvider({ children }: { children: ReactNode }) {
   const [openDialogId, setOpenDialogId] = useState<string | null>(null)
@@ -40,6 +42,9 @@ export function EcceDialogProvider({ children }: { children: ReactNode }) {
     (id: string) => openDialogId === id,
     [openDialogId]
   )
+
+  // Sync dialog state with URL parameters
+  useDialogUrlSync(openDialogId, openDialog, closeDialog)
 
   return (
     <EcceDialogContext.Provider

@@ -1,6 +1,6 @@
 "use client"
 
-import { EcceDialogProvider, EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
+import { EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import { useGarmentSessionTracking } from "@/lib/analytics"
@@ -130,7 +130,7 @@ export default function UIElementsPublic() {
   </>
 
   return (
-    <EcceDialogProvider>
+    <>
       {/* Login Modal */}
       <LoginModal />
 
@@ -205,6 +205,6 @@ export default function UIElementsPublic() {
           />
         </div>
       </div>
-    </EcceDialogProvider>
+    </>
   )
 }

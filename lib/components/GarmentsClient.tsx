@@ -18,7 +18,8 @@ import { ThemeToggle } from "./ThemeToggle";
 import { AnimationToggle } from "./AnimationToggle";
 import { useAppModeStore } from "../stores/appModeStore";
 import LogoutButton from "./LogoutButton";
-
+import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
+import { useSpring, animated } from "@react-spring/web";
 
 /**
  * Client component that renders the 3D garments canvas
@@ -40,11 +41,12 @@ import LogoutButton from "./LogoutButton";
  * - Opacity fade: Non-selected garments fade out when one is selected
  */
 export default function GarmentsClient() {
-  const { viewMode } = useAppModeStore()
+  const { viewMode, selectedGarment } = useAppModeStore()
 
   const { garments, isLoading: isDataLoading, refreshGarments } = useGarments();
   const { active: isAssetsLoading } = useProgress();
   const { deviceType } = useDevice();
+  const { openDialogId } = useEcceDialog()
 
   // Trigger to reset countdown when user manually explores
   const [manualRefreshCount, setManualRefreshCount] = useState(0);
@@ -76,6 +78,7 @@ export default function GarmentsClient() {
  * Tracks analytics with different trigger type
  */
   const handleAutoRefresh = useCallback(async () => {
+    if (selectedGarment) return;
     const { previous, current } = await refreshGarments();
     posthog.capture('explore_clicked', {
       previousGarments: previous,
@@ -85,6 +88,12 @@ export default function GarmentsClient() {
     });
   }, [refreshGarments]);
 
+
+  
+  const opacitySpring = useSpring({
+    opacity: openDialogId ? 0 : 1,
+    config: { tension: 2100, friction: 210 },
+  })
   return (
     <>
       <LoadingScreen isLoading={isLoading} />
@@ -93,14 +102,18 @@ export default function GarmentsClient() {
       {/* Auto-refresh countdown indicator */}
       {!isLoading && (
         <>
+          {selectedGarment ? null : (
           <CountdownProgress
-            onComplete={handleAutoRefresh}
-            resetTrigger={manualRefreshCount}
-            isPaused={isLoading}
-          />
-          <ThemeToggle />
-          <AnimationToggle />
-          {viewMode === "research" && <LogoutButton />}
+              onComplete={handleAutoRefresh}
+              resetTrigger={manualRefreshCount}
+              isPaused={isLoading}
+            />
+          )}
+          <animated.div style={opacitySpring}>
+            <ThemeToggle />
+            <AnimationToggle />
+            {viewMode === "research" && <LogoutButton />}
+          </animated.div>
         </>
       )}
 

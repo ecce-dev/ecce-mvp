@@ -44,11 +44,11 @@ export default function GarmentsClient() {
 
   // Trigger to reset countdown when user manually explores
   const [manualRefreshCount, setManualRefreshCount] = useState(0);
-  
+
   // Theme detection for dark mode effects
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -67,19 +67,19 @@ export default function GarmentsClient() {
     : ENVIRONMENT_CONFIG.lightModePreset;
 
 
-    /**
-   * Handle auto-refresh from countdown timer
-   * Tracks analytics with different trigger type
-   */
-    const handleAutoRefresh = useCallback(async () => {
-      const { previous, current } = await refreshGarments();
-      posthog.capture('explore_clicked', {
-        previousGarments: previous,
-        newGarments: current,
-        userType: 'visitor',
-        trigger: 'auto',
-      });
-    }, [refreshGarments]);
+  /**
+ * Handle auto-refresh from countdown timer
+ * Tracks analytics with different trigger type
+ */
+  const handleAutoRefresh = useCallback(async () => {
+    const { previous, current } = await refreshGarments();
+    posthog.capture('explore_clicked', {
+      previousGarments: previous,
+      newGarments: current,
+      userType: 'visitor',
+      trigger: 'auto',
+    });
+  }, [refreshGarments]);
 
   return (
     <>
@@ -89,15 +89,14 @@ export default function GarmentsClient() {
       {/* Auto-refresh countdown indicator */}
       {!isLoading && (
         <>
-      <CountdownProgress
-        onComplete={handleAutoRefresh}
-          resetTrigger={manualRefreshCount}
-          isPaused={isLoading}
-        />
-
-        <ThemeToggle />
+          <CountdownProgress
+            onComplete={handleAutoRefresh}
+            resetTrigger={manualRefreshCount}
+            isPaused={isLoading}
+          />
+          <ThemeToggle />
           <AnimationToggle />
-          </>
+        </>
       )}
 
       <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">

@@ -15,19 +15,13 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return (
-      <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-card/80 px-3 py-2 shadow-lg backdrop-blur-sm">
-        <span className="text-xs text-muted-foreground">Light</span>
-        <Switch disabled />
-        <span className="text-xs text-muted-foreground">Dark</span>
-      </div>
-    );
+    return null;
   }
 
   const isDark = theme === "dark";
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full px-3 py-2">
+    <div className="fixed bottom-40 md:bottom-4 right-6 z-50 flex items-center gap-2 rounded-full py-2">
       {/* <span className="text-xs text-muted-foreground">Light</span> */}
       {/* <Switch
         checked={isDark}

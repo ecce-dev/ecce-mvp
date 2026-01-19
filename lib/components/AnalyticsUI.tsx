@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChartLineIcon, GlobeIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
-import { Switch } from "./ui/switch"
+import { GlobeIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
+// import { Switch } from "./ui/switch"
 import { cn, addTargetBlankToLinks } from "../utils/utils"
 import posthog from "posthog-js"
 import { getGarmentAnalytics, type GarmentAnalytics, type InterestLevel } from "@/lib/actions/getGarmentAnalytics"
+import { useTheme } from "next-themes"
 
 // ============================================
 // Analytics Dialog Content
@@ -289,7 +290,18 @@ export function ExportDialogContent({
   const previewAlt = patternPngPreview?.node?.altText ?? `Pattern preview for ${garmentName}`
   const downloadUrl = patternPngDownload?.node?.mediaItemUrl
 
-  const [isInverted, setIsInverted] = useState(false)
+  // const [isInverted, setIsInverted] = useState(false)
+
+  // Theme detection for dark mode effects
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Determine if dark mode is active (default to light during SSR)
+  const isDarkMode = mounted && resolvedTheme === "dark";
 
   const handleDownload = () => {
     if (!downloadUrl) return
@@ -322,7 +334,7 @@ export function ExportDialogContent({
           {previewUrl && (
             <div className="space-y-2">
               {/* Invert Switch */}
-              <div className="flex items-center justify-end gap-2">
+              {/* <div className="flex items-center justify-end gap-2">
                 <label 
                   htmlFor="invert-switch" 
                   className="text-xs font-ibm-plex-mono text-gray-600 cursor-pointer"
@@ -334,7 +346,7 @@ export function ExportDialogContent({
                   checked={isInverted}
                   onCheckedChange={setIsInverted}
                 />
-              </div>
+              </div> */}
               
               <div className="border border-foreground/20 bg-background/70 p-2">
                 <img
@@ -342,7 +354,7 @@ export function ExportDialogContent({
                   alt={previewAlt}
                   className={cn(
                     "w-full h-auto max-h-[420px] object-contain transition-all duration-200",
-                    isInverted && "invert"
+                    isDarkMode && "invert"
                   )}
                   loading="lazy"
                 />

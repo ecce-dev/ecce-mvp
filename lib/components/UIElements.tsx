@@ -26,7 +26,7 @@ import posthog from "posthog-js";
 export default function UIElements({ aboutContent, contactContent }: { aboutContent: string | null, contactContent: string | null }) {
   const { refreshGarments, isLoading } = useGarments();
   const { deviceType } = useDevice();
-  
+
   // Trigger to reset countdown when user manually explores
   const [manualRefreshCount, setManualRefreshCount] = useState(0);
 
@@ -44,20 +44,6 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
       newGarments: current,
       userType: 'visitor',
       trigger: 'manual',
-    });
-  }, [refreshGarments]);
-
-  /**
-   * Handle auto-refresh from countdown timer
-   * Tracks analytics with different trigger type
-   */
-  const handleAutoRefresh = useCallback(async () => {
-    const { previous, current } = await refreshGarments();
-    posthog.capture('explore_clicked', {
-      previousGarments: previous,
-      newGarments: current,
-      userType: 'visitor',
-      trigger: 'auto',
     });
   }, [refreshGarments]);
 
@@ -152,13 +138,6 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
           </EcceDialogContent>
         </div>
       </div>
-
-      {/* Auto-refresh countdown indicator */}
-      <CountdownProgress
-        onComplete={handleAutoRefresh}
-        resetTrigger={manualRefreshCount}
-        isPaused={isLoading}
-      />
     </>
   )
 }

@@ -3,7 +3,7 @@
 import { useGarments } from "@/lib/context/GarmentsContext";
 import { ContactShadows, Environment, useProgress } from "@react-three/drei";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CanvasWrapper from "./r3f/CanvasWrapper";
 import Garments from "./r3f/Garments";
 import LoadingScreen from "./LoadingScreen";
@@ -12,6 +12,11 @@ import { DarkModeEffects } from "./r3f/DarkModeEffects";
 import { DARK_MODE_EFFECTS, ENVIRONMENT_CONFIG } from "./r3f/darkModeEffectsConfig";
 import * as THREE from 'three';
 import { useDevice } from "../hooks/useDevice";
+import { CountdownProgress } from "./CountdownProgress";
+import posthog from "posthog-js";
+import { ThemeToggle } from "./ThemeToggle";
+import { AnimationToggle } from "./AnimationToggle";
+
 
 /**
  * Client component that renders the 3D garments canvas
@@ -33,9 +38,12 @@ import { useDevice } from "../hooks/useDevice";
  * - Opacity fade: Non-selected garments fade out when one is selected
  */
 export default function GarmentsClient() {
-  const { garments, isLoading: isDataLoading } = useGarments();
+  const { garments, isLoading: isDataLoading, refreshGarments } = useGarments();
   const { active: isAssetsLoading } = useProgress();
   const { deviceType } = useDevice();
+
+  // Trigger to reset countdown when user manually explores
+  const [manualRefreshCount, setManualRefreshCount] = useState(0);
   
   // Theme detection for dark mode effects
   const [mounted, setMounted] = useState(false);
@@ -58,10 +66,39 @@ export default function GarmentsClient() {
     ? ENVIRONMENT_CONFIG.darkModePreset
     : ENVIRONMENT_CONFIG.lightModePreset;
 
+
+    /**
+   * Handle auto-refresh from countdown timer
+   * Tracks analytics with different trigger type
+   */
+    const handleAutoRefresh = useCallback(async () => {
+      const { previous, current } = await refreshGarments();
+      posthog.capture('explore_clicked', {
+        previousGarments: previous,
+        newGarments: current,
+        userType: 'visitor',
+        trigger: 'auto',
+      });
+    }, [refreshGarments]);
+
   return (
     <>
       <LoadingScreen isLoading={isLoading} />
       <BlurredOverlay />
+
+      {/* Auto-refresh countdown indicator */}
+      {!isLoading && (
+        <>
+      <CountdownProgress
+        onComplete={handleAutoRefresh}
+          resetTrigger={manualRefreshCount}
+          isPaused={isLoading}
+        />
+
+        <ThemeToggle />
+          <AnimationToggle />
+          </>
+      )}
 
       <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
         <CanvasWrapper

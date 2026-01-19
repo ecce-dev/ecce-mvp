@@ -32,7 +32,7 @@ import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
  * - Mobile/Tablet: Wrapped flex row with all triggers
  */
 export default function UIElementsResearch() {
-  const { selectedGarment, deselectGarment, viewMode, setViewMode, userRole, logout } = useAppModeStore()
+  const { selectedGarment, deselectGarment, viewMode, setViewMode, userRole } = useAppModeStore()
   const { deviceType } = useDevice()
 
   // Track garment session (selection and time spent)
@@ -107,29 +107,6 @@ export default function UIElementsResearch() {
       mode="research"
       userRole={userRole}
     />
-  )
-
-  // Tracked TikTok trigger
-  const tiktokTrigger = tiktokUrl ? (
-    <TikTokTrigger
-      tiktokUrl={tiktokUrl}
-      garmentSlug={garmentSlug}
-      garmentName={garmentName}
-      mode="research"
-      userRole={userRole}
-    />
-  ) : null
-
-  {/* Hidden logout button - kept for future use */ }
-  const logoutButton = (
-    <EcceActionTrigger
-      variant="secondary"
-      className="pointer-events-auto px-3 md:px-4 text-sm hidden"
-      onAction={() => logout()}
-      title={`Logged in as ${userRole}`}
-    >
-      Logout
-    </EcceActionTrigger>
   )
 
   // Device-specific layouts

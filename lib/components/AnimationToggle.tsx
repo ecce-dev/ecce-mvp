@@ -13,7 +13,7 @@ export function AnimationToggle() {
   };
 
   return (
-    <div className="fixed bottom-40 md:bottom-4 right-14 z-50 flex items-center gap-2 rounded-full py-2">
+    <div className="fixed bottom-48 md:bottom-4 right-6 md:right-14 z-50 flex items-center gap-2 rounded-full py-2">
       <div
         onClick={handleToggle}
         className="cursor-pointer"

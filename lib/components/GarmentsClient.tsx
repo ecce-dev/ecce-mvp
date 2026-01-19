@@ -16,6 +16,8 @@ import { CountdownProgress } from "./CountdownProgress";
 import posthog from "posthog-js";
 import { ThemeToggle } from "./ThemeToggle";
 import { AnimationToggle } from "./AnimationToggle";
+import { useAppModeStore } from "../stores/appModeStore";
+import LogoutButton from "./LogoutButton";
 
 
 /**
@@ -38,6 +40,8 @@ import { AnimationToggle } from "./AnimationToggle";
  * - Opacity fade: Non-selected garments fade out when one is selected
  */
 export default function GarmentsClient() {
+  const { viewMode } = useAppModeStore()
+
   const { garments, isLoading: isDataLoading, refreshGarments } = useGarments();
   const { active: isAssetsLoading } = useProgress();
   const { deviceType } = useDevice();
@@ -96,6 +100,7 @@ export default function GarmentsClient() {
           />
           <ThemeToggle />
           <AnimationToggle />
+          {viewMode === "research" && <LogoutButton />}
         </>
       )}
 

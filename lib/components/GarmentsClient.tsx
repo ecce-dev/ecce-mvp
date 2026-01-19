@@ -77,8 +77,8 @@ export default function GarmentsClient() {
               enableZoom: true,
               enablePan: true,
               enableRotate: true,
-              maxPolarAngle: Math.PI / 2,
-              minPolarAngle: 0,
+              // maxPolarAngle: Math.PI / 2,
+              // minPolarAngle: 0,
             }
           }}
           enableLights={{

@@ -12,6 +12,8 @@ import {
   TrackedDialogTrigger,
   TikTokTrigger,
   createHtmlContent,
+  licensedTrigger,
+  versionElement,
 } from "./UIElementsShared"
 
 /**
@@ -23,14 +25,14 @@ import {
  * - Top Right: Mode switch (Public/Research)
  */
 export default function UIElementsPublic() {
-  const { 
-    selectedGarment, 
-    deselectGarment, 
-    viewMode, 
-    setViewMode, 
-    isAuthenticated, 
+  const {
+    selectedGarment,
+    deselectGarment,
+    viewMode,
+    setViewMode,
+    isAuthenticated,
     userRole,
-    setLoginModalOpen 
+    setLoginModalOpen
   } = useAppModeStore()
   const { deviceType } = useDevice()
 
@@ -41,6 +43,8 @@ export default function UIElementsPublic() {
 
   const garmentSlug = selectedGarment.slug ?? ""
   const garmentFields = selectedGarment.garmentFields
+  const rights = garmentFields?.rights ?? ""
+  const version = garmentFields?.version ?? ""
   const garmentName = garmentFields?.name ?? "Untitled Garment"
   const description = garmentFields?.description ?? ""
   const tiktokUrl = garmentFields?.linkToTiktok
@@ -80,11 +84,14 @@ export default function UIElementsPublic() {
   const mobileNavbar = <>
     {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
     <div className="flex flex-col gap-2 w-full mt-9">
-      {garmentNameElement(garmentName)}
+      <div className="flex flex-row justify-between items-center gap-2">
+        {garmentNameElement(garmentName)}
+        {versionElement(version)}
+      </div>
       <div className="grid grid-cols-2 gap-2 w-full justify-center">
         {descriptionTrigger}
         {tiktokTrigger}
-
+        {licensedTrigger(garmentSlug, garmentName, userRole)}
       </div>
     </div>
   </>
@@ -94,20 +101,31 @@ export default function UIElementsPublic() {
       <div className="mr-48 ml-18 flex flex-col justify-center items-center">
         {garmentNameElement(garmentName)}
       </div>
-      <div className="flex flex-col gap-2 w-full md:w-fit mt-2">
-        {descriptionTrigger}
-        {tiktokTrigger}
-        {/* <div className="flex flex-col gap-2 w-full justify-center">
-      </div> */}
+      <div className="grid grid-cols-2">
+        <div className="flex flex-col gap-2 w-full md:w-fit mt-2">
+          {descriptionTrigger}
+          {tiktokTrigger}
+
+        </div>
+        <div className="flex flex-col gap-2 justify-center items-end">
+          {versionElement(version)}
+          {licensedTrigger(garmentSlug, garmentName, userRole)}
+        </div>
       </div>
     </div>
   </>
   const desktopNavbar = <>
     {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
-    <div className="flex flex-row gap-4 w-full justify-center mr-62 ml-18">
-      {garmentNameElement(garmentName)}
-      {descriptionTrigger}
-      {tiktokTrigger}
+    <div className="flex flex-col w-full gap-4">
+      <div className="flex flex-row gap-4 justify-center mr-62 ml-18">
+        {garmentNameElement(garmentName)}
+        {descriptionTrigger}
+        {tiktokTrigger}
+      </div>
+      <div className="flex flex-col gap-2 justify-center items-end">
+        {versionElement(version)}
+        {licensedTrigger(garmentSlug, garmentName, userRole)}
+      </div>
     </div>
   </>
 
@@ -152,7 +170,7 @@ export default function UIElementsPublic() {
       {/* CSS Grid ensures content always appears at fixed position, preventing layout shifts */}
       <div
         id="dialog-content-container-public"
-        className="fixed safe-area-content top-36 md:top-44 lg:top-50 min-[1360px]:top-22! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100"
+        className="fixed safe-area-content top-44 md:top-44 lg:top-50 min-[1360px]:top-22! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100"
       >
         <div className="col-start-1 row-start-1 max-h-full overflow-hidden">
           <EcceUnifiedDialogRenderer
@@ -163,6 +181,25 @@ export default function UIElementsPublic() {
               description: {
                 title: garmentName,
                 content: createHtmlContent(description),
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      <div
+        id="dialog-content-container-public-right"
+        className={`fixed safe-area-content top-44 md:top-42 lg:top-48 min-[1360px]:top-50! 2xl:top-50! bottom-[150px] md:bottom-[180px] left-6 md:left-auto right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
+      >
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
+          <EcceUnifiedDialogRenderer
+            className="pointer-events-auto"
+            maxHeight="100%"
+            contentKey={selectedGarment.slug ?? ""}
+            dialogs={{
+              licensed: {
+                title: "Licensed",
+                content: createHtmlContent(rights),
               },
             }}
           />

@@ -11,8 +11,9 @@ import {
   TrackedDialogTrigger,
   TikTokTrigger,
   createHtmlContent,
+  licensedTrigger,
+  versionElement,
 } from "./UIElementsShared"
-import { addTargetBlankToLinks } from "../utils/utils"
 import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
 
 /**
@@ -108,27 +109,6 @@ export default function UIElementsResearch() {
     />
   )
 
-  const licensedTrigger = (
-    <TrackedDialogTrigger
-      dialogId="licensed"
-      label="licensed"
-      garmentSlug={garmentSlug}
-      garmentName={garmentName}
-      mode="research"
-      userRole={userRole}
-    />
-  )
-
-  // Version display element (no action, just displays content)
-  const versionElement = version ? (
-    <EcceActionTrigger
-      variant="secondary"
-      className="pointer-events-auto cursor-default max-w-20"
-    >
-      <span dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(version) }} className="" />
-    </EcceActionTrigger>
-  ) : null
-
   // Tracked TikTok trigger
   const tiktokTrigger = tiktokUrl ? (
     <TikTokTrigger
@@ -159,15 +139,14 @@ export default function UIElementsResearch() {
       <div className="flex flex-col gap-2 w-full mt-9">
         <div className="flex flex-row justify-between items-center gap-2">
           {garmentNameElement(garmentName)}
-          {versionElement}
-
+          {versionElement(version)}
         </div>
         <div className="flex flex-row flex-wrap gap-2 w-full max-w-[370px]">
           {descriptionTrigger}
           {tiktokTrigger}
           {provenanceTrigger}
           {constructionTrigger}
-          {licensedTrigger}
+          {licensedTrigger(garmentSlug, garmentName, userRole)}
           {analyticsTrigger}
           {exportTrigger}
         </div>
@@ -183,7 +162,6 @@ export default function UIElementsResearch() {
           {garmentNameElement(garmentName)}
         </div>
         <div className="flex w-full justify-between">
-
           <div className="flex flex-col flex-wrap gap-2 w-fit mt-2">
             {descriptionTrigger}
             {tiktokTrigger}
@@ -194,9 +172,8 @@ export default function UIElementsResearch() {
           </div>
           <div className="flex flex-col items-end"></div>
           <div className="flex flex-col items-end gap-2">
-          {versionElement}
-          {licensedTrigger}
-
+            {versionElement(version)}
+            {licensedTrigger(garmentSlug, garmentName, userRole)}
           </div>
         </div>
       </div>
@@ -224,8 +201,8 @@ export default function UIElementsResearch() {
             {garmentNameElement(garmentName)}
           </div>
           <div className="flex flex-col gap-2 justify-center items-end">
-            {versionElement}
-            {licensedTrigger}
+            {versionElement(version)}
+            {licensedTrigger(garmentSlug, garmentName, userRole)}
           </div>
         </div>
       </div>
@@ -249,7 +226,7 @@ export default function UIElementsResearch() {
         id="dialog-content-container-research"
         className={`fixed safe-area-content top-54 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
       >
-        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full">
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"
@@ -290,6 +267,21 @@ export default function UIElementsResearch() {
                   />
                 ),
               },
+            }}
+          />
+
+        </div>
+      </div>
+      <div
+        id="dialog-content-container-research-right"
+        className={`fixed safe-area-content top-54 md:top-42 lg:top-48 min-[1360px]:top-48! 2xl:top-50! bottom-[150px] md:bottom-[180px] left-6 md:left-auto right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
+      >
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
+          <EcceUnifiedDialogRenderer
+            className="pointer-events-auto"
+            maxHeight="100%"
+            contentKey={selectedGarment.slug ?? ""}
+            dialogs={{
               licensed: {
                 title: "Licensed",
                 content: createHtmlContent(rights),

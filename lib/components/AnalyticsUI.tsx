@@ -5,8 +5,9 @@ import { GlobeIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
 // import { Switch } from "./ui/switch"
 import { cn, addTargetBlankToLinks } from "../utils/utils"
 import posthog from "posthog-js"
-import { getGarmentAnalytics, type GarmentAnalytics, type InterestLevel } from "@/lib/actions/getGarmentAnalytics"
+import { getGarmentAnalytics, getGarmentTopClicksCached, type GarmentAnalytics, type InterestLevel } from "@/lib/actions/getGarmentAnalytics"
 import { useTheme } from "next-themes"
+import { Progress } from "./ui/progress"
 
 // ============================================
 // Analytics Dialog Content
@@ -46,7 +47,7 @@ function formatDuration(seconds: number): string {
 /**
  * Interest meter component - 7-step visual indicator
  */
-function InterestMeter({ level, color }: { level: InterestLevel; color: string }) {
+function InterestMeter({ level, score, color }: { level: InterestLevel; score: number; color?: string; }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -58,7 +59,8 @@ function InterestMeter({ level, color }: { level: InterestLevel; color: string }
           {INTEREST_LABELS[level]}
         </span>
       </div>
-      <div className="flex gap-1">
+      <Progress value={score} />
+      {/* <div className="flex gap-1">
         {([1, 2, 3, 4, 5, 6, 7] as InterestLevel[]).map((step) => (
           <div
             key={step}
@@ -68,7 +70,7 @@ function InterestMeter({ level, color }: { level: InterestLevel; color: string }
             }}
           />
         ))}
-      </div>
+      </div> */}
     </div>
   )
 }
@@ -121,9 +123,9 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
   }, [garmentSlug, garmentName, userRole])
 
   // Calculate total interactions from action breakdown
-  const totalInteractions = analytics
-    ? Object.values(analytics.actionBreakdown).reduce((sum, count) => sum + count, 0)
-    : 0
+  // const totalInteractions = analytics
+  //   ? Object.values(analytics.actionBreakdown).reduce((sum, count) => sum + count, 0)
+  //   : 0
 
   return (
     <div className="space-y-6 w-full">
@@ -158,11 +160,16 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
           <>
             {/* Interest Meter */}
             <div className="border border-foreground/20 p-4 bg-background/70">
-              <InterestMeter level={analytics.interestLevel} color={analytics.interestColor} />
+              <InterestMeter
+                level={analytics.interestLevel}
+                score={analytics.interestScore}
+                // color={INTEREST_COLORS[analytics.interestLevel]}
+                // topClicksPercentage={analytics.topClicksPercentage}
+              />
             </div>
 
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* <div className="grid grid-cols-2 gap-3">
               <div className="border border-foreground/20 p-3 bg-background/70">
                 <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Views</p>
                 <p className="text-2xl font-zangezi">{analytics.totalViews}</p>
@@ -179,7 +186,7 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
                 <p className="text-xs font-ibm-plex-mono text-foreground/50 uppercase">Avg. Time</p>
                 <p className="text-2xl font-zangezi">{formatDuration(analytics.avgTimePerView)}</p>
               </div>
-            </div>
+            </div> */}
 
             {/* Top Countries */}
             {analytics.topCountries.length > 0 && (
@@ -194,9 +201,9 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
                       <span className="text-sm font-ibm-plex-mono">
                         {index + 1}. {country.country}
                       </span>
-                      <span className="text-sm font-ibm-plex-mono text-foreground/50">
+                      {/* <span className="text-sm font-ibm-plex-mono text-foreground/50">
                         {country.count} views
-                      </span>
+                      </span> */}
                     </div>
                   ))}
                 </div>
@@ -204,7 +211,7 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
             )}
 
             {/* Action Breakdown */}
-            {totalInteractions > 0 && (
+            {/* {totalInteractions > 0 && (
               <div className="border border-foreground/20 p-4 bg-background/70 w-full">
                 <p className="text-xs font-ibm-plex-mono text-gray-500 uppercase mb-3">Action Breakdown</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-8 text-sm font-ibm-plex-mono">
@@ -240,14 +247,14 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
                   )}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* No data state */}
-            {analytics.totalViews === 0 && (
+            {/* {analytics.totalViews === 0 && (
               <p className="text-xs font-ibm-plex-mono text-gray-400 italic text-center py-4">
                 No engagement data recorded yet
               </p>
-            )}
+            )} */}
           </>
         )}
       </div>

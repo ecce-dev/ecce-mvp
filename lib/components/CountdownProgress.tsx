@@ -116,7 +116,7 @@ export function CountdownProgress({
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
+            strokeLinecap="butt"
             className="text-foreground/60 transition-[stroke-dashoffset] duration-100 ease-linear"
           />
         </svg>

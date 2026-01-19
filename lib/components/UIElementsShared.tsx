@@ -62,7 +62,7 @@ export const publicResearchSwitch = (
       )}
       onAction={() => setViewMode("public")}
     >
-      Public
+      Encounter
     </EcceActionTrigger>
     <EcceActionTrigger
       variant="primary"
@@ -74,7 +74,7 @@ export const publicResearchSwitch = (
       )}
       onAction={onResearchClick ?? (() => setViewMode("research"))}
     >
-      Research
+      Engage
     </EcceActionTrigger>
   </div>
 )

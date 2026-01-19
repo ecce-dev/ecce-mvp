@@ -1,6 +1,6 @@
 "use client";
 
-import { NumberOne, NumberTwo } from "@phosphor-icons/react";
+import { NumberOneIcon, NumberTwoIcon } from "@phosphor-icons/react";
 import { useAppModeStore } from "@/lib/stores/appModeStore";
 
 export function AnimationToggle() {
@@ -20,7 +20,7 @@ export function AnimationToggle() {
         aria-label={`Switch to ${isCarousel ? "camera" : "carousel"} animation mode`}
         title={`Current: ${selectionAnimationMode} mode`}
       >
-        {isCarousel ? <NumberTwo /> : <NumberOne />}
+        {!isCarousel ? <NumberTwoIcon /> : <NumberOneIcon />}
       </div>
     </div>
   );

@@ -172,7 +172,7 @@ export default function UIElementsPublic() {
         id="dialog-content-container-public"
         className="fixed safe-area-content top-44 md:top-44 lg:top-50 min-[1360px]:top-22! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100"
       >
-        <div className="col-start-1 row-start-1 max-h-full overflow-hidden">
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden max-w-[420px]">
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"

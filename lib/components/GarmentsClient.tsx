@@ -89,9 +89,8 @@ export default function GarmentsClient() {
   }, [refreshGarments]);
 
 
-  
   const opacitySpring = useSpring({
-    opacity: openDialogId ? 0 : 1,
+    opacity: deviceType === 'mobile' && openDialogId ? 0 : 1,
     config: { tension: 2100, friction: 210 },
   })
   return (
@@ -112,7 +111,7 @@ export default function GarmentsClient() {
           <animated.div style={opacitySpring}>
             <ThemeToggle />
             <AnimationToggle />
-            {viewMode === "research" && <LogoutButton />}
+            {/* {viewMode === "research" && <LogoutButton />} */}
           </animated.div>
         </>
       )}

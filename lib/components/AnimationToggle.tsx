@@ -13,6 +13,7 @@ export function AnimationToggle() {
   };
 
   return (
+    // hidden on mobile because the animation mode has no effect when only one garment is loaded
     <div className="fixed bottom-48 md:bottom-4 right-6 md:right-14 z-50 hidden md:flex items-center gap-2 rounded-full py-2">
       <div
         onClick={handleToggle}

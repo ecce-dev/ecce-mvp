@@ -18,7 +18,7 @@ export const DARK_MODE_EFFECTS = {
    * Changes the HDR environment from "studio" to a brighter/more contrasting
    * preset in dark mode for better garment visibility.
    */
-  ENABLE_ENVIRONMENT_SWITCH: false,
+  ENABLE_ENVIRONMENT_SWITCH: true,
 
   /**
    * 3. SUBTLE GLOW/BLOOM POST-PROCESSING
@@ -51,7 +51,7 @@ export const RIM_LIGHTING_CONFIG = {
 
 export const ENVIRONMENT_CONFIG = {
   /** Environment preset for light mode */
-  lightModePreset: "studio" as const,
+  lightModePreset: "forest" as const,
   /** Environment preset for dark mode (options: "city", "dawn", "night", "warehouse", "forest", "apartment", "studio", "sunset", "park", "lobby") */
   darkModePreset: "city" as const,
 } as const;

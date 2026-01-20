@@ -392,7 +392,7 @@ const [isCarouselAnimating, setIsCarouselAnimating] = useState(false)
           localClippingEnabled: true // required for uikit scrolling
         }}
       >
-        {props.environmentFilePath ? <CustomEnvironment environmentFilePath={props.environmentFilePath} /> : null}
+        {/* {props.environmentFilePath ? <CustomEnvironment environmentFilePath={props.environmentFilePath} /> : null} */}
         {controls && controls.orbitControls && <OrbitControls
           ref={orbitControlsRef}
           makeDefault

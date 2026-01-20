@@ -119,7 +119,7 @@ export default function GarmentsClient() {
 
       <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
         <CanvasWrapper
-          initialCameraPosition={new THREE.Vector3(0, 2, 19)}
+          initialCameraPosition={new THREE.Vector3(0, -1, 19)}
           maxCameraDistance={42}
           minCameraDistance={4.2}
           controls={{
@@ -142,7 +142,7 @@ export default function GarmentsClient() {
         >
           <Environment
             preset={environmentPreset}
-            background={isDarkMode ? false : undefined}
+            // background={isDarkMode ? false : undefined}
           />
           {/* Dark mode visual effects */}
           <DarkModeEffects isDarkMode={isDarkMode} />

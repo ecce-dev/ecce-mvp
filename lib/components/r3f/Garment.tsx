@@ -143,8 +143,8 @@ export default function Garment({
       position={initPosition}
       rotation={[0, initialRotationY, 0]}
       onClick={handleClick}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
+      // onPointerEnter={handlePointerEnter}
+      // onPointerLeave={handlePointerLeave}
       {...props}
     >
       <group ref={groupRef}>

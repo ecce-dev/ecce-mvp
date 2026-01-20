@@ -1,4 +1,4 @@
-import { LessThanIcon } from "@phosphor-icons/react"
+import { ArrowLeftIcon, LessThanIcon } from "@phosphor-icons/react"
 import { DeviceType } from "../hooks/useDevice"
 import { EcceActionTrigger, EcceDialogTrigger } from "./ecce-elements"
 import { cn, addTargetBlankToLinks } from "../utils/utils"
@@ -24,7 +24,7 @@ export const BackButtonElement = (deselectGarment: () => void, deviceType: Devic
       onAction={deselectGarment}
       aria-label="Go back"
     >
-      <LessThanIcon size={deviceType === "desktop" ? 20 : deviceType === "tablet" ? 16 : 14} className="translate-y-[2px]" />
+      <ArrowLeftIcon size={deviceType === "desktop" ? 20 : deviceType === "tablet" ? 16 : 14} className="translate-y-[2px]" />
     </EcceActionTrigger>
   </div>
 )

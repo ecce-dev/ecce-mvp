@@ -113,10 +113,9 @@ export default function UIElementsResearch() {
   const mobileNavbar = (
     <>
       {publicResearchSwitch(viewMode, setViewMode)}
-      <div className="flex flex-col gap-2 w-full mt-9">
+      <div className="flex flex-col gap-2 w-full mt-9 relative">
         <div className="flex flex-row justify-between items-center gap-2">
           {garmentNameElement(garmentName)}
-          {versionElement(version)}
         </div>
         <div className="flex flex-col flex-wrap gap-2 w-fit max-w-[370px]">
           {descriptionTrigger}
@@ -125,6 +124,9 @@ export default function UIElementsResearch() {
           {constructionTrigger}
           {analyticsTrigger}
           {exportTrigger}
+        </div>
+        <div className="absolute top-9.5 right-0 flex flex-col items-end gap-2">
+          {versionElement(version)}
           {licensedTrigger(garmentSlug, garmentName, userRole)}
         </div>
       </div>
@@ -135,7 +137,7 @@ export default function UIElementsResearch() {
     <>
       {publicResearchSwitch(viewMode, setViewMode)}
       <div className="flex flex-col gap-2 w-full justify-center">
-        <div className="mr-48 ml-18 flex flex-col justify-center items-center">
+        <div className="mr-52 ml-18 flex flex-col justify-center items-center">
           {garmentNameElement(garmentName)}
         </div>
         <div className="flex w-full justify-between">
@@ -147,8 +149,8 @@ export default function UIElementsResearch() {
             {analyticsTrigger}
             {exportTrigger}
           </div>
-          <div className="flex flex-col items-end"></div>
-          <div className="flex flex-col items-end gap-2">
+          {/* <div className="flex flex-col items-end"></div> */}
+          <div className="flex flex-col items-end gap-2 mt-2">
             {versionElement(version)}
             {licensedTrigger(garmentSlug, garmentName, userRole)}
           </div>
@@ -201,7 +203,7 @@ export default function UIElementsResearch() {
       {/* CSS Grid ensures content always appears at fixed position, preventing layout shifts */}
       <div
         id="dialog-content-container-research"
-        className={`fixed safe-area-content top-82 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
+        className={`fixed safe-area-content top-72 md:top-89 lg:top-104 min-[1360px]:top-33! 2xl:top-36! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
       >
         <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
           <EcceUnifiedDialogRenderer
@@ -251,7 +253,7 @@ export default function UIElementsResearch() {
       </div>
       <div
         id="dialog-content-container-research-right"
-        className={`fixed safe-area-content top-82 md:top-42 lg:top-48 min-[1360px]:top-48! 2xl:top-50! bottom-[150px] md:bottom-[180px] left-6 md:left-auto right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
+        className={`fixed safe-area-content top-72 md:top-42 lg:top-48 min-[1360px]:top-48! 2xl:top-50! bottom-[150px] md:bottom-[180px] left-6 md:left-auto right-6 grid grid-cols-1 items-stretch justify-items-start pointer-events-none z-100`}
       >
         <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
           <EcceUnifiedDialogRenderer

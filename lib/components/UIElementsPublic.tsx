@@ -83,22 +83,24 @@ export default function UIElementsPublic() {
 
   const mobileNavbar = <>
     {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
-    <div className="flex flex-col gap-2 w-full mt-9">
+    <div className="flex flex-col gap-2 w-full mt-9 relative">
       <div className="flex flex-row justify-between items-center gap-2">
         {garmentNameElement(garmentName)}
-        {versionElement(version)}
       </div>
-      <div className="grid grid-cols-2 gap-2 w-full justify-center">
+      <div className="flex flex-col w-fit max-w-[370px] gap-2">
         {descriptionTrigger}
         {tiktokTrigger}
-        {licensedTrigger(garmentSlug, garmentName, userRole)}
       </div>
+      <div className="absolute top-9.5 right-0 flex flex-col items-end gap-2">
+          {versionElement(version)}
+          {licensedTrigger(garmentSlug, garmentName, userRole)}
+        </div>
     </div>
   </>
   const tabletNavbar = <>
     {publicResearchSwitch(viewMode, setViewMode, handleResearchClick)}
     <div className="flex flex-col gap-2 w-full justify-center">
-      <div className="mr-48 ml-18 flex flex-col justify-center items-center">
+      <div className="mr-52 ml-18 flex flex-col justify-center items-center">
         {garmentNameElement(garmentName)}
       </div>
       <div className="grid grid-cols-2">
@@ -107,7 +109,7 @@ export default function UIElementsPublic() {
           {tiktokTrigger}
 
         </div>
-        <div className="flex flex-col gap-2 justify-center items-end">
+        <div className="flex flex-col gap-2 justify-center items-end mt-2">
           {versionElement(version)}
           {licensedTrigger(garmentSlug, garmentName, userRole)}
         </div>

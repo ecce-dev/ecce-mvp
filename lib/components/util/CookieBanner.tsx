@@ -98,7 +98,10 @@ export function CookieBanner() {
             onClick={handleDeclineCookies}
             className="w-full sm:w-auto"
           >
-            Decline
+            <span className="translate-y-[0px] md:translate-y-[2px]">
+              Decline
+
+            </span>
           </Button>
           <Button
             type="button"
@@ -107,7 +110,9 @@ export function CookieBanner() {
             onClick={handleAcceptCookies}
             className="w-full sm:w-auto"
           >
-            Accept all cookies
+            <span className="translate-y-[0px] md:translate-y-[2px]">
+              Accept all cookies
+            </span>
           </Button>
         </div>
       </div>

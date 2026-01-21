@@ -46,6 +46,8 @@ export function EcceActionTrigger({
     onClick?.(e)
   }
 
+  const extraClassesZangeziFont = getTriggerSpanTranslateClass(variant)
+
   return (
     <button
       type="button"
@@ -59,7 +61,7 @@ export function EcceActionTrigger({
       style={positionStyles}
       {...props}
     >
-      <span className={cn("inline-block", getTriggerSpanTranslateClass(variant))}>
+      <span className={cn("inline-block", extraClassesZangeziFont)}>
         {children}
       </span>
     </button>

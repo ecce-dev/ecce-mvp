@@ -58,6 +58,8 @@ export function EcceDialogTrigger({
     toggleDialog(dialogId)
   }
 
+  const extraClassesZangeziFont = getTriggerSpanTranslateClass(variant)
+
   return (<>
     {!asChild ? (
       <button
@@ -75,7 +77,7 @@ export function EcceDialogTrigger({
         data-active={isActive}
         {...props}
       >
-        <span className={cn("inline-block", getTriggerSpanTranslateClass(variant))}>
+        <span className={cn("inline-block", extraClassesZangeziFont)}>
           {children}
         </span>
       </button>

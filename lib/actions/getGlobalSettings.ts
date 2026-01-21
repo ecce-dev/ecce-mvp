@@ -6,6 +6,7 @@ import { graphQLQuery } from "@/lib/utils/graphql-query";
 type AboutContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['about'];
 type ContactContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['contact'];
 type LegalRightsContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['legalAndRightsContent'];
+type PublicDomainTextContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['publicDomainTextContent'];
 type PasswordConfig = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordConfig'];
 
 export async function getAboutContent(): Promise<AboutContent | null> {
@@ -48,6 +49,20 @@ export async function getLegalRightsContent(): Promise<LegalRightsContent | null
   }
 
   return result.globalSettingsPage.globalSettings.legalAndRightsContent;
+}
+
+export async function getPublicDomainTextContent(): Promise<PublicDomainTextContent | null> {
+  const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
+    GetGlobalSettings,
+    null,
+    'getPublicDomainTextContent',
+  );
+
+  if (!result?.globalSettingsPage?.globalSettings) {
+    return null;
+  }
+
+  return result.globalSettingsPage.globalSettings.publicDomainTextContent;
 }
 
 /**

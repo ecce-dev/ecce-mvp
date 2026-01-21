@@ -2531,6 +2531,8 @@ export type GarmentFields = AcfFieldGroup & AcfFieldGroupFields & GarmentFields_
   patternZipDownload?: Maybe<AcfMediaItemConnectionEdge>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   provenance?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;true_false&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  publicDomain?: Maybe<Scalars['Boolean']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   rights?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
@@ -2562,6 +2564,8 @@ export type GarmentFields_Fields = {
   patternZipDownload?: Maybe<AcfMediaItemConnectionEdge>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   provenance?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;true_false&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  publicDomain?: Maybe<Scalars['Boolean']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   rights?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
@@ -2680,6 +2684,8 @@ export type GlobalSettings = AcfFieldGroup & AcfFieldGroupFields & GlobalSetting
   legalAndRightsContent?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   passwordConfig?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  publicDomainTextContent?: Maybe<Scalars['String']['output']>;
 };
 
 export type GlobalSettingsPage = AcfOptionsPage & Node & WithAcfGlobalSettings & {
@@ -2708,6 +2714,8 @@ export type GlobalSettings_Fields = {
   legalAndRightsContent?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   passwordConfig?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  publicDomainTextContent?: Maybe<Scalars['String']['output']>;
 };
 
 /** Saved GraphQL Documents */
@@ -11344,12 +11352,12 @@ export type WritingSettings = {
 export type GetGarmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', slug?: string | null, garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternZipDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
+export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', slug?: string | null, garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, publicDomain?: boolean | null, patternZipDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
 
 export type GetGlobalSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null } | null } | null };
+export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null } | null } | null };
 
 
 export const GetGarments = gql`
@@ -11365,6 +11373,7 @@ export const GetGarments = gql`
         provenance
         rights
         version
+        publicDomain
         patternZipDownload {
           node {
             altText
@@ -11397,6 +11406,7 @@ export const GetGlobalSettings = gql`
       contact
       passwordConfig
       legalAndRightsContent
+      publicDomainTextContent
     }
   }
 }

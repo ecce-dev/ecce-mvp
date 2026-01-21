@@ -74,12 +74,14 @@ interface ModeConfig {
 
 function createModeConfig(
   mode: ViewMode,
+  publicDomainTextContent: string,
   garmentData: {
     slug: string
     name: string
     description: string
     provenance: string
     construction: string
+    publicDomain: boolean
     rights: string
     version: string
     tiktokUrl?: string | null
@@ -94,7 +96,7 @@ function createModeConfig(
     isAuthenticated: boolean
   }
 ): ModeConfig {
-  const { slug, name, description, provenance, construction, rights, version, tiktokUrl } = garmentData
+  const { slug, name, description, provenance, construction, rights, version, tiktokUrl, publicDomain } = garmentData
 
   // Common trigger components
   const descriptionTrigger = (
@@ -196,7 +198,7 @@ function createModeConfig(
       },
       {
         id: "licensed",
-        component: licensedTrigger(slug, name, userRole),
+        component: licensedTrigger(slug, name, userRole, publicDomain, mode),
         showInMobile: true,
         showInTablet: true,
         showInDesktop: true,
@@ -212,7 +214,7 @@ function createModeConfig(
       licensed: {
         id: "licensed",
         title: "Licensed",
-        content: createHtmlContent(rights),
+        content: !publicDomain ? createHtmlContent(rights) : createHtmlContent(publicDomainTextContent),
       },
     }
 
@@ -230,7 +232,7 @@ function createModeConfig(
           </div>
           <div className="absolute top-9.5 right-0 flex flex-col items-end gap-2">
             {versionElement(version)}
-            {licensedTrigger(slug, name, userRole)}
+            {licensedTrigger(slug, name, userRole, publicDomain, mode)}
           </div>
         </div>
       </>
@@ -250,7 +252,7 @@ function createModeConfig(
             </div>
             <div className="flex flex-col gap-2 justify-center items-end mt-2">
               {versionElement(version)}
-              {licensedTrigger(slug, name, userRole)}
+              {licensedTrigger(slug, name, userRole, publicDomain, mode)}
             </div>
           </div>
         </div>
@@ -268,7 +270,7 @@ function createModeConfig(
           </div>
           <div className="flex flex-col gap-2 justify-center items-end mt-2">
             {versionElement(version)}
-            {licensedTrigger(slug, name, userRole)}
+            {licensedTrigger(slug, name, userRole, publicDomain, mode)}
           </div>
         </div>
       </>
@@ -336,7 +338,7 @@ function createModeConfig(
       },
       {
         id: "licensed",
-        component: licensedTrigger(slug, name, userRole),
+        component: licensedTrigger(slug, name, userRole, publicDomain, mode),
         showInMobile: true,
         showInTablet: true,
         showInDesktop: true,
@@ -387,7 +389,7 @@ function createModeConfig(
       licensed: {
         id: "licensed",
         title: "Licensed",
-        content: createHtmlContent(rights),
+        content: !publicDomain ? createHtmlContent(rights) : createHtmlContent(publicDomainTextContent),
       },
     }
 
@@ -408,7 +410,7 @@ function createModeConfig(
           </div>
           <div className="absolute top-9.5 right-0 flex flex-col items-end gap-2">
             {versionElement(version)}
-            {licensedTrigger(slug, name, userRole)}
+            {licensedTrigger(slug, name, userRole, publicDomain, mode)}
           </div>
         </div>
       </>
@@ -431,7 +433,7 @@ function createModeConfig(
             </div>
             <div className="flex flex-col items-end gap-2 mt-2">
               {versionElement(version)}
-              {licensedTrigger(slug, name, userRole)}
+              {licensedTrigger(slug, name, userRole, publicDomain, mode)}
             </div>
           </div>
         </div>
@@ -455,7 +457,7 @@ function createModeConfig(
             </div>
             <div className="flex flex-col gap-2 justify-center items-end">
               {versionElement(version)}
-              {licensedTrigger(slug, name, userRole)}
+              {licensedTrigger(slug, name, userRole, publicDomain, mode)}
             </div>
           </div>
         </div>
@@ -486,6 +488,7 @@ function createModeConfig(
 interface UIElementsGarmentProps {
   mode: ViewMode
   legalRightsContent: string | null
+  publicDomainTextContent: string
 }
 
 /**
@@ -497,7 +500,7 @@ interface UIElementsGarmentProps {
  * - Top Right: Mode switch (Public/Research)
  * - Device-specific layouts for mobile, tablet, and desktop
  */
-export default function UIElementsGarment({ mode, legalRightsContent }: UIElementsGarmentProps) {
+export default function UIElementsGarment({ mode, legalRightsContent, publicDomainTextContent }: UIElementsGarmentProps) {
   const {
     selectedGarment,
     deselectGarment,
@@ -526,10 +529,11 @@ export default function UIElementsGarment({ mode, legalRightsContent }: UIElemen
   const patternDescription = garmentFields?.patternDescription
   const patternZipDownload = garmentFields?.patternZipDownload
   const patternPngPreview = garmentFields?.patternPngPreview
-
+  const publicDomain = garmentFields?.publicDomain ?? false
   // Create mode-specific configuration
   const config = createModeConfig(
     mode,
+    publicDomainTextContent,
     {
       slug: garmentSlug,
       name: garmentName,
@@ -542,6 +546,7 @@ export default function UIElementsGarment({ mode, legalRightsContent }: UIElemen
       patternDescription,
       patternZipDownload,
       patternPngPreview,
+      publicDomain,
     },
     userRole,
     {

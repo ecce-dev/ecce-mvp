@@ -3,6 +3,7 @@ import { DeviceType } from "@/lib/hooks/useDevice"
 import { EcceActionTrigger, EcceDialogTrigger } from "@/lib/components/ecce-elements"
 import { cn, addTargetBlankToLinks } from "@/lib/utils/utils"
 import posthog from "posthog-js"
+import { useAppModeStore } from "@/lib/stores/appModeStore"
 
 // ============================================
 // Garment Name Element
@@ -204,16 +205,20 @@ export const licensedTrigger = (
   garmentSlug: string,
   garmentName: string,
   userRole: UserRoleType,
-) => (
-  <TrackedDialogTrigger
-    dialogId="licensed"
-    label="licensed"
-    garmentSlug={garmentSlug}
-    garmentName={garmentName}
-    mode="research"
-    userRole={userRole}
-  />
-)
+  publicDomain: boolean,
+  viewMode: "public" | "research",
+) => {
+  return (
+    <TrackedDialogTrigger
+      dialogId="licensed"
+      label={publicDomain ? "public domain" : "licensed"}
+      garmentSlug={garmentSlug}
+      garmentName={garmentName}
+      mode={viewMode}
+      userRole={userRole}
+    />
+  )
+}
 
 
 // Version display element (no action, just displays content)

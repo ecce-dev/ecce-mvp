@@ -33,6 +33,8 @@ export type EcceDialogTriggerProps = Omit<React.ButtonHTMLAttributes<HTMLButtonE
     left?: string
     /** Optional callback when trigger is clicked (in addition to toggle) */
     onClick?: () => void
+    /** Whether to render as a child component */
+    asChild?: boolean
   }
 
 /**
@@ -54,6 +56,7 @@ export function EcceDialogTrigger({
   left,
   onClick,
   children,
+  asChild = false,
   ...props
 }: EcceDialogTriggerProps) {
   const { isDialogOpen, toggleDialog } = useEcceDialog()
@@ -61,7 +64,7 @@ export function EcceDialogTrigger({
 
   // Only apply fixed positioning if any position prop is provided
   const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
-  
+
   const positionStyles = hasPositionProps
     ? { top, right, bottom, left }
     : undefined
@@ -73,26 +76,34 @@ export function EcceDialogTrigger({
     toggleDialog(dialogId)
   }
 
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={cn(
-        ecceDialogTriggerVariants({ variant }),
-        hasPositionProps && "fixed",
-        isActive
-          ? "bg-foreground text-background"
-          : "bg-background/70 text-foreground hover:bg-background/90",
-        className
-      )}
-      style={positionStyles}
-      data-active={isActive}
-      {...props}
-    >
-      <span className={cn("inline-block", variant === "primary" ? "translate-y-[0px] md:translate-y-[1px]" : "")}>
+  return (<>
+    {!asChild ? (
+      <button
+        type="button"
+        onClick={handleClick}
+        className={cn(
+          ecceDialogTriggerVariants({ variant }),
+          hasPositionProps && "fixed",
+          isActive
+            ? "bg-foreground text-background"
+            : "bg-background/70 text-foreground hover:bg-background/90",
+          className
+        )}
+        style={positionStyles}
+        data-active={isActive}
+        {...props}
+      >
+        <span className={cn("inline-block", variant === "primary" ? "translate-y-[0px] md:translate-y-[1px]" : "")}>
+          {children}
+        </span>
+      </button>
+    ) : (
+      <div
+        onClick={handleClick}
+      >
         {children}
-      </span>
-    </button>
+      </div>
+    )}
+  </>
   )
 }
-

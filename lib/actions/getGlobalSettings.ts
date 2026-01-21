@@ -5,13 +5,14 @@ import { graphQLQuery } from "@/lib/utils/graphql-query";
 
 type AboutContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['about'];
 type ContactContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['contact'];
+type LegalRightsContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['legalAndRightsContent'];
 type PasswordConfig = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordConfig'];
 
 export async function getAboutContent(): Promise<AboutContent | null> {
   const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
     GetGlobalSettings,
     null,
-    'getGlobalSettings',
+    'getAboutContent',
   );
 
   if (!result?.globalSettingsPage?.globalSettings) {
@@ -25,7 +26,7 @@ export async function getContactContent(): Promise<ContactContent | null> {
   const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
     GetGlobalSettings,
     null,
-    'getGlobalSettings',
+    'getContactContent',
   );
 
   if (!result?.globalSettingsPage?.globalSettings) {
@@ -33,6 +34,20 @@ export async function getContactContent(): Promise<ContactContent | null> {
   }
 
   return result.globalSettingsPage.globalSettings.contact;
+}
+
+export async function getLegalRightsContent(): Promise<LegalRightsContent | null> {
+  const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
+    GetGlobalSettings,
+    null,
+    'getLegalRightsContent',
+  );
+
+  if (!result?.globalSettingsPage?.globalSettings) {
+    return null;
+  }
+
+  return result.globalSettingsPage.globalSettings.legalAndRightsContent;
 }
 
 /**

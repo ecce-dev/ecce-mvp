@@ -16,6 +16,7 @@ import {
   versionElement,
 } from "./UIElementsShared"
 import { AnalyticsDialogContent, ExportDialogContent } from "@/lib/components/ui-elements/AnalyticsUI"
+import { LegalRightsContent } from "./LegalRightsToggle"
 
 // ============================================
 // Configuration Types
@@ -41,7 +42,7 @@ interface TriggerConfig {
   showInDesktop?: boolean
 }
 
-interface DialogConfig {
+export interface UIElementsDialogConfig {
   id: string
   title: string
   content: React.ReactNode
@@ -60,7 +61,7 @@ interface ContainerClasses {
 
 interface ModeConfig {
   triggers: TriggerConfig[]
-  dialogs: Record<string, DialogConfig>
+  dialogs: Record<string, UIElementsDialogConfig>
   layout: LayoutConfig
   containerClasses: ContainerClasses
   showLoginModal: boolean
@@ -202,7 +203,7 @@ function createModeConfig(
       },
     ]
 
-    const dialogs: Record<string, DialogConfig> = {
+    const dialogs: Record<string, UIElementsDialogConfig> = {
       description: {
         id: "description",
         title: name,
@@ -342,7 +343,7 @@ function createModeConfig(
       },
     ]
 
-    const dialogs: Record<string, DialogConfig> = {
+    const dialogs: Record<string, UIElementsDialogConfig> = {
       description: {
         id: "description",
         title: name,
@@ -484,6 +485,7 @@ function createModeConfig(
 
 interface UIElementsGarmentProps {
   mode: ViewMode
+  legalRightsContent: string | null
 }
 
 /**
@@ -495,7 +497,7 @@ interface UIElementsGarmentProps {
  * - Top Right: Mode switch (Public/Research)
  * - Device-specific layouts for mobile, tablet, and desktop
  */
-export default function UIElementsGarment({ mode }: UIElementsGarmentProps) {
+export default function UIElementsGarment({ mode, legalRightsContent }: UIElementsGarmentProps) {
   const {
     selectedGarment,
     deselectGarment,
@@ -565,6 +567,8 @@ export default function UIElementsGarment({ mode }: UIElementsGarmentProps) {
     <>
       {/* Login Modal - only shown in public mode */}
       {config.showLoginModal && <LoginModal />}
+      
+      <LegalRightsContent content={legalRightsContent ?? null} />
 
       {/* Top navigation bar */}
       <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">

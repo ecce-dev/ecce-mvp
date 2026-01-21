@@ -17,6 +17,8 @@ export interface DialogConfig {
 export type EcceUnifiedDialogRendererProps = {
   /** Map of dialogId to dialog configuration */
   dialogs: Record<string, DialogConfig>
+  /** Whether to show the close icon */
+  closeIcon?: boolean
   /** Additional class names for the dialog container */
   className?: string
   /** Fixed position from top (enables fixed positioning mode) */
@@ -46,6 +48,7 @@ export type EcceUnifiedDialogRendererProps = {
  */
 export function EcceUnifiedDialogRenderer({
   dialogs,
+  closeIcon = false,
   className,
   top,
   right,
@@ -99,14 +102,16 @@ export function EcceUnifiedDialogRenderer({
         role="dialog"
         aria-label={dialog.title}
       >
-        {/* <button
-          type="button"
-          onClick={() => closeDialog(dialogId)}
-          className="absolute top-4 right-4 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
-          aria-label="Close"
-        >
-          <XIcon className="size-5" />
-        </button> */}
+        {closeIcon && (
+          <button
+            type="button"
+            onClick={() => closeDialog(dialogId)}
+            className="absolute top-4 right-4 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+            aria-label="Close"
+          >
+            <XIcon className="size-5" />
+          </button>
+        )}
         <div className="w-full">{dialog.content}</div>
       </animated.div>
     )

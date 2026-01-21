@@ -6,12 +6,12 @@ import { useAppModeStore, type UserRole } from "@/lib/stores/appModeStore"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { uiElementsTransitionConfig } from "@/lib/components/ecce-elements/transition-config"
 import UIElements from "./UIElements"
-import UIElementsPublic from "./UIElementsPublic"
-import UIElementsResearch from "./UIElementsResearch"
+import UIElementsGarment from "./UIElementsGarment"
 
 interface UIElementsRouterProps {
   aboutContent: string | null
   contactContent: string | null
+  legalRightsContent: string | null
 }
 
 /** UI view state for transition management */
@@ -30,7 +30,11 @@ type UIViewState = "default" | "public" | "research"
  * - Session initialization from HttpOnly cookie
  * - URL parameter sync with Zustand state
  */
-export default function UIElementsRouter({ aboutContent, contactContent }: UIElementsRouterProps) {
+export default function UIElementsRouter({
+  aboutContent,
+  contactContent,
+  legalRightsContent,
+}: UIElementsRouterProps) {
   const { selectedGarment, viewMode, isAuthInitialized, setAuthenticated, setAuthInitialized, initializeFromUrl } = useAppModeStore()
   const { garments } = useGarments()
 
@@ -42,7 +46,7 @@ export default function UIElementsRouter({ aboutContent, contactContent }: UIEle
       try {
         const response = await fetch("/api/auth/session")
         const data = await response.json()
-        
+
         if (data.authenticated && data.role) {
           setAuthenticated(true, data.role as UserRole)
         }
@@ -59,7 +63,7 @@ export default function UIElementsRouter({ aboutContent, contactContent }: UIEle
   // Initialize state from URL parameters after auth is initialized
   useEffect(() => {
     if (!isAuthInitialized || garments.length === 0) return
-    
+
     initializeFromUrl(garments)
   }, [isAuthInitialized, garments, initializeFromUrl])
 
@@ -90,10 +94,16 @@ export default function UIElementsRouter({ aboutContent, contactContent }: UIEle
       }}
     >
       {view === "default" && (
-        <UIElements aboutContent={aboutContent} contactContent={contactContent} />
+        <UIElements
+          aboutContent={aboutContent}
+          contactContent={contactContent}
+          legalRightsContent={legalRightsContent}
+        />
       )}
-      {view === "public" && <UIElementsPublic />}
-      {view === "research" && <UIElementsResearch />}
+      <UIElementsGarment
+        mode={view === "public" ? "public" : "research"}
+        legalRightsContent={legalRightsContent}
+      />
     </animated.div>
   ))
 }

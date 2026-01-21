@@ -12,6 +12,7 @@ import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "@/lib/hooks/useDevice";
 import { cn, addTargetBlankToLinks } from "@/lib/utils/utils";
 import posthog from "posthog-js";
+import { LegalRightsContent } from "./LegalRightsToggle"
 
 /**
  * Main UI Elements component
@@ -23,7 +24,7 @@ import posthog from "posthog-js";
  * 
  * Includes auto-refresh functionality that loads new garments every 30s.
  */
-export default function UIElements({ aboutContent, contactContent }: { aboutContent: string | null, contactContent: string | null }) {
+export default function UIElements({ aboutContent, contactContent, legalRightsContent }: { aboutContent: string | null, contactContent: string | null, legalRightsContent: string | null }) {
   const { refreshGarments, isLoading } = useGarments();
   const { deviceType } = useDevice();
 
@@ -56,6 +57,8 @@ export default function UIElements({ aboutContent, contactContent }: { aboutCont
         - flex justify-between distributes buttons evenly
         - Order: About → Submit Request → Explore → Contact
       */}
+      <LegalRightsContent content={legalRightsContent ?? ''} />
+
       <div className="fixed safe-area-content top-6 left-6 right-6 flex pointer-events-none z-100">
         <div className={cn("flex flex-row justify-between w-full gap-2", deviceType === "mobile" && "flex-col")}>
           <EcceDialogTrigger

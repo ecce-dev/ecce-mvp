@@ -88,7 +88,7 @@ const CountdownProgressComponent = ({
   return (
     <div 
       className={cn(
-        "fixed bottom-52 md:bottom-6 right-6 left-auto md:left-6 flex gap-2 pointer-events-none z-100",
+        "fixed bottom-52 md:bottom-6 right-7 left-auto md:left-6 flex gap-2 pointer-events-none z-100",
         "safe-area-content",
         // "bottom-[180px]",
         className

@@ -1,4 +1,4 @@
-import { getAboutContent, getContactContent } from "@/lib/actions/getGlobalSettings";
+import { getAboutContent, getContactContent, getLegalRightsContent } from "@/lib/actions/getGlobalSettings";
 import Background from "@/lib/components/shared/Background";
 import { EcceDialogWrapper } from "@/lib/components/ecce-elements/EcceDialogWrapper";
 import GarmentsClient from "@/lib/components/r3f/GarmentsClient";
@@ -10,6 +10,7 @@ import UIElementsRouter from "@/lib/components/ui-elements/UIElementsRouter";
 export default async function Home() {
   const aboutContent = await getAboutContent();
   const contactContent = await getContactContent();
+  const legalRightsContent = await getLegalRightsContent();
   
   return (
     <PageContainer>
@@ -22,6 +23,7 @@ export default async function Home() {
           <UIElementsRouter
             aboutContent={aboutContent ?? null}
             contactContent={contactContent ?? null}
+            legalRightsContent={legalRightsContent ?? null}
           />
         </EcceDialogWrapper>
       </GarmentsWrapper>

@@ -20,6 +20,7 @@ import { useAppModeStore } from "../../stores/appModeStore";
 import LogoutButton from "../ui-elements/LogoutButton";
 import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
 import { useSpring, animated } from "@react-spring/web";
+import { LegalRightsToggle } from "../ui-elements/LegalRightsToggle";
 
 /**
  * Client component that renders the 3D garments canvas
@@ -110,6 +111,7 @@ export default function GarmentsClient() {
           )}
           <animated.div style={opacitySpring}>
             <ThemeToggle />
+            <LegalRightsToggle />
             {/* <AnimationToggle /> */}
             {/* {viewMode === "research" && <LogoutButton />} */}
           </animated.div>

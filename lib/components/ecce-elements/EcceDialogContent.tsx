@@ -9,6 +9,8 @@ import { transitionConfig } from "./transition-config"
 export type EcceDialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Unique ID to link this content to its trigger */
   dialogId: string
+  /** Whether to show the close icon */
+  closeIcon?: boolean
   /** Fixed position from top (enables fixed positioning mode) */
   top?: string
   /** Fixed position from right */
@@ -32,6 +34,7 @@ export type EcceDialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
 export function EcceDialogContent({
   className,
   dialogId,
+  closeIcon = false,
   top,
   right,
   bottom,
@@ -56,8 +59,8 @@ export function EcceDialogContent({
     (styles, item) =>
       item && (
         <animated.div
-          style={{ 
-            ...styles, 
+          style={{
+            ...styles,
             ...positionStyles,
           }}
           className={cn(
@@ -68,14 +71,16 @@ export function EcceDialogContent({
           )}
           {...props}
         >
-          {/* <button
-            type="button"
-            onClick={() => closeDialog(dialogId)}
-            className="absolute top-4 right-4 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
-            aria-label="Close"
-          >
-            <XIcon className="size-5" size={20} />
-          </button> */}
+          {closeIcon && <>
+            <button
+              type="button"
+              onClick={() => closeDialog(dialogId)}
+              className="absolute top-4 right-4 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Close"
+            >
+              <XIcon className="size-5" size={20} />
+            </button>
+          </>}
           <div className="">{children}</div>
         </animated.div>
       )

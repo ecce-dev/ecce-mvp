@@ -5,23 +5,20 @@ import { XIcon } from "lucide-react"
 import { cn } from "@/lib/utils/utils"
 import { useEcceDialog } from "./EcceDialogContext"
 import { transitionConfig } from "./transition-config"
+import {
+  type EccePositioningProps,
+  hasPositionProps,
+  getPositionStyles,
+} from "./ecceTriggerVariants"
 
 export type EcceDialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Unique ID to link this content to its trigger */
   dialogId: string
   /** Whether to show the close icon */
   closeIcon?: boolean
-  /** Fixed position from top (enables fixed positioning mode) */
-  top?: string
-  /** Fixed position from right */
-  right?: string
-  /** Fixed position from bottom */
-  bottom?: string
-  /** Fixed position from left */
-  left?: string
   /** Max height before content becomes scrollable. Use "full" to inherit from parent container */
   maxHeight?: string
-}
+} & EccePositioningProps
 
 /**
  * ECCE Dialog Content
@@ -46,14 +43,16 @@ export function EcceDialogContent({
   const { isDialogOpen, closeDialog } = useEcceDialog()
   const isOpen = isDialogOpen(dialogId)
 
-  // Only apply fixed positioning if any position prop is provided
-  const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
+  const positionProps = { top, right, bottom, left }
+  const hasPosition = hasPositionProps(positionProps)
+  const basePositionStyles = getPositionStyles(positionProps)
 
   const transitions = useTransition(isOpen, transitionConfig)
 
-  const positionStyles = hasPositionProps
-    ? { top, right, bottom, left, maxHeight }
-    : { maxHeight }
+  const positionStyles = {
+    ...basePositionStyles,
+    maxHeight,
+  }
 
   return transitions(
     (styles, item) =>
@@ -66,7 +65,7 @@ export function EcceDialogContent({
           className={cn(
             // Base styles
             "z-100 max-w-[420px] bg-background/70 border border-foreground p-8 overflow-y-auto w-full",
-            hasPositionProps && "fixed",
+            hasPosition && "fixed",
             className
           )}
           {...props}

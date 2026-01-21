@@ -1,33 +1,18 @@
 "use client"
 
-import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils/utils"
-
-const ecceActionTriggerVariants = cva(
-  "px-4 pt-1 md:py-2 text-sm md:text-md lg:text-xl border border-foreground cursor-pointer transition-colors duration-200 z-100 bg-background/70 text-foreground disabled:opacity-50 disabled:cursor-not-allowed",
-  {
-    variants: {
-      variant: {
-        primary: "font-zangezi uppercase",
-        secondary: "font-ibm-plex-mono py-1",
-      },
-    },
-    defaultVariants: {
-      variant: "primary",
-    },
-  }
-)
+import {
+  ecceTriggerVariants,
+  type EcceTriggerVariantProps,
+  type EccePositioningProps,
+  hasPositionProps,
+  getPositionStyles,
+  getTriggerSpanTranslateClass,
+} from "./ecceTriggerVariants"
 
 export type EcceActionTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof ecceActionTriggerVariants> & {
-    /** Fixed position from top (enables fixed positioning mode) */
-    top?: string
-    /** Fixed position from right */
-    right?: string
-    /** Fixed position from bottom */
-    bottom?: string
-    /** Fixed position from left */
-    left?: string
+  EcceTriggerVariantProps &
+  EccePositioningProps & {
     /** Action to perform on click */
     onAction?: () => void
   }
@@ -52,12 +37,9 @@ export function EcceActionTrigger({
   onClick,
   ...props
 }: EcceActionTriggerProps) {
-  // Only apply fixed positioning if any position prop is provided
-  const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
-
-  const positionStyles = hasPositionProps
-    ? { top, right, bottom, left }
-    : undefined
+  const positionProps = { top, right, bottom, left }
+  const hasPosition = hasPositionProps(positionProps)
+  const positionStyles = getPositionStyles(positionProps)
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     onAction?.()
@@ -69,14 +51,15 @@ export function EcceActionTrigger({
       type="button"
       onClick={handleClick}
       className={cn(
-        ecceActionTriggerVariants({ variant }),
-        hasPositionProps && "fixed",
+        ecceTriggerVariants({ variant }),
+        "bg-background/70 disabled:opacity-50 disabled:cursor-not-allowed",
+        hasPosition && "fixed",
         className,
       )}
       style={positionStyles}
       {...props}
     >
-      <span className={cn("inline-block", variant === "primary" ? "translate-y-[0px] md:translate-y-[2px]" : "")}>
+      <span className={cn("inline-block", getTriggerSpanTranslateClass(variant))}>
         {children}
       </span>
     </button>

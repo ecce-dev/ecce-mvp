@@ -1,36 +1,21 @@
 "use client"
 
-import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils/utils"
 import { useEcceDialog } from "./EcceDialogContext"
-
-const ecceDialogTriggerVariants = cva(
-  "px-4 py-1 md:py-2 text-sm md:text-md lg:text-xl border border-foreground cursor-pointer transition-colors duration-200 z-100 text-foreground",
-  {
-    variants: {
-      variant: {
-        primary: "font-zangezi uppercase pt-1 pb-0 md:pt-3 ",
-        secondary: "font-ibm-plex-mono",
-      },
-    },
-    defaultVariants: {
-      variant: "primary",
-    },
-  }
-)
+import {
+  ecceTriggerVariants,
+  type EcceTriggerVariantProps,
+  type EccePositioningProps,
+  hasPositionProps,
+  getPositionStyles,
+  getTriggerSpanTranslateClass,
+} from "./ecceTriggerVariants"
 
 export type EcceDialogTriggerProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> &
-  VariantProps<typeof ecceDialogTriggerVariants> & {
+  EcceTriggerVariantProps &
+  EccePositioningProps & {
     /** Unique ID to link this trigger to its content */
     dialogId: string
-    /** Fixed position from top (enables fixed positioning mode) */
-    top?: string
-    /** Fixed position from right */
-    right?: string
-    /** Fixed position from bottom */
-    bottom?: string
-    /** Fixed position from left */
-    left?: string
     /** Optional callback when trigger is clicked (in addition to toggle) */
     onClick?: () => void
     /** Whether to render as a child component */
@@ -62,12 +47,9 @@ export function EcceDialogTrigger({
   const { isDialogOpen, toggleDialog } = useEcceDialog()
   const isActive = isDialogOpen(dialogId)
 
-  // Only apply fixed positioning if any position prop is provided
-  const hasPositionProps = top !== undefined || right !== undefined || bottom !== undefined || left !== undefined
-
-  const positionStyles = hasPositionProps
-    ? { top, right, bottom, left }
-    : undefined
+  const positionProps = { top, right, bottom, left }
+  const hasPosition = hasPositionProps(positionProps)
+  const positionStyles = getPositionStyles(positionProps)
 
   const handleClick = () => {
     // Call optional onClick callback first (for analytics, etc.)
@@ -82,8 +64,8 @@ export function EcceDialogTrigger({
         type="button"
         onClick={handleClick}
         className={cn(
-          ecceDialogTriggerVariants({ variant }),
-          hasPositionProps && "fixed",
+          ecceTriggerVariants({ variant }),
+          hasPosition && "fixed",
           isActive
             ? "bg-foreground text-background"
             : "bg-background/70 text-foreground hover:bg-background/90",
@@ -93,7 +75,7 @@ export function EcceDialogTrigger({
         data-active={isActive}
         {...props}
       >
-        <span className={cn("inline-block", variant === "primary" ? "translate-y-[0px] md:translate-y-[1px]" : "")}>
+        <span className={cn("inline-block", getTriggerSpanTranslateClass(variant))}>
           {children}
         </span>
       </button>

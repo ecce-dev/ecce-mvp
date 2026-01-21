@@ -104,7 +104,7 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   isAuthenticated: false,
   userRole: null,
   isAuthInitialized: false,
-  selectionAnimationMode: "carousel",
+  selectionAnimationMode: "camera",
   isLoginModalOpen: false,
 
   // Actions

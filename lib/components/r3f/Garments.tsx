@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useMemo, useContext, useEffect, useCallback } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql";
 import Garment from "./Garment";
 import { useResponsiveScale } from "@/lib/hooks/useResponsiveScale";
@@ -79,7 +79,7 @@ const SELECTED_CAMERA_DISTANCE = {
 export const SWITCH_CAMERA_DISTANCE = {
   mobile: 17,
   tablet: 12,
-  desktop: 11,
+  desktop: 17,
 } as const;
 
 /** Default camera distance when no garment is selected */
@@ -385,9 +385,11 @@ export default function Garments({ garments }: GarmentsProps) {
         }
       }
     } else if (isExitingSelection) {
-      // Exiting selection in camera mode - return orbit target to origin and camera to default distance
+      // Exiting selection in camera mode - return orbit target to origin and camera to current distance
       setTargetOrbitTarget(new THREE.Vector3(0, 0, 0));
-      setTargetDistance(defaultCameraDistance);
+      // Use original orbit target position to reset camera position
+      const targetDistance = orbitControlsRef?.current?.position0.length();
+      setTargetDistance(targetDistance ?? null);
     }
   }, [
     selectedIndex,
@@ -399,7 +401,6 @@ export default function Garments({ garments }: GarmentsProps) {
     setTargetDistance,
     setQueuedDistanceCorrection,
     selectedCameraDistance,
-    defaultCameraDistance,
   ]);
 
   // Memoized callbacks to prevent unnecessary effect re-runs in OrbitingGroup

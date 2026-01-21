@@ -110,7 +110,7 @@ export default function GarmentsClient() {
           )}
           <animated.div style={opacitySpring}>
             <ThemeToggle />
-            <AnimationToggle />
+            {/* <AnimationToggle /> */}
             {/* {viewMode === "research" && <LogoutButton />} */}
           </animated.div>
         </>

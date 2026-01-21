@@ -147,7 +147,7 @@ export default function GarmentsClient() {
           />
           {/* Dark mode visual effects */}
           <DarkModeEffects isDarkMode={isDarkMode} />
-          <ContactShadows scale={shadowRadius * 4} position={[0, -5, 0]} far={shadowRadius} blur={2} />
+          {!isDarkMode && <ContactShadows scale={shadowRadius * 4} position={[0, -5, 0]} far={shadowRadius} blur={2} />}
           <Garments garments={garments} />
         </CanvasWrapper>
       </div>

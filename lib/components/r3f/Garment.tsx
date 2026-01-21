@@ -83,6 +83,7 @@ export default function Garment({
               material.transparent = true;
               material.opacity = newOpacity;
               material.needsUpdate = true;
+              material.visible = newOpacity > 0;
             }
           }
         });
@@ -98,6 +99,7 @@ export default function Garment({
               material.transparent = true;
               material.opacity = targetOpacity;
               material.needsUpdate = true;
+              material.visible = targetOpacity > 0;
             }
           }
         });

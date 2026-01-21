@@ -59,7 +59,7 @@ const GARMENT_FACING: 'outward' | 'direction' = 'outward';
 // ============================================
 
 /** Opacity for non-selected garments when one is selected */
-const NON_SELECTED_OPACITY = 0.3;
+const NON_SELECTED_OPACITY = 0.0;
 
 /** Opacity transition speed (higher = faster) */
 const OPACITY_TRANSITION_SPEED = 3;

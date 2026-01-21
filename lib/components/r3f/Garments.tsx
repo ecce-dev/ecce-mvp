@@ -26,7 +26,7 @@ const MIN_ROTATION_THRESHOLD = 0.01;
  * Models will be scaled uniformly to fit within these dimensions.
  * Smaller devices will scale down from these values.
  */
-const DESKTOP_BOUNDING_BOX: TargetBoundingBox = { x: 42, y: 9, z: 42 };
+const DESKTOP_BOUNDING_BOX: TargetBoundingBox = { x: 9, y: 9, z: 9 };
 
 /** Desktop baseline radius of the circular orbit (units) */
 const DESKTOP_ORBIT_RADIUS = 11;

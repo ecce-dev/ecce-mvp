@@ -8,6 +8,9 @@ import { unstable_cache } from "next/cache";
 const privateFields = [
   'patternPng',
   'patternDescription',
+  'patternZipDownload',
+  'provenance',
+  'construction'
 ] as const;
 
 /** Cache revalidation interval in seconds (5 minutes) */

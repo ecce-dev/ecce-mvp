@@ -424,14 +424,14 @@ function createModeConfig(
             {garmentNameElement(name)}
           </div>
           <div className="flex w-full justify-between">
-            <div className="flex flex-col flex-wrap gap-2 w-fit mt-2">
+            <div className="flex flex-col flex-wrap gap-2 w-fit">
               {descriptionTrigger}
               {provenanceTrigger}
               {constructionTrigger}
               {analyticsTrigger}
               {exportTrigger}
             </div>
-            <div className="flex flex-col items-end gap-2 mt-2">
+            <div className="flex flex-col items-end gap-2">
               {versionElement(version)}
               {licensedTrigger(slug, name, userRole, publicDomain, mode)}
             </div>
@@ -584,7 +584,7 @@ export default function UIElementsGarment({ mode, legalRightsContent, publicDoma
 
       {/* Main Dialog Container */}
       <div id={mainContainerId} className={config.containerClasses.main}>
-        <div className="col-start-1 row-start-1 max-h-full overflow-hidden max-w-[420px]">
+        <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px] mt-2">
           <EcceUnifiedDialogRenderer
             className="pointer-events-auto"
             maxHeight="100%"
@@ -599,7 +599,7 @@ export default function UIElementsGarment({ mode, legalRightsContent, publicDoma
       {/* Right Dialog Container (for Licensed dialog) */}
       {config.dialogs.licensed && (
         <div id={rightContainerId} className={config.containerClasses.right}>
-          <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px]">
+          <div className="col-start-1 row-start-1 max-h-full overflow-hidden w-full max-w-[420px] mt-2">
             <EcceUnifiedDialogRenderer
               className="pointer-events-auto"
               maxHeight="100%"

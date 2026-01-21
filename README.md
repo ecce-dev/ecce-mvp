@@ -269,7 +269,7 @@ type GarmentFields {
 }
 ```
 
-**Note**: `patternPngDownload` and `patternDescription` are private fields only visible in research mode.
+**Note**: `patternZipDownload` and `patternDescription` are private fields only visible in research mode.
 
 #### Global Settings
 

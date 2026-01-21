@@ -5,7 +5,7 @@ import "./globals.css";
 import "./wpAcfWysiwyg.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
 import { ThemeProvider } from "@/lib/providers/theme-provider";
-import { CookieBanner } from "@/lib/components/CookieBanner";
+import { CookieBanner } from "@/lib/components/util/CookieBanner";
 
 
 const ibmPlexMono = IBM_Plex_Mono({

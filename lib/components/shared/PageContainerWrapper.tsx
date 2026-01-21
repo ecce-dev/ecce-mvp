@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDevice } from '@/lib/hooks/useDevice';
-import { cn } from '../utils/utils';
+import { cn } from '../../utils/utils';
 
 export default function PageContainerWrapper({ 
   children,

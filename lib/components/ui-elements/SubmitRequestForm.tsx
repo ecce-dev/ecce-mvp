@@ -17,7 +17,7 @@ import { Textarea } from "@/lib/components/ui/textarea"
 import { Button } from "@/lib/components/ui/button"
 import { trackRequestSubmitted } from "@/lib/analytics"
 import { useEcceDialog } from "@/lib/components/ecce-elements"
-import TurnstileWidget from "./TurnstileWidget"
+import TurnstileWidget from "@/lib/components/util/TurnstileWidget"
 
 /**
  * Form validation schema

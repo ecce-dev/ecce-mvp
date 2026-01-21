@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 import { GlobeIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
 // import { Switch } from "./ui/switch"
-import { cn, addTargetBlankToLinks } from "../utils/utils"
+import { cn, addTargetBlankToLinks } from "../../utils/utils"
 import posthog from "posthog-js"
 import { getGarmentAnalytics, getGarmentTopClicksCached, type GarmentAnalytics, type InterestLevel } from "@/lib/actions/getGarmentAnalytics"
 import { useTheme } from "next-themes"
-import { Progress } from "./ui/progress"
+import { Progress } from "../ui/progress"
 
 // ============================================
 // Analytics Dialog Content

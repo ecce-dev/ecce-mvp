@@ -1,4 +1,4 @@
-import { cn } from '../utils/utils';
+import { cn } from '../../utils/utils';
 import PageContainerWrapper from './PageContainerWrapper';
 
 export default function PageContainer({ children, mainClassName }: { children: React.ReactNode, mainClassName?: string }) {

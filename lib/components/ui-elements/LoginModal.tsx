@@ -17,7 +17,7 @@ import { Input } from "@/lib/components/ui/input"
 import { Button } from "@/lib/components/ui/button"
 import { useAppModeStore, type UserRole } from "@/lib/stores/appModeStore"
 import { Eye, EyeIcon, EyeSlash, EyeSlashIcon } from "@phosphor-icons/react"
-import TurnstileWidget from "./TurnstileWidget"
+import TurnstileWidget from "../util/TurnstileWidget"
 
 /**
  * Form validation schema

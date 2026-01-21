@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, LessThanIcon } from "@phosphor-icons/react"
-import { DeviceType } from "../hooks/useDevice"
-import { EcceActionTrigger, EcceDialogTrigger } from "./ecce-elements"
-import { cn, addTargetBlankToLinks } from "../utils/utils"
+import { DeviceType } from "@/lib/hooks/useDevice"
+import { EcceActionTrigger, EcceDialogTrigger } from "@/lib/components/ecce-elements"
+import { cn, addTargetBlankToLinks } from "@/lib/utils/utils"
 import posthog from "posthog-js"
 
 // ============================================

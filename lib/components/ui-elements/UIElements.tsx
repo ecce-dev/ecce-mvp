@@ -6,11 +6,11 @@ import {
   EcceDialogContent,
   EcceActionTrigger,
 } from "@/lib/components/ecce-elements"
-import { SubmitRequestForm } from "@/lib/components/SubmitRequestForm"
-import { CountdownProgress } from "@/lib/components/CountdownProgress"
+import { SubmitRequestForm } from "@/lib/components/ui-elements/SubmitRequestForm"
+import { CountdownProgress } from "@/lib/components/ui-elements/CountdownProgress"
 import { useGarments } from "@/lib/context/GarmentsContext"
-import { useDevice } from "../hooks/useDevice";
-import { cn, addTargetBlankToLinks } from "../utils/utils";
+import { useDevice } from "@/lib/hooks/useDevice";
+import { cn, addTargetBlankToLinks } from "@/lib/utils/utils";
 import posthog from "posthog-js";
 
 /**

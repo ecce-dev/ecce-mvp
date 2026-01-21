@@ -4,7 +4,7 @@ import { EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import { useGarmentSessionTracking } from "@/lib/analytics"
-import LoginModal from "./LoginModal"
+import LoginModal from "@/lib/components/ui-elements/LoginModal"
 import {
   BackButtonElement,
   garmentNameElement,
@@ -15,8 +15,7 @@ import {
   licensedTrigger,
   versionElement,
 } from "./UIElementsShared"
-import { AnalyticsDialogContent, ExportDialogContent } from "./AnalyticsUI"
-import type { DeviceType } from "@/lib/hooks/useDevice"
+import { AnalyticsDialogContent, ExportDialogContent } from "@/lib/components/ui-elements/AnalyticsUI"
 
 // ============================================
 // Configuration Types

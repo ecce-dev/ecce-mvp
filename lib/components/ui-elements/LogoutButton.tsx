@@ -1,7 +1,7 @@
 import { SignOutIcon } from "@phosphor-icons/react";
-import { useAppModeStore } from "../stores/appModeStore";
-import { EcceActionTrigger } from "./ecce-elements";
-import { Button } from "./ui/button";
+import { useAppModeStore } from "../../stores/appModeStore";
+import { EcceActionTrigger } from "../ecce-elements";
+import { Button } from "../ui/button";
 
 export default function LogoutButton() {
   const { logout } = useAppModeStore()

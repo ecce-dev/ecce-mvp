@@ -1,5 +1,5 @@
-import { getRandomGarments } from "../actions/getGarments";
-import { GarmentsProvider } from "../context/GarmentsContext";
+import { getRandomGarments } from "../../actions/getGarments";
+import { GarmentsProvider } from "../../context/GarmentsContext";
 
 /** Default garment count for SSR (desktop baseline) */
 const DEFAULT_SSR_GARMENT_COUNT = 3;

@@ -4,6 +4,7 @@ query getGlobalSettings {
       about
       contact
       passwordConfig
+      legalAndRightsContent
     }
   }
 }

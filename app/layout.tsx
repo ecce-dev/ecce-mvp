@@ -17,7 +17,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "ecce",
-  description: "Discover ecce.",
+  description: "\"I will not compare my insides to their outsides.\"",
   icons: {
     icon: "/app-assets/android-chrome-512x512.png",
     apple: "/app-assets/apple-touch-icon.png",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "ecce",
-    description: "Discover ecce.",
+    description: "\"I will not compare my insides to their outsides.\"",
   },
 };
 

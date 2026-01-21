@@ -4,14 +4,13 @@ query getGarments {
       garmentFields {
         construction
         description
-        designer
         linkToTiktok
         name
         patternDescription
         provenance
         rights
         version
-        patternPngDownload {
+        patternZipDownload {
           node {
             altText
             mediaItemUrl

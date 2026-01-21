@@ -84,7 +84,7 @@ function createModeConfig(
     version: string
     tiktokUrl?: string | null
     patternDescription?: string | null
-    patternPngDownload?: any
+    patternZipDownload?: any
     patternPngPreview?: any
   },
   userRole: "curator" | "designer" | "vc" | null,
@@ -379,7 +379,7 @@ function createModeConfig(
             garmentName={name}
             userRole={userRole}
             patternDescription={garmentData.patternDescription}
-            patternPngDownload={garmentData.patternPngDownload}
+            patternZipDownload={garmentData.patternZipDownload}
             patternPngPreview={garmentData.patternPngPreview}
           />
         ),
@@ -523,7 +523,7 @@ export default function UIElementsGarment({ mode }: UIElementsGarmentProps) {
   const rights = garmentFields?.rights ?? ""
   const tiktokUrl = garmentFields?.linkToTiktok
   const patternDescription = garmentFields?.patternDescription
-  const patternPngDownload = garmentFields?.patternPngDownload
+  const patternZipDownload = garmentFields?.patternZipDownload
   const patternPngPreview = garmentFields?.patternPngPreview
 
   // Create mode-specific configuration
@@ -539,7 +539,7 @@ export default function UIElementsGarment({ mode }: UIElementsGarmentProps) {
       version,
       tiktokUrl,
       patternDescription,
-      patternPngDownload,
+      patternZipDownload,
       patternPngPreview,
     },
     userRole,

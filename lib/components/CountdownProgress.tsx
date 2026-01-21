@@ -1,13 +1,16 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState, useCallback, useRef, memo } from "react"
 import { cn } from "@/lib/utils/utils"
 
 /** Auto-refresh interval in seconds */
 const AUTO_REFRESH_INTERVAL_SECONDS = 30
 
-/** Update interval for smooth progress animation (in ms) */
-const PROGRESS_UPDATE_INTERVAL_MS = 100
+/** Update interval for smooth progress animation (in ms) 
+ * Reduced from 100ms to 250ms to minimize re-renders while maintaining smooth animation.
+ * CSS transitions handle the visual smoothing between updates.
+ */
+const PROGRESS_UPDATE_INTERVAL_MS = 250
 
 interface CountdownProgressProps {
   /** Callback fired when countdown reaches zero */
@@ -25,13 +28,15 @@ interface CountdownProgressProps {
  * 
  * Displays a filling circular progress bar with countdown text.
  * Resets when resetTrigger changes or when countdown completes.
+ * 
+ * Memoized to prevent unnecessary parent re-renders from frequent state updates.
  */
-export function CountdownProgress({
+const CountdownProgressComponent = ({
   onComplete,
   resetTrigger,
   isPaused = false,
   className,
-}: CountdownProgressProps) {
+}: CountdownProgressProps) => {
   const [remainingSeconds, setRemainingSeconds] = useState(AUTO_REFRESH_INTERVAL_SECONDS)
   const [progress, setProgress] = useState(0)
   const startTimeRef = useRef<number>(Date.now())
@@ -117,7 +122,7 @@ export function CountdownProgress({
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="butt"
-            className="text-foreground/60 transition-[stroke-dashoffset] duration-100 ease-linear"
+            className="text-foreground/60 transition-[stroke-dashoffset] duration-250 ease-linear"
           />
         </svg>
       </div>
@@ -129,3 +134,9 @@ export function CountdownProgress({
     </div>
   )
 }
+
+/**
+ * Memoized export to prevent parent re-renders from frequent internal state updates.
+ * Only re-renders when props actually change.
+ */
+export const CountdownProgress = memo(CountdownProgressComponent)

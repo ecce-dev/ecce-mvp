@@ -15,6 +15,33 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type Acfe_AdvancedLink = {
+  linkText?: Maybe<Scalars['String']['output']>;
+  shouldOpenInNewWindow?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type Acfe_AdvancedLink_ContentNode = Acfe_AdvancedLink & {
+  __typename?: 'ACFE_AdvancedLink_ContentNode';
+  contentNode?: Maybe<ContentNode>;
+  linkText?: Maybe<Scalars['String']['output']>;
+  shouldOpenInNewWindow?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type Acfe_AdvancedLink_TermNode = Acfe_AdvancedLink & {
+  __typename?: 'ACFE_AdvancedLink_TermNode';
+  linkText?: Maybe<Scalars['String']['output']>;
+  shouldOpenInNewWindow?: Maybe<Scalars['Boolean']['output']>;
+  term?: Maybe<TermNode>;
+};
+
+export type Acfe_AdvancedLink_Url = Acfe_AdvancedLink & {
+  __typename?: 'ACFE_AdvancedLink_Url';
+  linkText?: Maybe<Scalars['String']['output']>;
+  shouldOpenInNewWindow?: Maybe<Scalars['Boolean']['output']>;
+  /** The url linked to */
+  url?: Maybe<Scalars['String']['output']>;
+};
+
 /** A Field Group managed by ACF */
 export type AcfFieldGroup = {
   /**
@@ -88,13 +115,6 @@ export type AvatarRatingEnum =
   | 'R'
   /** Indicates an X level avatar rating level. */
   | 'X';
-
-/** The blogPublic setting type */
-export type BlogPublicSettings = {
-  __typename?: 'BlogPublicSettings';
-  /** The boolean Settings Group */
-  blogPublic?: Maybe<Scalars['Boolean']['output']>;
-};
 
 /** A taxonomy term that classifies content. Categories support hierarchy and can be used to create a nested structure. */
 export type Category = DatabaseIdentifier & HierarchicalNode & HierarchicalTermNode & MenuItemLinkable & Node & TermNode & UniformResourceIdentifiable & {
@@ -2494,8 +2514,6 @@ export type GarmentFields = AcfFieldGroup & AcfFieldGroupFields & GarmentFields_
   construction?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   description?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  designer?: Maybe<Scalars['String']['output']>;
   /**
    * The name of the field group
    * @deprecated Use __typename instead
@@ -2508,9 +2526,9 @@ export type GarmentFields = AcfFieldGroup & AcfFieldGroupFields & GarmentFields_
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   patternDescription?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  patternPngDownload?: Maybe<AcfMediaItemConnectionEdge>;
-  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   patternPngPreview?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  patternZipDownload?: Maybe<AcfMediaItemConnectionEdge>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   provenance?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
@@ -2527,8 +2545,6 @@ export type GarmentFields_Fields = {
   construction?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   description?: Maybe<Scalars['String']['output']>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  designer?: Maybe<Scalars['String']['output']>;
   /**
    * The name of the field group
    * @deprecated Use __typename instead
@@ -2541,9 +2557,9 @@ export type GarmentFields_Fields = {
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   patternDescription?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
-  patternPngDownload?: Maybe<AcfMediaItemConnectionEdge>;
-  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   patternPngPreview?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
+  patternZipDownload?: Maybe<AcfMediaItemConnectionEdge>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
   provenance?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GarmentFields&quot; Field Group */
@@ -2623,20 +2639,6 @@ export type GarmentToPreviewConnectionEdge = Edge & GarmentConnectionEdge & OneT
   cursor?: Maybe<Scalars['String']['output']>;
   /** The node of the connection, without the edges */
   node: Garment;
-};
-
-/** The gdlLiveSiteDismiss setting type */
-export type GdlLiveSiteDismissSettings = {
-  __typename?: 'GdlLiveSiteDismissSettings';
-  /** The boolean Settings Group */
-  gdlLiveSiteDismiss?: Maybe<Scalars['Boolean']['output']>;
-};
-
-/** The gdlSitePublished setting type */
-export type GdlSitePublishedSettings = {
-  __typename?: 'GdlSitePublishedSettings';
-  /** The boolean Settings Group */
-  gdlSitePublished?: Maybe<Scalars['Boolean']['output']>;
 };
 
 /** The general setting type */
@@ -7189,8 +7191,6 @@ export type RootQuery = WithAcfOptionsPageGlobalSettingsPage & {
   __typename?: 'RootQuery';
   /** Entry point to get all settings for the site */
   allSettings?: Maybe<Settings>;
-  /** Fields of the &#039;BlogPublicSettings&#039; settings group */
-  blogPublicSettings?: Maybe<BlogPublicSettings>;
   /** Connection between the RootQuery type and the category type */
   categories?: Maybe<RootQueryToCategoryConnection>;
   /** A 0bject */
@@ -7218,10 +7218,6 @@ export type RootQuery = WithAcfOptionsPageGlobalSettingsPage & {
   garmentBy?: Maybe<Garment>;
   /** Connection between the RootQuery type and the Garment type */
   garments?: Maybe<RootQueryToGarmentConnection>;
-  /** Fields of the &#039;GdlLiveSiteDismissSettings&#039; settings group */
-  gdlLiveSiteDismissSettings?: Maybe<GdlLiveSiteDismissSettings>;
-  /** Fields of the &#039;GdlSitePublishedSettings&#039; settings group */
-  gdlSitePublishedSettings?: Maybe<GdlSitePublishedSettings>;
   /** Fields of the &#039;GeneralSettings&#039; settings group */
   generalSettings?: Maybe<GeneralSettings>;
   globalSettingsPage?: Maybe<GlobalSettingsPage>;
@@ -9210,16 +9206,10 @@ export type SendPasswordResetEmailPayload = {
 /** All of the registered settings */
 export type Settings = {
   __typename?: 'Settings';
-  /** Settings of the the boolean Settings Group */
-  blogPublicSettingsBlogPublic?: Maybe<Scalars['Boolean']['output']>;
   /** Settings of the the string Settings Group */
   discussionSettingsDefaultCommentStatus?: Maybe<Scalars['String']['output']>;
   /** Settings of the the string Settings Group */
   discussionSettingsDefaultPingStatus?: Maybe<Scalars['String']['output']>;
-  /** Settings of the the boolean Settings Group */
-  gdlLiveSiteDismissSettingsGdlLiveSiteDismiss?: Maybe<Scalars['Boolean']['output']>;
-  /** Settings of the the boolean Settings Group */
-  gdlSitePublishedSettingsGdlSitePublished?: Maybe<Scalars['Boolean']['output']>;
   /** Settings of the the string Settings Group */
   generalSettingsDateFormat?: Maybe<Scalars['String']['output']>;
   /** Settings of the the string Settings Group */
@@ -10346,15 +10336,12 @@ export type UpdatePostPayload = {
 
 /** Input for the updateSettings mutation. */
 export type UpdateSettingsInput = {
-  blogPublicSettingsBlogPublic?: InputMaybe<Scalars['Boolean']['input']>;
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   /** Allow people to submit comments on new posts. */
   discussionSettingsDefaultCommentStatus?: InputMaybe<Scalars['String']['input']>;
   /** Allow link notifications from other blogs (pingbacks and trackbacks) on new articles. */
   discussionSettingsDefaultPingStatus?: InputMaybe<Scalars['String']['input']>;
-  gdlLiveSiteDismissSettingsGdlLiveSiteDismiss?: InputMaybe<Scalars['Boolean']['input']>;
-  gdlSitePublishedSettingsGdlSitePublished?: InputMaybe<Scalars['Boolean']['input']>;
   /** A date format for all date strings. */
   generalSettingsDateFormat?: InputMaybe<Scalars['String']['input']>;
   /** Site tagline. */
@@ -10394,16 +10381,10 @@ export type UpdateSettingsPayload = {
   __typename?: 'UpdateSettingsPayload';
   /** Update all settings. */
   allSettings?: Maybe<Settings>;
-  /** Update the BlogPublicSettings setting. */
-  blogPublicSettings?: Maybe<BlogPublicSettings>;
   /** If a &#039;clientMutationId&#039; input is provided to the mutation, it will be returned as output on the mutation. This ID can be used by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: Maybe<Scalars['String']['output']>;
   /** Update the DiscussionSettings setting. */
   discussionSettings?: Maybe<DiscussionSettings>;
-  /** Update the GdlLiveSiteDismissSettings setting. */
-  gdlLiveSiteDismissSettings?: Maybe<GdlLiveSiteDismissSettings>;
-  /** Update the GdlSitePublishedSettings setting. */
-  gdlSitePublishedSettings?: Maybe<GdlSitePublishedSettings>;
   /** Update the GeneralSettings setting. */
   generalSettings?: Maybe<GeneralSettings>;
   /** Update the ReadingSettings setting. */
@@ -11359,7 +11340,7 @@ export type WritingSettings = {
 export type GetGarmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', slug?: string | null, garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, designer?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternPngDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
+export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typename?: 'RootQueryToGarmentConnection', nodes: Array<{ __typename?: 'Garment', slug?: string | null, garmentFields?: { __typename?: 'GarmentFields', construction?: string | null, description?: string | null, linkToTiktok?: string | null, name?: string | null, patternDescription?: string | null, provenance?: string | null, rights?: string | null, version?: string | null, patternZipDownload?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, patternPngPreview?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, threeDFileGlb?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null }> } | null };
 
 export type GetGlobalSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -11374,14 +11355,13 @@ export const GetGarments = gql`
       garmentFields {
         construction
         description
-        designer
         linkToTiktok
         name
         patternDescription
         provenance
         rights
         version
-        patternPngDownload {
+        patternZipDownload {
           node {
             altText
             mediaItemUrl

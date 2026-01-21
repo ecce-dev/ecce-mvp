@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useContext, useCallback, useState } from "react"
+import { useRef, useContext, useCallback } from "react"
 import { useFrame, ThreeEvent, ThreeElements } from "@react-three/fiber"
 import NormalizedGlbModel, { TargetBoundingBox } from "./NormalizedGlbModel"
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
@@ -46,8 +46,10 @@ export default function Garment({
   const { isDragging } = useContext(OrbitControlsContext);
   const selectGarment = useAppModeStore((state) => state.selectGarment);
 
-  // Track current opacity for smooth transitions
-  const [currentOpacity, setCurrentOpacity] = useState(1);
+  // Track current opacity using ref to avoid React re-renders
+  // State updates in useFrame cause excessive re-renders and RSC payload requests
+  // Using ref allows smooth animation without triggering React re-renders
+  const currentOpacityRef = useRef(1);
 
   // Calculate target opacity based on selection state
   const targetOpacity = hasSelection 
@@ -61,7 +63,8 @@ export default function Garment({
       groupRef.current.rotation.y += spinSpeed * delta;
     }
 
-    // Opacity animation
+    // Opacity animation - using ref to avoid React state updates
+    const currentOpacity = currentOpacityRef.current;
     const diff = targetOpacity - currentOpacity;
     if (Math.abs(diff) > 0.01) {
       const newOpacity = THREE.MathUtils.lerp(
@@ -69,9 +72,9 @@ export default function Garment({
         targetOpacity,
         delta * opacityTransitionSpeed
       );
-      setCurrentOpacity(newOpacity);
+      currentOpacityRef.current = newOpacity;
       
-      // Apply opacity to all meshes in the group
+      // Apply opacity directly to materials without triggering React re-renders
       if (meshGroupRef.current) {
         meshGroupRef.current.traverse((child) => {
           if (child instanceof THREE.Mesh && child.material) {
@@ -79,6 +82,21 @@ export default function Garment({
             if ('opacity' in material) {
               material.transparent = true;
               material.opacity = newOpacity;
+              material.needsUpdate = true;
+            }
+          }
+        });
+      }
+    } else if (currentOpacity !== targetOpacity) {
+      // Snap to target when close enough
+      currentOpacityRef.current = targetOpacity;
+      if (meshGroupRef.current) {
+        meshGroupRef.current.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            const material = child.material as THREE.Material;
+            if ('opacity' in material) {
+              material.transparent = true;
+              material.opacity = targetOpacity;
               material.needsUpdate = true;
             }
           }

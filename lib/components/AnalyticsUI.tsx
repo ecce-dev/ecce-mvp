@@ -277,7 +277,7 @@ interface ExportDialogContentProps {
   garmentName: string
   userRole: string | null
   patternDescription?: string | null
-  patternPngDownload?: PatternMediaItem | null
+  patternZipDownload?: PatternMediaItem | null
   patternPngPreview?: PatternMediaItem | null
 }
 
@@ -290,12 +290,12 @@ export function ExportDialogContent({
   garmentName,
   userRole,
   patternDescription,
-  patternPngDownload,
+  patternZipDownload,
   patternPngPreview,
 }: ExportDialogContentProps) {
   const previewUrl = patternPngPreview?.node?.mediaItemUrl
   const previewAlt = patternPngPreview?.node?.altText ?? `Pattern preview for ${garmentName}`
-  const downloadUrl = patternPngDownload?.node?.mediaItemUrl
+  const downloadUrl = patternZipDownload?.node?.mediaItemUrl
 
   // const [isInverted, setIsInverted] = useState(false)
 

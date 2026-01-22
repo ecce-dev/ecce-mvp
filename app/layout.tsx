@@ -44,6 +44,18 @@ export const metadata: Metadata = {
     title: "ecce",
     description: "\"I will not compare my insides to their outsides.\"",
   },
+  // SEO: Allow search engines to index the page
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   // Performance optimizations
   other: {
     "dns-prefetch": "https://archive.ecce.ing",

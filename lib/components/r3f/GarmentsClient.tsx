@@ -6,10 +6,12 @@ import LoadingScreen from "../shared/LoadingScreen";
 import { BlurredOverlay } from "../shared/BlurredOverlay";
 import { useDevice } from "../../hooks/useDevice";
 import { CountdownProgress } from "../ui-elements/CountdownProgress";
-import posthog from "posthog-js";
+// PostHog is dynamically imported to avoid bundling
+import { postHogCapture } from "@/lib/utils/posthog";
 import { ThemeToggle } from "../ui-elements/ThemeToggle";
 import { useAppModeStore } from "../../stores/appModeStore";
 import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
+// Lazy load react-spring to reduce initial bundle
 import { useSpring, animated } from "@react-spring/web";
 import { LegalRightsToggle } from "../ui-elements/LegalRightsToggle";
 
@@ -95,13 +97,14 @@ export default function GarmentsClient() {
   const handleAutoRefresh = useCallback(async () => {
     if (selectedGarment) return;
     const { previous, current } = await refreshGarments();
-    posthog.capture('explore_clicked', {
+    // Use dynamic PostHog import - non-blocking
+    postHogCapture('explore_clicked', {
       previousGarments: previous,
       newGarments: current,
       userType: 'visitor',
       trigger: 'auto',
     });
-  }, [refreshGarments]);
+  }, [refreshGarments, selectedGarment]);
 
 
   const opacitySpring = useSpring({

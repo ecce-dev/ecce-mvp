@@ -2,7 +2,7 @@ import { ArrowLeftIcon, LessThanIcon } from "@phosphor-icons/react"
 import { DeviceType } from "@/lib/hooks/useDevice"
 import { EcceActionTrigger, EcceDialogTrigger } from "@/lib/components/ecce-elements"
 import { cn, addTargetBlankToLinks } from "@/lib/utils/utils"
-import posthog from "posthog-js"
+import { postHogCapture } from "@/lib/utils/posthog"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 
 // ============================================
@@ -113,7 +113,7 @@ export function TrackedDialogTrigger({
   userRole = null,
 }: TrackedDialogTriggerProps) {
   const handleClick = () => {
-    posthog.capture("garment_action_clicked", {
+    postHogCapture("garment_action_clicked", {
       garment_slug: garmentSlug,
       garment_name: garmentName,
       mode,
@@ -160,7 +160,7 @@ export function TikTokTrigger({
 }: TikTokTriggerProps) {
   const handleTiktokClick = () => {
     // Track the click
-    posthog.capture("garment_action_clicked", {
+    postHogCapture("garment_action_clicked", {
       garment_slug: garmentSlug,
       garment_name: garmentName,
       mode,

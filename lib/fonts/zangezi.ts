@@ -11,17 +11,17 @@ export const zangezi = localFont({
       weight: "400",
       style: "normal",
     },
-    // Only load italic variant if needed - defer others
-    {
-      path: "./Zangezi/Zangezi08-Italic.woff2",
-      weight: "400",
-      style: "italic",
-    },
+    // Defer italic variant - load only when needed
+    // {
+    //   path: "./Zangezi/Zangezi08-Italic.woff2",
+    //   weight: "400",
+    //   style: "italic",
+    // },
   ],
   variable: "--font-zangezi",
   display: "swap", // Critical: don't block rendering
-  fallback: ["serif"],
-  preload: true, // Preload only the regular weight
+  fallback: ["serif", "system-ui"], // Fast fallback fonts
+  preload: false, // Defer font preload to avoid blocking initial render
 });
 
 /**

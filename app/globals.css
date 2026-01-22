@@ -149,6 +149,10 @@
     /* min-height: 100vh; */
     min-height: 100dvh;
     /* Dynamic viewport height for mobile */
+    /* Performance optimizations */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
@@ -229,6 +233,8 @@
   /* Loading screen dot animation */
   .loading-dot {
     animation: loadingDot 1.4s ease-in-out infinite;
+    will-change: opacity, transform;
+    contain: layout style paint;
   }
 
   @keyframes loadingDot {
@@ -248,6 +254,10 @@
       logoSpin 8s linear infinite, 
       logoPulse 2s ease-in-out infinite,
       logoColorShift 6s ease-in-out infinite;
+    will-change: transform, opacity, filter;
+    contain: layout style paint;
+    /* Use GPU acceleration */
+    transform: translateZ(0);
   }
 
   @keyframes logoSpin {

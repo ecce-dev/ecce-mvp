@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import posthog from "posthog-js";
-import Link from "next/link";
 import { Button } from "@/lib/components/ui/button";
 import { cn } from "@/lib/utils/utils";
 import { CookieIcon } from "@phosphor-icons/react";
+
+// Dynamically import PostHog to avoid bundling it in initial load
+const loadPostHog = () => import("posthog-js").then(mod => mod.default);
 
 
 export function CookieBanner() {
@@ -13,28 +14,81 @@ export function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // We want this to only run once the client loads
-    // or else it causes a hydration error
-    const status = posthog.get_explicit_consent_status();
-    setConsentGiven(status);
+    // Defer PostHog loading until after initial render
+    // This prevents PostHog from blocking the initial bundle
+    let mounted = true;
+    
+    const initBanner = async () => {
+      try {
+        const posthog = await loadPostHog();
+        if (!mounted) return;
+        
+        const status = posthog.get_explicit_consent_status();
+        setConsentGiven(status);
 
-    // Show banner with animation if consent is pending
-    if (status === 'pending') {
-      // Small delay to ensure smooth animation
-      setTimeout(() => setIsVisible(true), 100);
+        // Show banner with animation if consent is pending
+        if (status === 'pending') {
+          // Small delay to ensure smooth animation
+          setTimeout(() => {
+            if (mounted) setIsVisible(true);
+          }, 100);
+        }
+      } catch (error) {
+        console.error("Failed to load PostHog:", error);
+        // Don't show banner if PostHog fails to load
+        setConsentGiven('denied');
+      }
+    };
+
+    // Defer initialization until after page is interactive
+    if (typeof window !== 'undefined') {
+      if (document.readyState === 'complete') {
+        // Use requestIdleCallback if available, otherwise setTimeout
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(initBanner, { timeout: 2000 });
+        } else {
+          setTimeout(initBanner, 100);
+        }
+      } else {
+        window.addEventListener('load', () => {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(initBanner, { timeout: 2000 });
+          } else {
+            setTimeout(initBanner, 100);
+          }
+        }, { once: true });
+      }
     }
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const handleAcceptCookies = () => {
-    posthog.opt_in_capturing();
-    setConsentGiven('granted');
-    setIsVisible(false);
+  const handleAcceptCookies = async () => {
+    try {
+      const posthog = await loadPostHog();
+      posthog.opt_in_capturing();
+      setConsentGiven('granted');
+      setIsVisible(false);
+    } catch (error) {
+      console.error("Failed to opt in:", error);
+      setConsentGiven('granted');
+      setIsVisible(false);
+    }
   };
 
-  const handleDeclineCookies = () => {
-    posthog.opt_out_capturing();
-    setConsentGiven('denied');
-    setIsVisible(false);
+  const handleDeclineCookies = async () => {
+    try {
+      const posthog = await loadPostHog();
+      posthog.opt_out_capturing();
+      setConsentGiven('denied');
+      setIsVisible(false);
+    } catch (error) {
+      console.error("Failed to opt out:", error);
+      setConsentGiven('denied');
+      setIsVisible(false);
+    }
   };
 
   // Don't render if consent has been given or denied

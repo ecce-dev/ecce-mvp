@@ -109,7 +109,7 @@ export default function Garment({
 
   /**
    * Converts WordPress media URLs to proxied paths to avoid CORS issues.
-   * e.g., https://admin.ecce.ing/wp-content/uploads/2026/01/file.glb
+   * e.g., https://archive.ecce.ing/wp-content/uploads/2026/01/file.glb
    *   ->  /wp-content/uploads/2026/01/file.glb
    */
   function getProxiedUrl(url: string): string {

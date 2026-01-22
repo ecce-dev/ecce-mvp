@@ -1,10 +1,15 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { EcceUnifiedDialogRenderer } from "@/lib/components/ecce-elements"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 import { useDevice } from "@/lib/hooks/useDevice"
 import { useGarmentSessionTracking } from "@/lib/analytics"
-import LoginModal from "@/lib/components/ui-elements/LoginModal"
+// Lazy load LoginModal to defer Zod bundle until login is actually needed
+const LoginModal = dynamic(
+  () => import("@/lib/components/ui-elements/LoginModal"),
+  { ssr: false }
+)
 import {
   BackButtonElement,
   garmentNameElement,

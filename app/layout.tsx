@@ -3,8 +3,9 @@ import { IBM_Plex_Mono } from "next/font/google";
 import { zangezi, zangeziCondensed } from "@/lib/fonts/zangezi";
 // Import critical CSS - Next.js will optimize and minimize automatically
 import "./globals.css";
-// wpAcfWysiwyg.css is deferred - loaded dynamically when content is rendered
-// This prevents it from blocking initial render (saves ~160ms)
+// WYSIWYG CSS - loaded normally but only used in components that render after initial load
+// Next.js optimizes this and it won't block LCP since content using it loads later
+import "./wpAcfWysiwyg.css";
 import { QueryProvider } from "@/lib/providers/query-provider";
 import { ThemeProvider } from "@/lib/providers/theme-provider";
 import dynamic from "next/dynamic";
@@ -87,49 +88,6 @@ export default function RootLayout({
         />
         {/* DNS prefetch for external resources */}
         <link rel="dns-prefetch" href="https://archive.ecce.ing" />
-        {/* Defer WYSIWYG CSS loading - prevents blocking initial render */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                // Load WYSIWYG CSS asynchronously after page load
-                // Uses the "print" media trick to load without blocking render
-                function loadWysiwygCSS() {
-                  if (document.querySelector('link[data-wysiwyg-css]')) return;
-                  
-                  const link = document.createElement('link');
-                  link.rel = 'stylesheet';
-                  link.setAttribute('data-wysiwyg-css', 'true');
-                  link.media = 'print'; // Load with low priority
-                  link.onload = function() {
-                    link.media = 'all'; // Switch to all once loaded
-                  };
-                  
-                  // Find Next.js base path
-                  const scripts = document.querySelectorAll('script[src*="_next"]');
-                  if (scripts.length > 0) {
-                    const scriptSrc = scripts[0].getAttribute('src') || '';
-                    const basePath = scriptSrc.substring(0, scriptSrc.lastIndexOf('/_next') + 6);
-                    link.href = basePath + '/static/css/app/wpAcfWysiwyg.css';
-                  } else {
-                    link.href = '/_next/static/css/app/wpAcfWysiwyg.css';
-                  }
-                  
-                  document.head.appendChild(link);
-                }
-                
-                // Load after page is interactive
-                if (document.readyState === 'complete') {
-                  setTimeout(loadWysiwygCSS, 0);
-                } else {
-                  window.addEventListener('load', function() {
-                    setTimeout(loadWysiwygCSS, 0);
-                  }, { once: true });
-                }
-              })();
-            `,
-          }}
-        />
       </head>
       <body
         className={`${ibmPlexMono.variable} ${zangezi.variable} ${zangeziCondensed.variable} antialiased`}

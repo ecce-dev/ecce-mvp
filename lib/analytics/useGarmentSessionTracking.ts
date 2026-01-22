@@ -96,17 +96,18 @@ export function useGarmentSessionTracking(): void {
     }
   }, [])
 
-  // Handle before unload (track when user closes tab/navigates away)
+  // Handle page unload (track when user closes tab/navigates away)
+  // Uses pagehide event (Page Lifecycle API) instead of deprecated beforeunload
   useEffect(() => {
-    const handleBeforeUnload = () => {
+    const handlePageHide = () => {
       if (sessionRef.current) {
         endGarmentSession(sessionRef.current)
       }
     }
 
-    window.addEventListener("beforeunload", handleBeforeUnload)
+    window.addEventListener("pagehide", handlePageHide)
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
+      window.removeEventListener("pagehide", handlePageHide)
     }
   }, [])
 }

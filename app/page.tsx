@@ -1,22 +1,29 @@
 import { getAboutContent, getContactContent, getLegalRightsContent, getPublicDomainTextContent } from "@/lib/actions/getGlobalSettings";
+import { getRandomGarments } from "@/lib/actions/getGarments";
 import Background from "@/lib/components/shared/Background";
 import { EcceDialogWrapper } from "@/lib/components/ecce-elements/EcceDialogWrapper";
 import GarmentsClient from "@/lib/components/r3f/GarmentsClient";
-import GarmentsWrapper from "@/lib/components/r3f/GarmentsWrapper";
+import { GarmentsProvider } from "@/lib/context/GarmentsContext";
 import PageContainer from "@/lib/components/shared/PageContainer";
 import UIElementsRouter from "@/lib/components/ui-elements/UIElementsRouter";
 
+/** Default garment count for SSR (desktop baseline) */
+const DEFAULT_SSR_GARMENT_COUNT = 3;
 
 export default async function Home() {
-  const aboutContent = await getAboutContent();
-  const contactContent = await getContactContent();
-  const legalRightsContent = await getLegalRightsContent();
-  const publicDomainTextContent = await getPublicDomainTextContent();
+  // Parallelize ALL server actions including garments to avoid blocking SSR
+  const [aboutContent, contactContent, legalRightsContent, publicDomainTextContent, initialGarments] = await Promise.all([
+    getAboutContent(),
+    getContactContent(),
+    getLegalRightsContent(),
+    getPublicDomainTextContent(),
+    getRandomGarments(DEFAULT_SSR_GARMENT_COUNT),
+  ]);
   
   return (
     <PageContainer>
-      {/* GarmentsWrapper provides context to both GarmentsClient and UIElementsRouter */}
-      <GarmentsWrapper>
+      {/* GarmentsProvider provides context to both GarmentsClient and UIElementsRouter */}
+      <GarmentsProvider initialGarments={initialGarments}>
         {/* EcceDialogWrapper provides dialog context to canvas and UI components */}
         <EcceDialogWrapper>
           <Background />
@@ -28,7 +35,7 @@ export default async function Home() {
             publicDomainTextContent={publicDomainTextContent ?? null}
           />
         </EcceDialogWrapper>
-      </GarmentsWrapper>
+      </GarmentsProvider>
     </PageContainer>
   );
 }

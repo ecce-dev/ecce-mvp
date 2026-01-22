@@ -11,7 +11,9 @@ import { CookieBanner } from "@/lib/components/util/CookieBanner";
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"], // Load only most common weights
+  display: "swap", // Ensure font doesn't block rendering
+  preload: true,
 });
 
 

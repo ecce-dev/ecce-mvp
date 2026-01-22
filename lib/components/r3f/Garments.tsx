@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useMemo, useContext, useEffect, useCallback } from "react";
+import React, { useRef, useMemo, useContext, useEffect, useCallback, Suspense } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql";
 import Garment from "./Garment";
@@ -437,18 +437,20 @@ export default function Garments({ garments }: GarmentsProps) {
             <animated.group
               scale={scaleSpring.scale}
             >
-              <Garment
-                garment={garment}
-                initPosition={garmentData[index].position}
-                initialRotationY={garmentData[index].initialRotationY}
-                spinSpeed={hasSelection ? (index === selectedIndex ? SELECTED_SPIN_SPEED : 0) : SPIN_SPEED}
-                targetBoundingBox={targetBoundingBox}
-                isSelected={index === selectedIndex}
-                hasSelection={hasSelection}
-                nonSelectedOpacity={NON_SELECTED_OPACITY}
-                opacityTransitionSpeed={OPACITY_TRANSITION_SPEED}
-              />
-
+              {/* Individual Suspense boundary for each garment to prevent blocking */}
+              <Suspense fallback={null}>
+                <Garment
+                  garment={garment}
+                  initPosition={garmentData[index].position}
+                  initialRotationY={garmentData[index].initialRotationY}
+                  spinSpeed={hasSelection ? (index === selectedIndex ? SELECTED_SPIN_SPEED : 0) : SPIN_SPEED}
+                  targetBoundingBox={targetBoundingBox}
+                  isSelected={index === selectedIndex}
+                  hasSelection={hasSelection}
+                  nonSelectedOpacity={NON_SELECTED_OPACITY}
+                  opacityTransitionSpeed={OPACITY_TRANSITION_SPEED}
+                />
+              </Suspense>
             </animated.group>
 
           </React.Fragment>

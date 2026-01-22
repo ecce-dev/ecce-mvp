@@ -12,7 +12,9 @@ export default function Background() {
     setMounted(true);
   }, []);
 
-  // Use black logo as default during SSR, then switch based on theme
+  // Always show black logo initially (SSR and first render) for faster LCP
+  // Switch to white only after hydration if dark theme is detected
+  // This ensures the image is available immediately without waiting for theme detection
   const logoSrc = mounted && resolvedTheme === "dark" 
     ? "/ecce_logo_white.svg" 
     : "/ecce_logo_black.svg";
@@ -20,11 +22,26 @@ export default function Background() {
   return (
     <div className="safe-area-content fixed inset-0 z-1">
       <div className="h-full w-full flex flex-col justify-end items-center p-8">
+        {/* Show black logo immediately, switch to white after hydration if needed */}
         <Image
           src={logoSrc}
           alt="Background"
           width={420}
           height={420}
+          priority
+          loading="eager"
+          fetchPriority="high"
+          // Preload both variants to avoid layout shift on theme switch
+          onLoad={() => {
+            // Preload the other variant in the background
+            if (typeof window !== 'undefined') {
+              const link = document.createElement('link');
+              link.rel = 'preload';
+              link.as = 'image';
+              link.href = resolvedTheme === "dark" ? "/ecce_logo_black.svg" : "/ecce_logo_white.svg";
+              document.head.appendChild(link);
+            }
+          }}
         />
       </div>
     </div>

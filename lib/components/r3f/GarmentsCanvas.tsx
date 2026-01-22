@@ -34,11 +34,15 @@ export default function GarmentsCanvas({ onLoadingStateChange }: GarmentsCanvasP
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   
-  // For testing: disable garment rendering to test performance without 3D models
-  const [shouldRenderGarments] = useState(false);
+  // Render garments after canvas is mounted to ensure proper initialization
+  // This ensures the canvas is ready before we start loading 3D models
+  const [shouldRenderGarments, setShouldRenderGarments] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Enable garment rendering after canvas is mounted
+    // This ensures the canvas is initialized before loading 3D models
+    setShouldRenderGarments(true);
   }, []);
 
   // Determine if dark mode is active (default to light during SSR)

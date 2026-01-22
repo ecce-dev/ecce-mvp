@@ -47,8 +47,8 @@ export default function GarmentsClient() {
   const hasMarkedPageReadyRef = useRef(false);
   
   // Track if 3D canvas should be loaded
-  // For testing: disable canvas entirely to test performance without Three.js
-  const [shouldLoadCanvas, _setShouldLoadCanvas] = useState(false);
+  // Canvas loads after page-ready mark to ensure it doesn't block initial page load
+  const [shouldLoadCanvas, setShouldLoadCanvas] = useState(false);
   
   // Track loading state from canvas (set by GarmentsCanvas via callback)
   const [isModelsLoading, setIsModelsLoading] = useState(false);
@@ -81,10 +81,12 @@ export default function GarmentsClient() {
       // Dispatch custom event for other tools that might be listening
       window.dispatchEvent(new CustomEvent('page-ready'));
       
-      // Canvas loading disabled for testing
-      // setTimeout(() => {
-      //   setShouldLoadCanvas(true);
-      // }, 0);
+      // Load canvas after page-ready mark to ensure it doesn't block initial page load
+      // Using setTimeout(0) ensures this happens in the next event loop tick
+      // This allows the page-ready mark to complete before Three.js code loads
+      setTimeout(() => {
+        setShouldLoadCanvas(true);
+      }, 0);
     }
   }, [isDataLoading]);
 

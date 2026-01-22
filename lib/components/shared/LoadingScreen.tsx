@@ -62,12 +62,14 @@ export default function LoadingScreen({
 
   if (!shouldRender) return null
 
+
+  // bg-foreground/20 backdrop-blur-md
   return (
     <div
       className={`
         fixed inset-0 z-50
         flex items-center justify-center
-        bg-foreground/20 backdrop-blur-md
+        bg-background
         transition-opacity duration-500 ease-out
         ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}
@@ -76,7 +78,7 @@ export default function LoadingScreen({
     >
       <div className="relative flex flex-col items-center gap-6">
         {/* Animated loading text */}
-        <h2 
+        {/* <h2 
           className="
             font-ibm-plex-mono
             text-2xl md:text-3xl lg:text-4xl
@@ -90,14 +92,15 @@ export default function LoadingScreen({
           }}
         >
           Loading
-        </h2>
+        </h2> */}
         {/* <EcceLogoBlack 
           width={100} 
           height={100} 
           className="w-24 h-24 invert loading-logo" 
         /> */}
-
-        {/* <EcceLoadingLottie /> */}
+        <div className="dark:invert">
+          <EcceLoadingLottie />
+        </div>
 
         {/* Subtle animated dots */}
         {/* <div className="flex gap-2">

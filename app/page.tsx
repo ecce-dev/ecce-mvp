@@ -34,7 +34,7 @@ export default function Home() {
       {/* Background renders FIRST - completely independent of any client components */}
       {/* This ensures it can render immediately without waiting for hydration or data */}
       {/* This is the LCP element and must render as fast as possible */}
-      <Background />
+      
 
       {/* Page content wrapped in container - loads after Background */}
       {/* This is deferred and won't block the Background/LCP */}

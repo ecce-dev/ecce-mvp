@@ -14,6 +14,7 @@ import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
 // Lazy load react-spring to reduce initial bundle
 import { useSpring, animated } from "@react-spring/web";
 import { LegalRightsToggle } from "../ui-elements/LegalRightsToggle";
+import Background from "../shared/Background";
 
 interface GarmentsCanvasProps {
   onLoadingStateChange?: (isLoading: boolean) => void;
@@ -121,6 +122,8 @@ export default function GarmentsClient() {
           3. Models are loading (after canvas is loaded) */}
       <LoadingScreen isModelsLoading={isDataLoading || !shouldLoadCanvas || isModelsLoading} />
       <BlurredOverlay />
+
+      {!(isDataLoading || !shouldLoadCanvas || isModelsLoading) && <Background />}
 
       {/* Auto-refresh countdown indicator - show when data is loaded, even if models are still loading */}
       {!isDataLoading && (

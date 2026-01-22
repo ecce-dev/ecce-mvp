@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { GlobeIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
 // import { Switch } from "./ui/switch"
 import { cn, addTargetBlankToLinks } from "../../utils/utils"
-import posthog from "posthog-js"
+import { postHogCapture } from "@/lib/utils/posthog"
 import { getGarmentAnalytics, getGarmentTopClicksCached, type GarmentAnalytics, type InterestLevel } from "@/lib/actions/getGarmentAnalytics"
 import { useTheme } from "next-themes"
 import { Progress } from "../ui/progress"
@@ -111,7 +111,7 @@ export function AnalyticsDialogContent({ garmentSlug, garmentName, userRole }: A
     fetchAnalytics()
 
     // Track analytics view
-    posthog.capture("research_analytics_viewed", {
+    postHogCapture("research_analytics_viewed", {
       garmentSlug,
       garmentName,
       userRole,
@@ -313,7 +313,7 @@ export function ExportDialogContent({
   const handleDownload = () => {
     if (!downloadUrl) return
 
-    posthog.capture("research_export_initiated", {
+    postHogCapture("research_export_initiated", {
       garmentSlug,
       garmentName,
       userRole,

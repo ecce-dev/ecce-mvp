@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react';
 import { useDevice } from '@/lib/hooks/useDevice';
 import { cn } from '../../utils/utils';
 
+/**
+ * PageContainerWrapper - Optimized for performance
+ * 
+ * Performance optimizations:
+ * - Uses mounted state to prevent hydration mismatches
+ * - PWA detection happens after initial render (non-blocking)
+ * - Minimal client-side JavaScript
+ */
 export default function PageContainerWrapper({ 
   children,
   className

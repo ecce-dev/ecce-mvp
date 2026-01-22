@@ -76,7 +76,7 @@ export function getTriggerSpanTranslateClass(
   offset?: { mobile?: string; desktop?: string }
 ): string {
   if (variant === "primary") {
-    const mobile = offset?.mobile ?? "0px"
+    const mobile = offset?.mobile ?? "2px"
     const desktop = offset?.desktop ?? "2px"
     return `translate-y-[${mobile}] md:translate-y-[${desktop}]`
   }

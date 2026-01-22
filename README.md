@@ -43,7 +43,7 @@ Create a `.env.local` file in the project root with the following variables:
 # ============================================
 
 # WordPress GraphQL endpoint base URL (without /graphql)
-WORDPRESS_CMS_URL=https://admin.ecce.ing
+WORDPRESS_CMS_URL=https://archive.ecce.ing
 
 # Basic Auth credentials for WordPress API access
 WORDPRESS_CMS_BASIC_AUTH_USER=your_username
@@ -72,7 +72,7 @@ TURNSTILE_SECRET_KEY=0x...
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `WORDPRESS_CMS_URL` | Required | WordPress site URL (e.g., `https://admin.ecce.ing`) |
+| `WORDPRESS_CMS_URL` | Required | WordPress site URL (e.g., `https://archive.ecce.ing`) |
 | `WORDPRESS_CMS_BASIC_AUTH_USER` | Required | WordPress Basic Auth username |
 | `WORDPRESS_CMS_BASIC_AUTH_PW` | Required | WordPress Basic Auth password |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Required | PostHog project API key (client-side) |
@@ -209,9 +209,9 @@ The WordPress CMS is self-hosted on a Hetzner VPS with the WPGraphQL plugin.
 #### Server Details
 
 - **Provider**: Hetzner Cloud
-- **Domain**: `admin.ecce.ing`
+- **Domain**: `archive.ecce.ing`
 - **Stack**: LAMP/LEMP with WordPress
-- **GraphQL Endpoint**: `https://admin.ecce.ing/graphql`
+- **GraphQL Endpoint**: `https://archive.ecce.ing/graphql`
 
 #### WordPress Plugins Required
 
@@ -235,7 +235,7 @@ ssh user@your-hetzner-ip
 
 ### Accessing the CMS
 
-1. Navigate to [https://admin.ecce.ing/wp-admin](https://admin.ecce.ing/wp-admin)
+1. Navigate to [https://archive.ecce.ing/wp-admin](https://archive.ecce.ing/wp-admin)
 2. Log in with your WordPress credentials
 3. Access garments via **Garments** in the sidebar
 

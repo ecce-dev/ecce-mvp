@@ -5,8 +5,8 @@ import { EcceLogoBlack } from "../ecce-elements/EcceLogoSVG"
 import EcceLoadingLottie from "../ecce-elements/EcceLoadingLottie"
 
 interface LoadingScreenProps {
-  /** Whether loading is in progress */
-  isLoading: boolean
+  /** Whether 3D models are still loading */
+  isModelsLoading: boolean
   /** Minimum time to show the loading screen (ms) - prevents flash */
   minDisplayTime?: number
 }
@@ -19,21 +19,27 @@ interface LoadingScreenProps {
  * - Smooth fade in/out transitions
  * - Animated loading text with glow effect
  * - Minimum display time to prevent jarring flashes
+ * - Marks page as loaded for PageSpeed Insights when component mounts
  * 
  * Note: Animation keyframes are defined in globals.css
+ * 
+ * Performance:
+ * - This component displays while 3D models are loading
+ * - Page is marked as "ready" separately when data fetch completes (in GarmentsClient)
+ * - "all-models-loaded" is tracked when models finish loading (in GarmentsClient)
  */
 export default function LoadingScreen({ 
-  isLoading, 
-  minDisplayTime = 500 
+  isModelsLoading, 
+  minDisplayTime = 0 // Reduced for testing - was 500ms
 }: LoadingScreenProps) {
-  const [isVisible, setIsVisible] = useState(isLoading)
-  const [shouldRender, setShouldRender] = useState(isLoading)
+  const [isVisible, setIsVisible] = useState(isModelsLoading)
+  const [shouldRender, setShouldRender] = useState(isModelsLoading)
 
   useEffect(() => {
     let minTimeoutId: NodeJS.Timeout | null = null
     let hideTimeoutId: NodeJS.Timeout | null = null
 
-    if (isLoading) {
+    if (isModelsLoading) {
       // Show immediately when loading starts
       setShouldRender(true)
       setIsVisible(true)
@@ -52,7 +58,7 @@ export default function LoadingScreen({
       if (minTimeoutId) clearTimeout(minTimeoutId)
       if (hideTimeoutId) clearTimeout(hideTimeoutId)
     }
-  }, [isLoading, isVisible, minDisplayTime])
+  }, [isModelsLoading, isVisible, minDisplayTime])
 
   if (!shouldRender) return null
 
@@ -66,7 +72,7 @@ export default function LoadingScreen({
         ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}
       aria-live="polite"
-      aria-busy={isLoading}
+      aria-busy={isModelsLoading}
     >
       <div className="relative flex flex-col items-center gap-6">
         {/* Animated loading text */}

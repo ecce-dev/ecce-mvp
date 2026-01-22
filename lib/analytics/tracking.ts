@@ -1,6 +1,6 @@
 "use client"
 
-import posthog from "posthog-js"
+import { postHogCapture } from "@/lib/utils/posthog"
 
 // ============================================
 // ANALYTICS EVENT TYPES
@@ -90,7 +90,7 @@ export function trackGarmentSelected(
     user_role: userRole,
   }
   
-  posthog.capture("garment_selected", properties)
+  postHogCapture("garment_selected", properties)
 }
 
 /**
@@ -118,7 +118,7 @@ export function trackGarmentSessionEnded(
     duration_seconds: Math.round(durationSeconds * 100) / 100, // Round to 2 decimals
   }
   
-  posthog.capture("garment_session_ended", properties)
+  postHogCapture("garment_session_ended", properties)
 }
 
 /**
@@ -145,7 +145,7 @@ export function trackGarmentActionClicked(
     action_type: actionType,
   }
   
-  posthog.capture("garment_action_clicked", properties)
+  postHogCapture("garment_action_clicked", properties)
 }
 
 // ============================================
@@ -173,7 +173,7 @@ export function trackRequestSubmitted(message: string): void {
     source: "submit_request_dialog",
   }
   
-  posthog.capture("request_submitted", properties)
+  postHogCapture("request_submitted", properties)
 }
 
 // ============================================

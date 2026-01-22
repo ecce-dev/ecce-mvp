@@ -1,17 +1,23 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import dynamic from "next/dynamic"
 import {
   EcceDialogTrigger,
   EcceDialogContent,
   EcceActionTrigger,
 } from "@/lib/components/ecce-elements"
-import { SubmitRequestForm } from "@/lib/components/ui-elements/SubmitRequestForm"
+// Lazy load form component to defer Zod bundle until form is actually opened
+const SubmitRequestForm = dynamic(
+  () => import("@/lib/components/ui-elements/SubmitRequestForm").then(mod => ({ default: mod.SubmitRequestForm })),
+  { ssr: false }
+)
 import { CountdownProgress } from "@/lib/components/ui-elements/CountdownProgress"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { useDevice } from "@/lib/hooks/useDevice";
 import { cn, addTargetBlankToLinks } from "@/lib/utils/utils";
-import posthog from "posthog-js";
+// Use dynamic PostHog import to avoid bundling in initial load
+import { postHogCapture } from "@/lib/utils/posthog";
 import { LegalRightsContent } from "./LegalRightsToggle"
 
 /**
@@ -31,6 +37,10 @@ export default function UIElements({ aboutContent, contactContent, legalRightsCo
   // Trigger to reset countdown when user manually explores
   const [manualRefreshCount, setManualRefreshCount] = useState(0);
 
+  // WYSIWYG CSS is now loaded via inline script in layout.tsx
+  // This prevents it from blocking initial render
+  // No need to load it here as it's handled at the document level
+
   /**
    * Handle manual explore click
    * Resets the auto-refresh countdown and tracks analytics
@@ -40,7 +50,8 @@ export default function UIElements({ aboutContent, contactContent, legalRightsCo
     setManualRefreshCount((prev) => prev + 1);
     
     const { previous, current } = await refreshGarments();
-    posthog.capture('explore_clicked', {
+    // Use deferred PostHog capture to avoid blocking
+    postHogCapture('explore_clicked', {
       previousGarments: previous,
       newGarments: current,
       userType: 'visitor',

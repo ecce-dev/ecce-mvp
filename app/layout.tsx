@@ -20,8 +20,8 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
   weight: ["400"], // Only load regular weight initially - defer others
-  display: "optional", // Don't block rendering - use fallback if font not ready
-  preload: false, // Defer font preload to avoid blocking
+  display: "swap", // Use fallback immediately, swap to custom font when loaded
+  preload: false, // Don't preload to avoid blocking critical path - fonts will still load and display
   adjustFontFallback: true, // Better fallback rendering
   fallback: ["monospace", "system-ui"], // Fast fallback fonts
 });

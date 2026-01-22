@@ -19,9 +19,9 @@ export const zangezi = localFont({
     // },
   ],
   variable: "--font-zangezi",
-  display: "optional", // Don't block rendering - use fallback if font not ready
+  display: "swap", // Use fallback immediately, swap to custom font when loaded
   fallback: ["serif", "system-ui"], // Fast fallback fonts
-  preload: false, // Defer font preload to avoid blocking initial render
+  preload: false, // Don't preload to avoid blocking critical path - fonts will still load and display
 });
 
 /**
@@ -30,7 +30,7 @@ export const zangezi = localFont({
 export const zangeziCondensed = localFont({
   src: "./Zangezi/Zangezi08-Condensed.woff2",
   variable: "--font-zangezi-condensed",
-  display: "optional", // Don't block rendering - use fallback if font not ready
+  display: "swap", // Use fallback immediately, swap to custom font when loaded
   fallback: ["serif"],
   preload: false, // Defer condensed - likely not used on initial render
 });

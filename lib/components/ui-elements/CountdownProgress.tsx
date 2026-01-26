@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useCallback, useRef, memo } from "react"
 import { cn } from "@/lib/utils/utils"
+import { useSpring, animated } from "@react-spring/web"
+import { useDevice } from "@/lib/hooks/useDevice"
+import { useEcceDialog } from "../ecce-elements"
 
 /** Auto-refresh interval in seconds */
 const AUTO_REFRESH_INTERVAL_SECONDS = 30
@@ -37,6 +40,8 @@ const CountdownProgressComponent = ({
   isPaused = false,
   className,
 }: CountdownProgressProps) => {
+  const { deviceType } = useDevice()
+  const { openDialogId } = useEcceDialog()
   const [remainingSeconds, setRemainingSeconds] = useState(AUTO_REFRESH_INTERVAL_SECONDS)
   const [progress, setProgress] = useState(0)
   const startTimeRef = useRef<number>(Date.now())
@@ -85,11 +90,16 @@ const CountdownProgressComponent = ({
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (progress / 100) * circumference
 
+  const opacitySpring = useSpring({
+    opacity: deviceType === 'mobile' && openDialogId && ["submit-request"].includes(openDialogId) ? 0 : 1,
+    config: { tension: 2100, friction: 210 },
+  })
+
   return (
-    <div 
+    <animated.div 
+      style={opacitySpring}
       className={cn(
-        "fixed bottom-52 md:bottom-6 right-7 left-auto md:left-6 flex gap-2 pointer-events-none z-100",
-        "safe-area-content",
+        "safe-area-content fixed bottom-52 md:bottom-6 right-7 left-auto md:left-6 flex gap-2 pointer-events-none z-100",
         // "bottom-[180px]",
         className
       )}
@@ -131,7 +141,7 @@ const CountdownProgressComponent = ({
       {/* <span className="text-sm text-muted-foreground font-mono tabular-nums min-w-[2ch]">
         {remainingSeconds}
       </span> */}
-    </div>
+    </animated.div>
   )
 }
 

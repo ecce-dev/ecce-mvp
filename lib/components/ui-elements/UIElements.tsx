@@ -119,7 +119,7 @@ export default function UIElements({ aboutContent, contactContent, legalRightsCo
       */}
       <div
         id="dialog-content-container"
-        className="fixed safe-area-content top-40 md:top-20 lg:top-24 bottom-6 left-6 right-6 grid grid-cols-1 md:grid-cols-3 items-stretch pointer-events-none z-100"
+        className="fixed safe-area-content top-46 md:top-20 lg:top-24 bottom-6 left-6 right-6 grid grid-cols-1 md:grid-cols-3 items-stretch pointer-events-none z-100"
       >
         {/* Left slot: About content - same cell on mobile, first column on tablet/desktop */}
         <div className="col-start-1 row-start-1 justify-self-start md:col-start-1 max-h-full overflow-hidden">

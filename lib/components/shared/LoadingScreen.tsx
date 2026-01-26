@@ -67,7 +67,7 @@ export default function LoadingScreen({
   return (
     <div
       className={`
-        fixed inset-0 z-50
+        safe-area-content fixed inset-0 z-90
         flex items-center justify-center
         bg-background
         transition-opacity duration-500 ease-out

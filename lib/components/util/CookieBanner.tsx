@@ -94,7 +94,7 @@ export function CookieBanner() {
   return (
     <div
       className={cn(
-        "fixed bottom-0 right-0 z-[9998]",
+        "safe-area-content fixed bottom-0 right-0 z-[9998]",
         "animate-fade-in",
         "pb-[max(1rem,env(safe-area-inset-bottom))]",
         "px-4 sm:px-6"

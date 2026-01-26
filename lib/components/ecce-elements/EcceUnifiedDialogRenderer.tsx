@@ -95,7 +95,7 @@ export function EcceUnifiedDialogRenderer({
           ...positionStyles,
         }}
         className={cn(
-          "z-100 max-w-[420px w-full bg-background/70 border border-foreground p-8 overflow-y-auto",
+          "z-100 max-w-[420px w-full bg-background/70 border border-foreground p-8 overflow-y-auto overflow-x-hidden",
           hasPositionProps && "fixed",
           className
         )}

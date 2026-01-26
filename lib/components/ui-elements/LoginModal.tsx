@@ -111,7 +111,7 @@ export default function LoginModal() {
       item && (
         <animated.div
           style={styles}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] w-full max-w-md px-4 pointer-events-auto"
+          className="safe-area-content fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] w-full max-w-md px-4 pointer-events-auto"
         >
           <div className="bg-transparent p-0">
             <Form {...form}>

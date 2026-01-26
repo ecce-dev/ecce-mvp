@@ -18,7 +18,7 @@ export const garmentNameElement = (garmentName: string) => (
 // Back Button Element
 // ============================================
 export const BackButtonElement = (deselectGarment: () => void, deviceType: DeviceType) => (
-  <div className="fixed top-6 left-6">
+  <div className="safe-area-content fixed top-6 left-6">
     <EcceActionTrigger
       variant="secondary"
       className="pointer-events-auto w-12 md:w-16 text-center py-0.5"
@@ -52,7 +52,7 @@ export const publicResearchSwitch = (
   setViewMode: (viewMode: "public" | "research") => void,
   onResearchClick?: () => void
 ) => (
-  <div className="fixed top-6 right-6 flex flex-row gap-0">
+  <div className="safe-area-content fixed top-6 right-6 flex flex-row gap-0">
     <EcceActionTrigger
       variant="primary"
       className={cn(

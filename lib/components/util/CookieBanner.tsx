@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import posthog from "posthog-js";
 import { Button } from "@/lib/components/ui/button";
 import { cn } from "@/lib/utils/utils";
 import { CookieIcon } from "@phosphor-icons/react";
-import posthog from "posthog-js";
 
 
 export function CookieBanner() {
@@ -12,78 +12,28 @@ export function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Defer PostHog loading until after initial render
-    // This prevents PostHog from blocking the initial bundle
-    let mounted = true;
-    
-    const initBanner = async () => {
-      try {
-        if (!mounted) return;
-        
-        const status = posthog.get_explicit_consent_status();
-        setConsentGiven(status);
+    // We want this to only run once the client loads
+    // or else it causes a hydration error
+    const status = posthog.get_explicit_consent_status();
+    setConsentGiven(status);
 
-        // Show banner with animation if consent is pending
-        if (status === 'pending') {
-          // Small delay to ensure smooth animation
-          setTimeout(() => {
-            if (mounted) setIsVisible(true);
-          }, 100);
-        }
-      } catch (error) {
-        console.error("Failed to load PostHog:", error);
-        // Don't show banner if PostHog fails to load
-        setConsentGiven('denied');
-      }
-    };
-
-    // Defer initialization until after page is interactive
-    if (typeof window !== 'undefined') {
-      if (document.readyState === 'complete') {
-        // Use requestIdleCallback if available, otherwise setTimeout
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(initBanner, { timeout: 2000 });
-        } else {
-          setTimeout(initBanner, 100);
-        }
-      } else {
-        window.addEventListener('load', () => {
-          if ('requestIdleCallback' in window) {
-            requestIdleCallback(initBanner, { timeout: 2000 });
-          } else {
-            setTimeout(initBanner, 100);
-          }
-        }, { once: true });
-      }
+    // Show banner with animation if consent is pending
+    if (status === 'pending') {
+      // Small delay to ensure smooth animation
+      setTimeout(() => setIsVisible(true), 100);
     }
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
-  const handleAcceptCookies = async () => {
-    try {
-      posthog.opt_in_capturing();
-      setConsentGiven('granted');
-      setIsVisible(false);
-    } catch (error) {
-      console.error("Failed to opt in:", error);
-      setConsentGiven('granted');
-      setIsVisible(false);
-    }
+  const handleAcceptCookies = () => {
+    posthog.opt_in_capturing();
+    setConsentGiven('granted');
+    setIsVisible(false);
   };
 
-  const handleDeclineCookies = async () => {
-    try {
-      posthog.opt_out_capturing();
-      setConsentGiven('denied');
-      setIsVisible(false);
-    } catch (error) {
-      console.error("Failed to opt out:", error);
-      setConsentGiven('denied');
-      setIsVisible(false);
-    }
+  const handleDeclineCookies = () => {
+    posthog.opt_out_capturing();
+    setConsentGiven('denied');
+    setIsVisible(false);
   };
 
   // Don't render if consent has been given or denied
@@ -94,7 +44,7 @@ export function CookieBanner() {
   return (
     <div
       className={cn(
-        "safe-area-content fixed bottom-0 right-0 z-[9998]",
+        "fixed bottom-0 right-0 z-[9998]",
         "animate-fade-in",
         "pb-[max(1rem,env(safe-area-inset-bottom))]",
         "px-4 sm:px-6"

@@ -119,7 +119,7 @@ export function SubmitRequestForm() {
                     <FormItem className="w-full">
                       <FormControl>
                         <Textarea
-                          placeholder="Type your request here..."
+                          placeholder="Let us know if there&apos;s a particular garment, look, or collection you&apos;d like to explore on ecce..."
                           className="min-h-[120px] resize-none w-full max-h-[240px] overflow-hidden overflow-y-auto rounded-none border-foreground text-foreground placeholder:text-foreground bg-background/70 shadow-none"
                           {...field}
                         />

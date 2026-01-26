@@ -2,8 +2,9 @@
 
 import { GavelIcon } from "@phosphor-icons/react";
 import { EcceDialogContent, EcceDialogTrigger, EcceUnifiedDialogRenderer, useEcceDialog } from "@/lib/components/ecce-elements";
-import { addTargetBlankToLinks } from "@/lib/utils/utils";
+import { addTargetBlankToLinks, cn } from "@/lib/utils/utils";
 import { createHtmlContent } from "./UIElementsShared";
+import { useAppModeStore } from "@/lib/stores/appModeStore";
 
 export function LegalRightsToggle() {
   return (
@@ -23,11 +24,16 @@ export function LegalRightsToggle() {
 
 
 export function LegalRightsContent({ content }: { content: string | null }) {
+  const viewMode = useAppModeStore((state) => state.viewMode);
+  const selectedGarment = useAppModeStore((state) => state.selectedGarment);
   return (
     <>
       <div
         id={'legaRightsContainer'}
-        className={"safe-area-content fixed top-42 md:top-36 lg:top-30 min-[1360px]:top-30! 2xl:top-30! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-center pointer-events-none z-100"}
+        className={cn(
+          selectedGarment ? viewMode === "research" ? "top-70 md:top-72" : "top-40 md:top-40" : "top-40 md:top-20",
+          "safe-area-content fixed lg:top-30 min-[1360px]:top-30! 2xl:top-30! bottom-[150px] md:bottom-[180px] left-6 right-6 grid grid-cols-1 items-stretch justify-items-center pointer-events-none z-100"
+        )}
         >
         <div className="max-h-full overflow-hidden max-w-screen p-6 md:max-w-[720px]">
           <EcceUnifiedDialogRenderer

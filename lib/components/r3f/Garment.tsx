@@ -41,6 +41,7 @@ export default function Garment({
   opacityTransitionSpeed,
   ...props
 }: GarmentProps) {
+  const selectedGarment = useAppModeStore((state) => state.selectedGarment);
   const groupRef = useRef<THREE.Group>(null!);
   const meshGroupRef = useRef<THREE.Group>(null!);
   const { isDragging } = useContext(OrbitControlsContext);
@@ -125,17 +126,19 @@ export default function Garment({
 
   /**
    * Handle garment click - select this garment
-   * Allows clicking on any garment, even when another is selected (switches selection)
    */
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
     // Stop propagation to prevent multiple garments from being selected
     event.stopPropagation();
+
+    // return if a garment is already selected
+    if (selectedGarment !== null) return
     
     // Don't re-select already selected garment
     if (isSelected) return;
     
     selectGarment(garment);
-  }, [garment, selectGarment, isSelected]);
+  }, [garment, selectGarment, selectedGarment, isSelected]);
 
   /**
    * Handle pointer enter - show cursor pointer

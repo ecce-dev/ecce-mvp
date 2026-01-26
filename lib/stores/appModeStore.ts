@@ -31,6 +31,8 @@ interface AppModeState {
   selectionAnimationMode: SelectionAnimationMode
   /** Whether the login modal is open */
   isLoginModalOpen: boolean
+  /** The submit request message (persisted in case dialog is closed) */
+  submitRequestMessage: string | null
 }
 
 interface AppModeActions {
@@ -52,6 +54,8 @@ interface AppModeActions {
   setSelectionAnimationMode: (mode: SelectionAnimationMode) => void
   /** Open/close the login modal */
   setLoginModalOpen: (open: boolean) => void
+  /** Set the submit request message */
+  setSubmitRequestMessage: (message: string | null) => void
 }
 
 type AppModeStore = AppModeState & AppModeActions
@@ -106,6 +110,7 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   isAuthInitialized: false,
   selectionAnimationMode: "camera",
   isLoginModalOpen: false,
+  submitRequestMessage: null,
 
   // Actions
   selectGarment: (garment) => {
@@ -201,5 +206,9 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
 
   setLoginModalOpen: (open) => {
     set({ isLoginModalOpen: open })
+  },
+
+  setSubmitRequestMessage: (message) => {
+    set({ submitRequestMessage: message })
   },
 }))

@@ -18,6 +18,8 @@ import { Button } from "@/lib/components/ui/button"
 import { trackRequestSubmitted } from "@/lib/analytics"
 import { useEcceDialog } from "@/lib/components/ecce-elements"
 import TurnstileWidget from "@/lib/components/util/TurnstileWidget"
+import { useDevice } from "@/lib/hooks/useDevice"
+import { useAppModeStore } from "@/lib/stores/appModeStore"
 
 /**
  * Form validation schema
@@ -44,12 +46,14 @@ type FormView = "form" | "success"
  * Auto-closes after successful submission with animated transitions
  */
 export function SubmitRequestForm() {
+  const { deviceType } = useDevice()
   const { closeDialog } = useEcceDialog()
+  const { submitRequestMessage, setSubmitRequestMessage } = useAppModeStore()
   
   const form = useForm<RequestFormValues>({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
-      message: "",
+      message: submitRequestMessage || "",
     },
   })
 
@@ -65,8 +69,16 @@ export function SubmitRequestForm() {
     },
     onSuccess: () => {
       form.reset()
+      setSubmitRequestMessage(null)
     },
   })
+
+  // Sync form with stored message when component mounts or stored message changes
+  useEffect(() => {
+    if (submitRequestMessage !== null && submitRequestMessage !== form.getValues("message")) {
+      form.setValue("message", submitRequestMessage)
+    }
+  }, [submitRequestMessage, form])
 
   // Auto-close after success
   useEffect(() => {
@@ -98,7 +110,7 @@ export function SubmitRequestForm() {
   })
 
   return (
-    <div className="relative w-full min-h-[200px]">
+    <div className="relative w-full min-h-[calc(100dvh-420px)]">
       {transitions((styles, view) => (
         <animated.div style={styles} className="absolute inset-0 w-full">
           {view === "success" ? (
@@ -119,9 +131,14 @@ export function SubmitRequestForm() {
                     <FormItem className="w-full">
                       <FormControl>
                         <Textarea
+                          rows={deviceType === 'mobile' ? 6 : 3}
                           placeholder="Let us know if there&apos;s a particular garment, look, or collection you&apos;d like to explore on ecce..."
                           className="min-h-[120px] resize-none w-full max-h-[240px] overflow-hidden overflow-y-auto rounded-none border-foreground text-foreground placeholder:text-foreground bg-background/70 shadow-none"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            setSubmitRequestMessage(e.target.value)
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

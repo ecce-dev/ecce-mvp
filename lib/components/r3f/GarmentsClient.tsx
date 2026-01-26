@@ -111,7 +111,7 @@ export default function GarmentsClient() {
 
 
   const opacitySpring = useSpring({
-    opacity: deviceType === 'mobile' && openDialogId && !["contact", "about"].includes(openDialogId) ? 0 : 1,
+    opacity: deviceType === 'mobile' && selectedGarment && openDialogId ? 0 : 1,
     config: { tension: 2100, friction: 210 },
   })
   return (

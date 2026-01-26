@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/lib/components/ui/button";
 import { cn } from "@/lib/utils/utils";
 import { CookieIcon } from "@phosphor-icons/react";
-
-// Dynamically import PostHog to avoid bundling it in initial load
-const loadPostHog = () => import("posthog-js").then(mod => mod.default);
+import posthog from "posthog-js";
 
 
 export function CookieBanner() {
@@ -20,7 +18,6 @@ export function CookieBanner() {
     
     const initBanner = async () => {
       try {
-        const posthog = await loadPostHog();
         if (!mounted) return;
         
         const status = posthog.get_explicit_consent_status();
@@ -67,7 +64,6 @@ export function CookieBanner() {
 
   const handleAcceptCookies = async () => {
     try {
-      const posthog = await loadPostHog();
       posthog.opt_in_capturing();
       setConsentGiven('granted');
       setIsVisible(false);
@@ -80,7 +76,6 @@ export function CookieBanner() {
 
   const handleDeclineCookies = async () => {
     try {
-      const posthog = await loadPostHog();
       posthog.opt_out_capturing();
       setConsentGiven('denied');
       setIsVisible(false);

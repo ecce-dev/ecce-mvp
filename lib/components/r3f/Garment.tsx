@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useContext, useCallback } from "react"
+import { useRef, useContext, useCallback, useEffect, useState } from "react"
 import { useFrame, ThreeEvent, ThreeElements } from "@react-three/fiber"
 import NormalizedGlbModel, { TargetBoundingBox } from "./NormalizedGlbModel"
 import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
@@ -172,6 +172,7 @@ export default function Garment({
     config: { tension: 2100, friction: 210 },
   })
 
+
   return (
     <group
       position={initPosition}
@@ -181,17 +182,19 @@ export default function Garment({
       // onPointerLeave={handlePointerLeave}
       {...props}
     >
-      <Html>
-        <animated.div
-          style={garmentCopyrightOpacitySpring}
-          className="bg-background/70 border border-foreground p-8 overflow-y-auto w-full min-w-[280px] md:min-w-[350px] lg:min-w-[420px] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-2"
-        >
-          <span className="font-zangezi uppercase" dangerouslySetInnerHTML={{ __html: garment.garmentFields?.name ?? "" }} />
-          <span className="text-sm">
-            {getLicenseContent(garment.garmentFields?.publicDomain ?? false, garment.garmentFields?.rights ?? "", publicDomainTextContent)}
-          </span>
-        </animated.div>
-      </Html>
+      {showGarmentCopyright && <>
+        <Html>
+          <animated.div
+            style={garmentCopyrightOpacitySpring}
+            className="bg-background/70 border border-foreground p-8 overflow-y-auto w-full min-w-[280px] md:min-w-[350px] lg:min-w-[420px] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-2 pointer-events-auto"
+          >
+            <span className="font-zangezi uppercase pointer-events-none" dangerouslySetInnerHTML={{ __html: garment.garmentFields?.name ?? "" }} />
+            <span className="text-sm pointer-events-none">
+              {getLicenseContent(garment.garmentFields?.publicDomain ?? false, garment.garmentFields?.rights ?? "", publicDomainTextContent)}
+            </span>
+          </animated.div>
+        </Html>
+      </>}
       <group ref={groupRef}>
         <group ref={meshGroupRef}>
           <NormalizedGlbModel

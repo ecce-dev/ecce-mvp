@@ -82,7 +82,7 @@ export default function GarmentsCanvas({ onLoadingStateChange }: GarmentsCanvasP
     }
   }, [isAssetsLoading, progress]);
 
-  const shadowRadius = deviceType === 'desktop' ? 21 : deviceType === 'tablet' ? 15 : 8;
+  const shadowRadius = 21 // deviceType === 'desktop' ? 21 : deviceType === 'tablet' ? 15 : 8;
 
   // Select environment preset based on theme
   const environmentPreset = isDarkMode && DARK_MODE_EFFECTS.ENABLE_ENVIRONMENT_SWITCH
@@ -116,7 +116,7 @@ export default function GarmentsCanvas({ onLoadingStateChange }: GarmentsCanvasP
         />
         {/* Dark mode visual effects */}
         <DarkModeEffects isDarkMode={isDarkMode} />
-        {(!isDarkMode && !selectedGarment) && <ContactShadows scale={shadowRadius * 4} position={[0, -5, 0]} far={shadowRadius} blur={2} />}
+        {(!isDarkMode && !selectedGarment) && <ContactShadows scale={shadowRadius * 4} position={[0, deviceType === 'mobile' ? -8 : -5, 0]} far={shadowRadius} blur={2} />}
         {/* Delay rendering Garments to ensure page-ready mark happens first */}
         {shouldRenderGarments && <Garments garments={garments} />}
       </CanvasWrapper>

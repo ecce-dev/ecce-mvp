@@ -8,7 +8,6 @@ import { useAppModeStore } from "@/lib/stores/appModeStore";
 
 export function LegalRightsToggle() {
   const { openDialogId } = useEcceDialog()
-  console.log('openDialogId', openDialogId)
   return (
     // hidden on mobile because the animation mode has no effect when only one garment is loaded
     <div className="safe-area-content fixed bottom-40 md:bottom-4 right-10 md:right-14 z-50 md:flex items-center gap-2 rounded-full py-2">

@@ -129,13 +129,13 @@ export default function GarmentsClient() {
       {/* Auto-refresh countdown indicator - show when data is loaded, even if models are still loading */}
       {!isDataLoading && (
         <>
-          {selectedGarment ? null : (
+          {/* {selectedGarment ? null : (
             <CountdownProgress
               onComplete={handleAutoRefresh}
               resetTrigger={0}
               isPaused={isDataLoading || isModelsLoading}
             />
-          )}
+          )} */}
           <animated.div style={opacitySpring}>
             <ThemeToggle />
             <LegalRightsToggle />

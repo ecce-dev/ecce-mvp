@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { getAboutContent, getContactContent, getLegalRightsContent, getPublicDomainTextContent } from "@/lib/actions/getGlobalSettings"
 import UIElementsRouter from "./UIElementsRouter"
+import { useAppModeStore } from "@/lib/stores/appModeStore"
 
 interface UIContent {
   aboutContent: string | null
@@ -28,12 +29,14 @@ export default function UIContentLoader() {
     publicDomainTextContent: null,
   })
 
+  const setPublicDomainTextContent = useAppModeStore((state) => state.setPublicDomainTextContent);
+
   useEffect(() => {
     // Fetch content client-side after initial render (non-blocking)
     // Use requestIdleCallback to defer until browser is idle
     const fetchContent = async () => {
       try {
-        const [about, contact, legal, publicDomain] = await Promise.all([
+        const [about, contact, legal, publicDomainTextContent] = await Promise.all([
           getAboutContent(),
           getContactContent(),
           getLegalRightsContent(),
@@ -44,8 +47,10 @@ export default function UIContentLoader() {
           aboutContent: about ?? null,
           contactContent: contact ?? null,
           legalRightsContent: legal ?? null,
-          publicDomainTextContent: publicDomain ?? null,
+          publicDomainTextContent: publicDomainTextContent ?? null,
         })
+        // Public domain text is used for both licensedDialogContent as well as showing the license text on the garment model, hence storing it in the store
+        setPublicDomainTextContent(publicDomainTextContent ?? "")
       } catch (error) {
         console.error("Failed to fetch UI content:", error)
       }
@@ -66,7 +71,6 @@ export default function UIContentLoader() {
       aboutContent={content.aboutContent}
       contactContent={content.contactContent}
       legalRightsContent={content.legalRightsContent}
-      publicDomainTextContent={content.publicDomainTextContent}
     />
   )
 }

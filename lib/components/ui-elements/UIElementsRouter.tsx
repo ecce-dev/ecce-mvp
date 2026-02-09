@@ -12,7 +12,6 @@ interface UIElementsRouterProps {
   aboutContent: string | null
   contactContent: string | null
   legalRightsContent: string | null
-  publicDomainTextContent: string | null
 }
 
 /** UI view state for transition management */
@@ -35,7 +34,6 @@ export default function UIElementsRouter({
   aboutContent,
   contactContent,
   legalRightsContent,
-  publicDomainTextContent,
 }: UIElementsRouterProps) {
   const { selectedGarment, viewMode, isAuthInitialized, setAuthenticated, setAuthInitialized, initializeFromUrl } = useAppModeStore()
   const { garments } = useGarments()
@@ -105,7 +103,6 @@ export default function UIElementsRouter({
       <UIElementsGarment
         mode={view === "public" ? "public" : "research"}
         legalRightsContent={legalRightsContent}
-        publicDomainTextContent={publicDomainTextContent ?? ""}
       />
     </animated.div>
   ))

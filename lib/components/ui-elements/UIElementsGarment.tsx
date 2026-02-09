@@ -19,6 +19,7 @@ import {
   createHtmlContent,
   licensedTrigger,
   versionElement,
+  getLicenseContent,
 } from "./UIElementsShared"
 import { AnalyticsDialogContent, ExportDialogContent } from "@/lib/components/ui-elements/AnalyticsUI"
 import { LegalRightsContent } from "./LegalRightsToggle"
@@ -219,7 +220,7 @@ function createModeConfig(
       licensed: {
         id: "licensed",
         title: "Licensed",
-        content: !publicDomain ? createHtmlContent(rights) : createHtmlContent(publicDomainTextContent),
+        content: getLicenseContent(publicDomain, rights, publicDomainTextContent),
       },
     }
 
@@ -394,7 +395,7 @@ function createModeConfig(
       licensed: {
         id: "licensed",
         title: "Licensed",
-        content: !publicDomain ? createHtmlContent(rights) : createHtmlContent(publicDomainTextContent),
+        content: getLicenseContent(publicDomain, rights, publicDomainTextContent),
       },
     }
 
@@ -493,7 +494,6 @@ function createModeConfig(
 interface UIElementsGarmentProps {
   mode: ViewMode
   legalRightsContent: string | null
-  publicDomainTextContent: string
 }
 
 /**
@@ -505,7 +505,7 @@ interface UIElementsGarmentProps {
  * - Top Right: Mode switch (Public/Research)
  * - Device-specific layouts for mobile, tablet, and desktop
  */
-export default function UIElementsGarment({ mode, legalRightsContent, publicDomainTextContent }: UIElementsGarmentProps) {
+export default function UIElementsGarment({ mode, legalRightsContent }: UIElementsGarmentProps) {
   const {
     selectedGarment,
     deselectGarment,
@@ -514,6 +514,7 @@ export default function UIElementsGarment({ mode, legalRightsContent, publicDoma
     isAuthenticated,
     userRole,
     setLoginModalOpen,
+    publicDomainTextContent,
   } = useAppModeStore()
   const { deviceType } = useDevice()
 

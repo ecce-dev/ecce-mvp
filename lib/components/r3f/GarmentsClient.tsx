@@ -15,6 +15,7 @@ import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
 import { useSpring, animated } from "@react-spring/web";
 import { LegalRightsToggle } from "../ui-elements/LegalRightsToggle";
 import Background from "../shared/Background";
+import { GarmentCopyrightToggle } from "../ui-elements/GarmentCopyrightToggle";
 
 interface GarmentsCanvasProps {
   onLoadingStateChange?: (isLoading: boolean) => void;
@@ -138,6 +139,7 @@ export default function GarmentsClient() {
           <animated.div style={opacitySpring}>
             <ThemeToggle />
             <LegalRightsToggle />
+            <GarmentCopyrightToggle />
           </animated.div>
         </>
       )}

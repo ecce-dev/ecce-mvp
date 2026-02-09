@@ -7,6 +7,9 @@ import { GetGarmentsQuery } from "@/lib/gql/__generated__/graphql"
 import OrbitControlsContext from "./OrbitControlsContext"
 import * as THREE from 'three';
 import { useAppModeStore } from "@/lib/stores/appModeStore"
+import { Html } from "@react-three/drei"
+import { getLicenseContent } from "../ui-elements/UIElementsShared"
+import { animated, useSpring } from "@react-spring/web"
 
 
 type GarmentProps = {
@@ -46,6 +49,8 @@ export default function Garment({
   const meshGroupRef = useRef<THREE.Group>(null!);
   const { isDragging } = useContext(OrbitControlsContext);
   const selectGarment = useAppModeStore((state) => state.selectGarment);
+  const publicDomainTextContent = useAppModeStore((state) => state.publicDomainTextContent);
+  const showGarmentCopyright = useAppModeStore((state) => state.showGarmentCopyright);
 
   // Track current opacity using ref to avoid React re-renders
   // State updates in useFrame cause excessive re-renders and RSC payload requests
@@ -53,8 +58,8 @@ export default function Garment({
   const currentOpacityRef = useRef(1);
 
   // Calculate target opacity based on selection state
-  const targetOpacity = hasSelection 
-    ? (isSelected ? 1 : nonSelectedOpacity) 
+  const targetOpacity = hasSelection
+    ? (isSelected ? 1 : nonSelectedOpacity)
     : 1;
 
   // Individual spin animation (pauses when orbit controls are dragging)
@@ -74,7 +79,7 @@ export default function Garment({
         delta * opacityTransitionSpeed
       );
       currentOpacityRef.current = newOpacity;
-      
+
       // Apply opacity directly to materials without triggering React re-renders
       if (meshGroupRef.current) {
         meshGroupRef.current.traverse((child) => {
@@ -133,10 +138,10 @@ export default function Garment({
 
     // return if a garment is already selected
     if (selectedGarment !== null) return
-    
+
     // Don't re-select already selected garment
     if (isSelected) return;
-    
+
     selectGarment(garment);
   }, [garment, selectGarment, selectedGarment, isSelected]);
 
@@ -161,8 +166,14 @@ export default function Garment({
   if (!glbUrl) return null;
   const proxiedUrl = getProxiedUrl(glbUrl);
 
+
+  const garmentCopyrightOpacitySpring = useSpring({
+    opacity: showGarmentCopyright ? 1 : 0,
+    config: { tension: 2100, friction: 210 },
+  })
+
   return (
-    <group 
+    <group
       position={initPosition}
       rotation={[0, initialRotationY, 0]}
       onClick={handleClick}
@@ -170,6 +181,17 @@ export default function Garment({
       // onPointerLeave={handlePointerLeave}
       {...props}
     >
+      <Html>
+        <animated.div
+          style={garmentCopyrightOpacitySpring}
+          className="bg-background/70 border border-foreground p-8 overflow-y-auto w-full min-w-[280px] md:min-w-[350px] lg:min-w-[420px] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-2"
+        >
+          <span className="font-zangezi uppercase" dangerouslySetInnerHTML={{ __html: garment.garmentFields?.name ?? "" }} />
+          <span className="text-sm">
+            {getLicenseContent(garment.garmentFields?.publicDomain ?? false, garment.garmentFields?.rights ?? "", publicDomainTextContent)}
+          </span>
+        </animated.div>
+      </Html>
       <group ref={groupRef}>
         <group ref={meshGroupRef}>
           <NormalizedGlbModel

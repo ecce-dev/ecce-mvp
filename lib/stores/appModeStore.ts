@@ -33,6 +33,10 @@ interface AppModeState {
   isLoginModalOpen: boolean
   /** The submit request message (persisted in case dialog is closed) */
   submitRequestMessage: string | null
+  /** The public domain text content - publicDomainTextContent is used for both licensedDialogContent as well as showing the license text on the garment model, hence storing it in the store*/
+  publicDomainTextContent: string
+  /** Whether to show the garment copyright */
+  showGarmentCopyright: boolean
 }
 
 interface AppModeActions {
@@ -56,6 +60,10 @@ interface AppModeActions {
   setLoginModalOpen: (open: boolean) => void
   /** Set the submit request message */
   setSubmitRequestMessage: (message: string | null) => void
+  /** Set the public domain text content */
+  setPublicDomainTextContent: (content: string) => void
+  /** Set whether to show the garment copyright */
+  setShowGarmentCopyright: (show: boolean) => void
 }
 
 type AppModeStore = AppModeState & AppModeActions
@@ -111,6 +119,8 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   selectionAnimationMode: "camera",
   isLoginModalOpen: false,
   submitRequestMessage: null,
+  publicDomainTextContent: "",
+  showGarmentCopyright: false,
 
   // Actions
   selectGarment: (garment) => {
@@ -210,5 +220,12 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
 
   setSubmitRequestMessage: (message) => {
     set({ submitRequestMessage: message })
+  },
+
+  setPublicDomainTextContent: (content) => {
+    set({ publicDomainTextContent: content })
+  },
+  setShowGarmentCopyright: (show) => {
+    set({ showGarmentCopyright: show })
   },
 }))

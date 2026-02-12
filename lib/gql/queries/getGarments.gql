@@ -2,6 +2,7 @@ query getGarments {
   garments {
     nodes {
       garmentFields {
+        excludeOnHomepage
         construction
         description
         linkToTiktok

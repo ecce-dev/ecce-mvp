@@ -10,6 +10,9 @@ import { useSpring } from "@react-spring/three";
 import OrbitControlsContext from "@/lib/components/r3f/OrbitControlsContext";
 import { SWITCH_CAMERA_DISTANCE } from "./Garments";
 
+/** Default orbit target - stable reference to prevent R3F from re-applying on re-renders */
+const DEFAULT_ORBIT_TARGET = new THREE.Vector3(0, 0, 0);
+
 // ============================================
 // CAMERA ANIMATION CONFIGURATION
 // ============================================
@@ -333,7 +336,7 @@ export type CanvasWrapperProps = {
 }
 
 function CanvasWrapper({
-  initialCameraPosition = new THREE.Vector3(0, 2, -15),
+  initialCameraPosition,
   controls = null,
   maxCameraDistance = 500,
   minCameraDistance = 1,
@@ -396,7 +399,7 @@ const [isCarouselAnimating, setIsCarouselAnimating] = useState(false)
         {controls && controls.orbitControls && <OrbitControls
           ref={orbitControlsRef}
           makeDefault
-          target={controls.orbitControls.target ?? new THREE.Vector3(0, 0, 0)}
+          target={controls.orbitControls.target ?? DEFAULT_ORBIT_TARGET}
           dampingFactor={controls.orbitControls.dampingFactor ?? 0.05}
           panSpeed={controls.orbitControls.panSpeed ?? 1}
           rotateSpeed={controls.orbitControls.rotateSpeed ?? 1}

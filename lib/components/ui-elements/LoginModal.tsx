@@ -16,6 +16,7 @@ import {
 import { Input } from "@/lib/components/ui/input"
 import { Button } from "@/lib/components/ui/button"
 import { useAppModeStore, type UserRole } from "@/lib/stores/appModeStore"
+import { useGarments } from "@/lib/context/GarmentsContext"
 import { Eye, EyeIcon, EyeSlash, EyeSlashIcon } from "@phosphor-icons/react"
 import TurnstileWidget from "../util/TurnstileWidget"
 
@@ -40,8 +41,11 @@ export default function LoginModal() {
     isLoginModalOpen,
     setLoginModalOpen,
     setAuthenticated,
-    setViewMode
+    setViewMode,
+    selectedGarment,
+    updateSelectedGarmentData,
   } = useAppModeStore()
+  const { reloadGarments } = useGarments()
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
@@ -70,11 +74,22 @@ export default function LoginModal() {
 
       return data
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setAuthenticated(true, data.role as UserRole)
       setViewMode("research")
       form.reset()
       setLoginModalOpen(false)
+
+      // Re-fetch garments with full data now that session cookie is set
+      const reloaded = await reloadGarments()
+
+      // Update selected garment with full data if one is selected
+      if (selectedGarment?.slug) {
+        const updated = reloaded.find((g) => g.slug === selectedGarment.slug)
+        if (updated) {
+          updateSelectedGarmentData(updated)
+        }
+      }
     },
   })
 

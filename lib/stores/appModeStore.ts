@@ -52,6 +52,8 @@ interface AppModeActions {
   setAuthInitialized: () => void
   /** Logout and clear session */
   logout: () => Promise<void>
+  /** Update selected garment data without triggering camera animation or URL changes */
+  updateSelectedGarmentData: (garment: GarmentNode) => void
   /** Initialize state from URL params */
   initializeFromUrl: (garments: GarmentNode[]) => void
   /** Set the selection animation mode */
@@ -184,6 +186,10 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
     if (selectedGarment?.slug) {
       updateUrlParams(selectedGarment.slug, "public")
     }
+  },
+
+  updateSelectedGarmentData: (garment) => {
+    set({ selectedGarment: garment })
   },
 
   initializeFromUrl: (garments) => {

@@ -1,13 +1,18 @@
 import { useAppModeStore } from "@/lib/stores/appModeStore";
 import { cn } from "@/lib/utils/utils";
 import { CopyrightIcon } from "@phosphor-icons/react";
+import { useEcceDialog } from "../ecce-elements";
 
 export function GarmentCopyrightToggle() {
   const { showGarmentCopyright, setShowGarmentCopyright } = useAppModeStore();
+  const { closeDialog } = useEcceDialog()
   return (
-    <div className="safe-area-content fixed bottom-40 right-16 md:bottom-4 md:right-22 z-50 flex items-center gap-2 rounded-full py-2">
+    <div className="safe-area-content fixed bottom-56 right-4 md:bottom-20 md:right-6 z-50 flex items-center gap-2 rounded-full py-2">
       <button
-        onClick={() => setShowGarmentCopyright(!showGarmentCopyright)}
+        onClick={() => {
+          setShowGarmentCopyright(!showGarmentCopyright)
+          closeDialog("legalRights")
+        }}
         className={cn(
           "pointer-events-auto bg-transparent border-0 p-0 m-0 text-base text-foreground leading-none"
         )}

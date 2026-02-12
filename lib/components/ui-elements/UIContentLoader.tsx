@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getAboutContent, getContactContent, getLegalRightsContent, getPublicDomainTextContent } from "@/lib/actions/getGlobalSettings"
+import { getAboutContent, getContactContent, getLegalRightsContent, getPasswordEntryInfo, getPublicDomainTextContent } from "@/lib/actions/getGlobalSettings"
 import UIElementsRouter from "./UIElementsRouter"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 
@@ -10,6 +10,7 @@ interface UIContent {
   contactContent: string | null
   legalRightsContent: string | null
   publicDomainTextContent: string | null
+  passwordEntryInfo: string | null
 }
 
 /**
@@ -27,6 +28,7 @@ export default function UIContentLoader() {
     contactContent: null,
     legalRightsContent: null,
     publicDomainTextContent: null,
+    passwordEntryInfo: null,
   })
 
   const setPublicDomainTextContent = useAppModeStore((state) => state.setPublicDomainTextContent);
@@ -36,11 +38,12 @@ export default function UIContentLoader() {
     // Use requestIdleCallback to defer until browser is idle
     const fetchContent = async () => {
       try {
-        const [about, contact, legal, publicDomainTextContent] = await Promise.all([
+        const [about, contact, legal, publicDomainTextContent, passwordEntryInfo] = await Promise.all([
           getAboutContent(),
           getContactContent(),
           getLegalRightsContent(),
           getPublicDomainTextContent(),
+          getPasswordEntryInfo(),
         ])
 
         setContent({
@@ -48,6 +51,7 @@ export default function UIContentLoader() {
           contactContent: contact ?? null,
           legalRightsContent: legal ?? null,
           publicDomainTextContent: publicDomainTextContent ?? null,
+          passwordEntryInfo: passwordEntryInfo ?? null,
         })
         // Public domain text is used for both licensedDialogContent as well as showing the license text on the garment model, hence storing it in the store
         setPublicDomainTextContent(publicDomainTextContent ?? "")
@@ -71,6 +75,7 @@ export default function UIContentLoader() {
       aboutContent={content.aboutContent}
       contactContent={content.contactContent}
       legalRightsContent={content.legalRightsContent}
+      passwordEntryInfo={content.passwordEntryInfo}
     />
   )
 }

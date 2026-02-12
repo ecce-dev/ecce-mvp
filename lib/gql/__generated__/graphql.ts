@@ -2689,6 +2689,8 @@ export type GlobalSettings = AcfFieldGroup & AcfFieldGroupFields & GlobalSetting
   /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   passwordConfig?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  passwordEntryInfo?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   publicDomainTextContent?: Maybe<Scalars['String']['output']>;
 };
 
@@ -2718,6 +2720,8 @@ export type GlobalSettings_Fields = {
   legalAndRightsContent?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   passwordConfig?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  passwordEntryInfo?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   publicDomainTextContent?: Maybe<Scalars['String']['output']>;
 };
@@ -11361,7 +11365,7 @@ export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typena
 export type GetGlobalSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null } | null } | null };
+export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null, passwordEntryInfo?: string | null } | null } | null };
 
 
 export const GetGarments = gql`
@@ -11412,6 +11416,7 @@ export const GetGlobalSettings = gql`
       passwordConfig
       legalAndRightsContent
       publicDomainTextContent
+      passwordEntryInfo
     }
   }
 }

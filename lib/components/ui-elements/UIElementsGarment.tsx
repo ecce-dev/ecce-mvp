@@ -494,6 +494,7 @@ function createModeConfig(
 interface UIElementsGarmentProps {
   mode: ViewMode
   legalRightsContent: string | null
+  passwordEntryInfo: string | null
 }
 
 /**
@@ -505,7 +506,7 @@ interface UIElementsGarmentProps {
  * - Top Right: Mode switch (Public/Research)
  * - Device-specific layouts for mobile, tablet, and desktop
  */
-export default function UIElementsGarment({ mode, legalRightsContent }: UIElementsGarmentProps) {
+export default function UIElementsGarment({ mode, legalRightsContent, passwordEntryInfo }: UIElementsGarmentProps) {
   const {
     selectedGarment,
     deselectGarment,
@@ -577,7 +578,7 @@ export default function UIElementsGarment({ mode, legalRightsContent }: UIElemen
   return (
     <>
       {/* Login Modal - only shown in public mode */}
-      {config.showLoginModal && <LoginModal />}
+      {config.showLoginModal && <LoginModal passwordEntryInfo={passwordEntryInfo} />}
       
       <LegalRightsContent content={legalRightsContent ?? null} />
 

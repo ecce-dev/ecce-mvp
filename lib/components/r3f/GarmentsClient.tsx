@@ -15,6 +15,7 @@ import { useEcceDialog } from "@/lib/components/ecce-elements/EcceDialogContext"
 import { useSpring, animated } from "@react-spring/web";
 import { LegalRightsToggle } from "../ui-elements/LegalRightsToggle";
 import Background from "../shared/Background";
+import { GarmentCopyrightToggle } from "../ui-elements/GarmentCopyrightToggle";
 
 interface GarmentsCanvasProps {
   onLoadingStateChange?: (isLoading: boolean) => void;
@@ -128,16 +129,17 @@ export default function GarmentsClient() {
       {/* Auto-refresh countdown indicator - show when data is loaded, even if models are still loading */}
       {!isDataLoading && (
         <>
-          {selectedGarment ? null : (
+          {/* {selectedGarment ? null : (
             <CountdownProgress
               onComplete={handleAutoRefresh}
               resetTrigger={0}
               isPaused={isDataLoading || isModelsLoading}
             />
-          )}
+          )} */}
           <animated.div style={opacitySpring}>
             <ThemeToggle />
             <LegalRightsToggle />
+            <GarmentCopyrightToggle />
           </animated.div>
         </>
       )}

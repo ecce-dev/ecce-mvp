@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, useTransition, useMemo, useRef, type ReactNode } from "react";
 import { useDevice, type DeviceType } from "@/lib/hooks/useDevice";
-import { getRandomGarments, type GarmentNode } from "@/lib/actions/getGarments";
+import { getRandomGarments, getGarmentsBySlugs, type GarmentNode } from "@/lib/actions/getGarments";
 
 /** Number of garments to display per device type */
 const GARMENT_COUNT_BY_DEVICE: Record<DeviceType, number> = {
@@ -30,6 +30,8 @@ interface GarmentsContextValue {
   garmentCount: number;
   /** Refresh garments with new random selection, returns tracking data for analytics */
   refreshGarments: () => Promise<{ previous: GarmentTrackingData[]; current: GarmentTrackingData[] }>;
+  /** Re-fetch the same garments (e.g. after login to get private fields) */
+  reloadGarments: () => Promise<GarmentNode[]>;
 }
 
 const GarmentsContext = createContext<GarmentsContextValue | null>(null);
@@ -168,6 +170,17 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
   }, [fetchGarments, targetCount]);
 
   /**
+   * Re-fetch the same garments by their slugs
+   * Used after login/logout to get updated field visibility
+   */
+  const reloadGarments = useCallback(async (): Promise<GarmentNode[]> => {
+    const currentSlugs = extractSlugs(garments);
+    const reloaded = await getGarmentsBySlugs(currentSlugs);
+    setGarments(reloaded);
+    return reloaded;
+  }, [garments]);
+
+  /**
    * Adjust garment count when device type changes
    * Only runs after initial hydration to prevent SSR mismatch
    * Note: Device change doesn't update shown memory as it's not user-initiated
@@ -180,8 +193,11 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
     }
 
     // Adjust garments if count differs from target
-    if (garments.length !== targetCount) {
-      // Don't exclude or update memory on device change - just adjust count
+    if (garments.length > targetCount) {
+      // Too many garments - slice to preserve existing garments (especially URL-linked ones at index 0)
+      setGarments(garments.slice(0, targetCount));
+    } else if (garments.length < targetCount) {
+      // Too few garments - fetch more, don't exclude or update memory on device change
       fetchGarments(targetCount, [], false);
     }
   }, [targetCount, isInitialized, garments.length, fetchGarments]);
@@ -193,7 +209,8 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
     deviceType,
     garmentCount: targetCount,
     refreshGarments,
-  }), [garments, previousGarments, isPending, deviceType, targetCount, refreshGarments]);
+    reloadGarments,
+  }), [garments, previousGarments, isPending, deviceType, targetCount, refreshGarments, reloadGarments]);
 
   return (
     <GarmentsContext.Provider value={contextValue}>

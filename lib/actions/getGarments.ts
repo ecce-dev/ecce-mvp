@@ -3,6 +3,7 @@
 import { GetGarmentsQuery, GetGarments } from "@/lib/gql/__generated__/graphql";
 import { graphQLQuery } from "@/lib/utils/graphql-query";
 import { unstable_cache } from "next/cache";
+import { cookies } from "next/headers";
 
 /** Fields to filter out from garmentFields when not in research mode */
 const privateFields = [
@@ -12,6 +13,9 @@ const privateFields = [
   'provenance',
   'construction'
 ] as const;
+
+/** Session cookie name (must match auth routes) */
+const SESSION_COOKIE_NAME = "ecce_session";
 
 /** Cache revalidation interval in seconds (5 minutes) */
 const CACHE_REVALIDATION_SECONDS = 300;
@@ -62,6 +66,28 @@ function filterPrivateFields(nodes: GarmentNode[], isResearchMode: boolean): Gar
 }
 
 /**
+ * Check if the current user has a valid session (research mode)
+ * Reads the ecce_session cookie and validates expiry
+ */
+async function isResearchMode(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
+
+    if (!sessionCookie?.value) {
+      return false;
+    }
+
+    const decoded = Buffer.from(sessionCookie.value, "base64").toString("utf-8");
+    const sessionData = JSON.parse(decoded);
+
+    return sessionData.expiresAt > Date.now();
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Fetches all garments from CMS with caching
  * Cache is revalidated every 5 minutes
  */
@@ -92,7 +118,7 @@ const fetchAllGarmentsCached = unstable_cache(
  * @deprecated Use getRandomGarments for display purposes
  */
 export async function getGarments(): Promise<GetGarmentsQuery | null> {
-  const isLoggedInResearchMode = true;
+  const isLoggedInResearchMode = await isResearchMode();
   const nodes = await fetchAllGarmentsCached();
   
   if (nodes.length === 0) {
@@ -130,7 +156,7 @@ export async function getRandomGarments(
   // Clamp count to valid range for safety
   const safeCount = Math.max(1, Math.min(10, Math.floor(count)));
   
-  const isLoggedInResearchMode = true;
+  const isLoggedInResearchMode = await isResearchMode();
   const allGarments = await fetchAllGarmentsCached();
   
   if (allGarments.length === 0) {
@@ -139,20 +165,25 @@ export async function getRandomGarments(
 
   // Filter private fields first
   const filteredGarments = filterPrivateFields(allGarments, isLoggedInResearchMode);
-  
+
+  // Exclude garments marked as excluded on homepage
+  const homepageGarments = filteredGarments.filter(
+    (garment) => !garment.garmentFields?.excludeOnHomepage
+  );
+
   // If we have fewer garments than requested, return all of them shuffled
-  if (filteredGarments.length <= safeCount) {
-    return secureShuffleArray(filteredGarments);
+  if (homepageGarments.length <= safeCount) {
+    return secureShuffleArray(homepageGarments);
   }
 
   // Create set for O(1) lookup of excluded slugs
   const excludeSet = new Set(excludeSlugs);
-  
+
   // Separate garments into available (not excluded) and excluded
   const availableGarments: GarmentNode[] = [];
   const excludedGarments: GarmentNode[] = [];
-  
-  for (const garment of filteredGarments) {
+
+  for (const garment of homepageGarments) {
     if (garment.slug && excludeSet.has(garment.slug)) {
       excludedGarments.push(garment);
     } else {
@@ -177,10 +208,47 @@ export async function getRandomGarments(
 }
 
 /**
+ * Get a single garment by slug (bypasses excludeOnHomepage filter)
+ * Used when a garment is directly linked via URL
+ */
+export async function getGarmentBySlug(slug: string): Promise<GarmentNode | null> {
+  const isLoggedInResearchMode = await isResearchMode();
+  const allGarments = await fetchAllGarmentsCached();
+  const garment = allGarments.find((g) => g.slug === slug);
+
+  if (!garment) {
+    return null;
+  }
+
+  const [filtered] = filterPrivateFields([garment], isLoggedInResearchMode);
+  return filtered ?? null;
+}
+
+/**
+ * Re-fetch garments by their slugs (e.g. after login to get private fields)
+ */
+export async function getGarmentsBySlugs(slugs: string[]): Promise<GarmentNode[]> {
+  const isLoggedInResearchMode = await isResearchMode();
+  const allGarments = await fetchAllGarmentsCached();
+
+  // Build lookup map for O(1) access
+  const garmentMap = new Map(allGarments.map((g) => [g.slug, g]));
+
+  // Preserve input order so carousel positions don't shift
+  const matched = slugs
+    .map((slug) => garmentMap.get(slug))
+    .filter((g): g is GarmentNode => g !== undefined);
+
+  return filterPrivateFields(matched, isLoggedInResearchMode);
+}
+
+/**
  * Get the total count of available garments
  * Useful for UI elements that need to know if more garments exist
  */
 export async function getGarmentsCount(): Promise<number> {
   const allGarments = await fetchAllGarmentsCached();
-  return allGarments.length;
+  return allGarments.filter(
+    (garment) => !garment.garmentFields?.excludeOnHomepage
+  ).length;
 }

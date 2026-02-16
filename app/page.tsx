@@ -28,13 +28,15 @@ const UIContentLoader = dynamic(
  * 
  * CRITICAL: Background is rendered FIRST and independently to ensure fast LCP
  */
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ garment?: string }> }) {
+  const { garment } = await searchParams;
+
   return (
     <>
       {/* Background renders FIRST - completely independent of any client components */}
       {/* This ensures it can render immediately without waiting for hydration or data */}
       {/* This is the LCP element and must render as fast as possible */}
-      
+
 
       {/* Page content wrapped in container - loads after Background */}
       {/* This is deferred and won't block the Background/LCP */}
@@ -42,7 +44,7 @@ export default function Home() {
       {/* Minimal fallback - no heavy components loaded */}
       <Suspense fallback={<GarmentsLoadingFallback>{null}</GarmentsLoadingFallback>}>
         <PageContainer>
-          <GarmentsDataLoader>
+          <GarmentsDataLoader garmentSlug={garment}>
             {/* Lazy load dialog wrapper and client components after data is ready */}
             <Suspense fallback={null}>
               <EcceDialogWrapper>

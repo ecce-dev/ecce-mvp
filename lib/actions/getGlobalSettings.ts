@@ -8,6 +8,7 @@ type ContactContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSett
 type LegalRightsContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['legalAndRightsContent'];
 type PublicDomainTextContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['publicDomainTextContent'];
 type PasswordConfig = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordConfig'];
+type PasswordEntryInfo = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordEntryInfo'];
 
 export async function getAboutContent(): Promise<AboutContent | null> {
   const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
@@ -81,4 +82,23 @@ export async function getPasswordConfig(): Promise<PasswordConfig | null> {
   }
 
   return result.globalSettingsPage.globalSettings.passwordConfig;
+}
+
+
+/**
+ * Fetches the password entry info from WordPress
+ * Returns HTML string with password entry info
+ */
+export async function getPasswordEntryInfo(): Promise<PasswordEntryInfo | null> {
+  const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
+    GetGlobalSettings,
+    null,
+    'getPasswordEntryInfo',
+  );
+
+  if (!result?.globalSettingsPage?.globalSettings) {
+    return null;
+  }
+
+  return result.globalSettingsPage.globalSettings.passwordEntryInfo;
 }

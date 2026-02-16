@@ -221,6 +221,11 @@ export const licensedTrigger = (
 }
 
 
+export const getLicenseContent = (publicDomain: boolean, rights: string, publicDomainTextContent: string) => {
+  return !publicDomain ? createHtmlContent(rights) : createHtmlContent(publicDomainTextContent)
+}
+
+
 // Version display element (no action, just displays content)
 export const versionElement = (version: string) => (
   version ? (

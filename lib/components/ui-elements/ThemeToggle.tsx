@@ -21,7 +21,7 @@ export function ThemeToggle() {
   const isDark = theme === "dark";
 
   return (
-    <div className="safe-area-content fixed bottom-40 right-6 md:bottom-4 md:right-6 z-50 flex items-center gap-2 rounded-full py-2">
+    <div className="safe-area-content fixed bottom-40 right-4 md:bottom-4 md:right-6 z-50 flex items-center gap-2 rounded-full py-2">
       {/* <span className="text-xs text-muted-foreground">Light</span> */}
       {/* <Switch
         checked={isDark}

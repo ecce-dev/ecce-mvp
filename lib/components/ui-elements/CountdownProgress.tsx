@@ -99,7 +99,7 @@ const CountdownProgressComponent = ({
     <animated.div 
       style={opacitySpring}
       className={cn(
-        "safe-area-content fixed bottom-52 md:bottom-6 right-7 left-auto md:left-6 flex gap-2 pointer-events-none z-100",
+        "safe-area-content fixed bottom-52 md:bottom-6 right-8 left-auto md:left-6 flex gap-2 pointer-events-none z-100",
         // "bottom-[180px]",
         className
       )}

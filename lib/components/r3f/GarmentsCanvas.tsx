@@ -12,6 +12,10 @@ import * as THREE from 'three';
 import { useDevice } from "../../hooks/useDevice";
 import { useAppModeStore } from "../../stores/appModeStore";
 
+/** Stable references to avoid R3F re-applying these on every re-render */
+const INITIAL_CAMERA_POSITION = new THREE.Vector3(0, -1, 19);
+const INITIAL_ORBIT_TARGET = new THREE.Vector3(0, 0, 0);
+
 interface GarmentsCanvasProps {
   /** Callback to notify parent of loading state changes */
   onLoadingStateChange?: (isLoading: boolean) => void;
@@ -82,7 +86,7 @@ export default function GarmentsCanvas({ onLoadingStateChange }: GarmentsCanvasP
     }
   }, [isAssetsLoading, progress]);
 
-  const shadowRadius = deviceType === 'desktop' ? 21 : deviceType === 'tablet' ? 15 : 8;
+  const shadowRadius = 21 // deviceType === 'desktop' ? 21 : deviceType === 'tablet' ? 15 : 8;
 
   // Select environment preset based on theme
   const environmentPreset = isDarkMode && DARK_MODE_EFFECTS.ENABLE_ENVIRONMENT_SWITCH
@@ -92,12 +96,12 @@ export default function GarmentsCanvas({ onLoadingStateChange }: GarmentsCanvasP
   return (
     <div className="fixed z-10 top-0 left-0 right-0 h-full w-full">
       <CanvasWrapper
-        initialCameraPosition={new THREE.Vector3(0, -1, 19)}
+        initialCameraPosition={INITIAL_CAMERA_POSITION}
         maxCameraDistance={42}
         minCameraDistance={4.2}
         controls={{
           orbitControls: {
-            target: new THREE.Vector3(0, 0, 0),
+            target: INITIAL_ORBIT_TARGET,
             dampingFactor: 0.05,
             panSpeed: 1,
             rotateSpeed: 1,
@@ -116,7 +120,7 @@ export default function GarmentsCanvas({ onLoadingStateChange }: GarmentsCanvasP
         />
         {/* Dark mode visual effects */}
         <DarkModeEffects isDarkMode={isDarkMode} />
-        {(!isDarkMode && !selectedGarment) && <ContactShadows scale={shadowRadius * 4} position={[0, -5, 0]} far={shadowRadius} blur={2} />}
+        {(!isDarkMode && !selectedGarment) && <ContactShadows scale={shadowRadius * 4} position={[0, deviceType === 'mobile' ? -8 : -5, 0]} far={shadowRadius} blur={2} />}
         {/* Delay rendering Garments to ensure page-ready mark happens first */}
         {shouldRenderGarments && <Garments garments={garments} />}
       </CanvasWrapper>

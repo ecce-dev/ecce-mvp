@@ -56,11 +56,73 @@ export default function Garment({
   // State updates in useFrame cause excessive re-renders and RSC payload requests
   // Using ref allows smooth animation without triggering React re-renders
   const currentOpacityRef = useRef(1);
+  // WeakMap stores original material properties so we can restore them when opacity returns to 1.
+  // This preserves the 3D artist's material setup (e.g. fur alpha, face culling, depth settings)
+  // while still allowing the opacity fade animation to work.
+  const originalMaterialStatesRef = useRef(new WeakMap<THREE.Material, {
+    transparent: boolean;
+    opacity: number;
+    side: THREE.Side;
+    depthTest: boolean;
+    depthWrite: boolean;
+    alphaTest: number;
+    visible: boolean;
+  }>());
 
   // Calculate target opacity based on selection state
   const targetOpacity = hasSelection
     ? (isSelected ? 1 : nonSelectedOpacity)
     : 1;
+
+  /** Save original material properties on first encounter (before any opacity animation) */
+  function captureOriginalMaterialState(material: THREE.Material) {
+    if (originalMaterialStatesRef.current.has(material)) return;
+    // if (!('opacity' in material)) return;
+    originalMaterialStatesRef.current.set(material, {
+      transparent: material.transparent,
+      opacity: material.opacity as number,
+      side: material.side,
+      depthTest: material.depthTest,
+      depthWrite: material.depthWrite,
+      alphaTest: material.alphaTest,
+      visible: material.visible,
+    });
+  }
+
+  /** Apply opacity during animation — only touches transparency-related properties */
+  function applyAnimatedOpacity(material: THREE.Material, opacity: number) {
+    if (!('opacity' in material)) return;
+    material.transparent = true;
+    (material as any).opacity = opacity;
+    material.visible = opacity > 0;
+    material.needsUpdate = true;
+  }
+
+  /** Restore all original material properties (called when opacity returns to 1) */
+  function restoreOriginalMaterialState(material: THREE.Material) {
+    const original = originalMaterialStatesRef.current.get(material);
+    if (!original) return;
+    material.transparent = original.transparent;
+    (material as any).opacity = original.opacity;
+    material.side = original.side;
+    material.depthTest = original.depthTest;
+    material.depthWrite = original.depthWrite;
+    material.alphaTest = original.alphaTest;
+    material.visible = original.visible;
+    material.needsUpdate = true;
+  }
+
+  // Capture original material states once after mount (before any opacity animation).
+  // Works because useGLTF is Suspense-based — by the time this effect fires,
+  // the GLB meshes are already committed to the scene graph.
+  useEffect(() => {
+    if (!meshGroupRef.current) return;
+    meshGroupRef.current.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material) {
+        captureOriginalMaterialState(child.material as THREE.Material);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Individual spin animation (pauses when orbit controls are dragging)
   useFrame((_, delta) => {
@@ -80,17 +142,10 @@ export default function Garment({
       );
       currentOpacityRef.current = newOpacity;
 
-      // Apply opacity directly to materials without triggering React re-renders
       if (meshGroupRef.current) {
         meshGroupRef.current.traverse((child) => {
           if (child instanceof THREE.Mesh && child.material) {
-            const material = child.material as THREE.Material;
-            if ('opacity' in material) {
-              material.transparent = true;
-              material.opacity = newOpacity;
-              material.needsUpdate = true;
-              material.visible = newOpacity > 0;
-            }
+            applyAnimatedOpacity(child.material as THREE.Material, newOpacity);
           }
         });
       }
@@ -100,12 +155,10 @@ export default function Garment({
       if (meshGroupRef.current) {
         meshGroupRef.current.traverse((child) => {
           if (child instanceof THREE.Mesh && child.material) {
-            const material = child.material as THREE.Material;
-            if ('opacity' in material) {
-              material.transparent = true;
-              material.opacity = targetOpacity;
-              material.needsUpdate = true;
-              material.visible = targetOpacity > 0;
+            if (targetOpacity === 1) {
+              restoreOriginalMaterialState(child.material as THREE.Material);
+            } else {
+              applyAnimatedOpacity(child.material as THREE.Material, targetOpacity);
             }
           }
         });

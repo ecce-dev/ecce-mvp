@@ -7,6 +7,16 @@ query getGlobalSettings {
       legalAndRightsContent
       publicDomainTextContent
       passwordEntryInfo
+      homepageBackgroundImage {
+        node {
+            altText
+            mediaItemUrl
+          }
+      }
+      homepageBackgroundImageText
+      homepageBackgroundImagePositioning
+      homepageBackgroundImagePositioningMobile
+      homepageBackgroundImageTheme
     }
   }
 }

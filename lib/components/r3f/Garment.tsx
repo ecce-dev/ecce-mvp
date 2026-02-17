@@ -235,7 +235,7 @@ export default function Garment({
       // onPointerLeave={handlePointerLeave}
       {...props}
     >
-      {showGarmentCopyright && <>
+      {showGarmentCopyright && !selectedGarment && <>
         <Html>
           <animated.div
             style={garmentCopyrightOpacitySpring}

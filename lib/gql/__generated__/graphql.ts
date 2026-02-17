@@ -2684,6 +2684,16 @@ export type GlobalSettings = AcfFieldGroup & AcfFieldGroupFields & GlobalSetting
    * @deprecated Use __typename instead
    */
   fieldGroupName?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImage?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImagePositioning?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImagePositioningMobile?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImageText?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImageTheme?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   legalAndRightsContent?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
@@ -2716,6 +2726,16 @@ export type GlobalSettings_Fields = {
    * @deprecated Use __typename instead
    */
   fieldGroupName?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImage?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImagePositioning?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImagePositioningMobile?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImageText?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  homepageBackgroundImageTheme?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   legalAndRightsContent?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;textarea&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
@@ -11365,7 +11385,7 @@ export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typena
 export type GetGlobalSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null, passwordEntryInfo?: string | null } | null } | null };
+export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null, passwordEntryInfo?: string | null, homepageBackgroundImageText?: string | null, homepageBackgroundImagePositioning?: string | null, homepageBackgroundImagePositioningMobile?: string | null, homepageBackgroundImageTheme?: string | null, homepageBackgroundImage?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null } | null };
 
 
 export const GetGarments = gql`
@@ -11417,6 +11437,16 @@ export const GetGlobalSettings = gql`
       legalAndRightsContent
       publicDomainTextContent
       passwordEntryInfo
+      homepageBackgroundImage {
+        node {
+          altText
+          mediaItemUrl
+        }
+      }
+      homepageBackgroundImageText
+      homepageBackgroundImagePositioning
+      homepageBackgroundImagePositioningMobile
+      homepageBackgroundImageTheme
     }
   }
 }

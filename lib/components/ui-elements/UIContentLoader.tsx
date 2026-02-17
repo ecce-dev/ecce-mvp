@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getAboutContent, getContactContent, getLegalRightsContent, getPasswordEntryInfo, getPublicDomainTextContent } from "@/lib/actions/getGlobalSettings"
+import { getAboutContent, getContactContent, getLegalRightsContent, getPasswordEntryInfo, getPublicDomainTextContent, getBackgroundImageData } from "@/lib/actions/getGlobalSettings"
 import UIElementsRouter from "./UIElementsRouter"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 
@@ -32,18 +32,20 @@ export default function UIContentLoader() {
   })
 
   const setPublicDomainTextContent = useAppModeStore((state) => state.setPublicDomainTextContent);
+  const setBackgroundImageData = useAppModeStore((state) => state.setBackgroundImageData);
 
   useEffect(() => {
     // Fetch content client-side after initial render (non-blocking)
     // Use requestIdleCallback to defer until browser is idle
     const fetchContent = async () => {
       try {
-        const [about, contact, legal, publicDomainTextContent, passwordEntryInfo] = await Promise.all([
+        const [about, contact, legal, publicDomainTextContent, passwordEntryInfo, backgroundImageData] = await Promise.all([
           getAboutContent(),
           getContactContent(),
           getLegalRightsContent(),
           getPublicDomainTextContent(),
           getPasswordEntryInfo(),
+          getBackgroundImageData(),
         ])
 
         setContent({
@@ -55,6 +57,8 @@ export default function UIContentLoader() {
         })
         // Public domain text is used for both licensedDialogContent as well as showing the license text on the garment model, hence storing it in the store
         setPublicDomainTextContent(publicDomainTextContent ?? "")
+        // Store background image data for the Background component and state machine
+        setBackgroundImageData(backgroundImageData)
       } catch (error) {
         console.error("Failed to fetch UI content:", error)
       }

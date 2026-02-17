@@ -10,6 +10,16 @@ type PublicDomainTextContent = NonNullable<NonNullable<GetGlobalSettingsQuery['g
 type PasswordConfig = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordConfig'];
 type PasswordEntryInfo = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordEntryInfo'];
 
+/** Background image data from WordPress global settings */
+export interface BackgroundImageData {
+  imageUrl: string | null
+  altText: string | null
+  text: string | null
+  positioning: string | null
+  positioningMobile: string | null
+  theme: "dark" | "light"
+}
+
 export async function getAboutContent(): Promise<AboutContent | null> {
   const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
     GetGlobalSettings,
@@ -101,4 +111,28 @@ export async function getPasswordEntryInfo(): Promise<PasswordEntryInfo | null> 
   }
 
   return result.globalSettingsPage.globalSettings.passwordEntryInfo;
+}
+
+/**
+ * Fetches all background image data from WordPress in a single call.
+ * Returns image URL, alt text, description text, positioning values, and theme preference.
+ */
+export async function getBackgroundImageData(): Promise<BackgroundImageData> {
+  const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
+    GetGlobalSettings,
+    null,
+    'getBackgroundImageData',
+  );
+
+  const settings = result?.globalSettingsPage?.globalSettings;
+  const themeValue = settings?.homepageBackgroundImageTheme;
+
+  return {
+    imageUrl: settings?.homepageBackgroundImage?.node?.mediaItemUrl ?? null,
+    altText: settings?.homepageBackgroundImage?.node?.altText ?? null,
+    text: settings?.homepageBackgroundImageText ?? null,
+    positioning: settings?.homepageBackgroundImagePositioning ?? null,
+    positioningMobile: settings?.homepageBackgroundImagePositioningMobile ?? null,
+    theme: themeValue === "light" ? "light" : "dark",
+  };
 }

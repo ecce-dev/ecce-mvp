@@ -8,12 +8,15 @@ import { useAppModeStore } from "@/lib/stores/appModeStore";
 
 export function LegalRightsToggle() {
   const { openDialogId } = useEcceDialog()
-  const { setShowGarmentCopyright } = useAppModeStore();
+  const { setShowGarmentCopyright, isDetailOverlayOpen } = useAppModeStore();
   return (
     // hidden on mobile because the animation mode has no effect when only one garment is loaded
     <div className="safe-area-content fixed bottom-48 right-4 md:bottom-12 md:right-6 z-50 md:flex items-center gap-2 rounded-full py-2">
       <EcceDialogTrigger
-        onClick={() => setShowGarmentCopyright(false)}
+        onClick={() => {
+          setShowGarmentCopyright(false)
+          if (isDetailOverlayOpen) useAppModeStore.setState({ isDetailOverlayOpen: false })
+        }}
         dialogId="legalRights"
         variant="primary"
         asChild={true}

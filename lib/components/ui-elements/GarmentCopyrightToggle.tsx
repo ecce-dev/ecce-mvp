@@ -4,7 +4,7 @@ import { CopyrightIcon } from "@phosphor-icons/react";
 import { useEcceDialog } from "../ecce-elements";
 
 export function GarmentCopyrightToggle() {
-  const { showGarmentCopyright, setShowGarmentCopyright } = useAppModeStore();
+  const { showGarmentCopyright, setShowGarmentCopyright, isDetailOverlayOpen } = useAppModeStore();
   const { closeDialog } = useEcceDialog()
   return (
     <div className="safe-area-content fixed bottom-56 right-4 md:bottom-20 md:right-6 z-50 flex items-center gap-2 rounded-full py-2">
@@ -12,6 +12,7 @@ export function GarmentCopyrightToggle() {
         onClick={() => {
           setShowGarmentCopyright(!showGarmentCopyright)
           closeDialog("legalRights")
+          if (isDetailOverlayOpen) useAppModeStore.setState({ isDetailOverlayOpen: false })
         }}
         className={cn(
           "pointer-events-auto bg-transparent border-0 p-0 m-0 text-base text-foreground leading-none"

@@ -16,6 +16,8 @@ import { useSpring, animated } from "@react-spring/web";
 import { LegalRightsToggle } from "../ui-elements/LegalRightsToggle";
 import Background from "../shared/Background";
 import { GarmentCopyrightToggle } from "../ui-elements/GarmentCopyrightToggle";
+import { ApertureToggle } from "../ui-elements/ApertureToggle";
+import { BackgroundImageDetailOverlay } from "../shared/BackgroundImageDetailOverlay";
 
 interface GarmentsCanvasProps {
   onLoadingStateChange?: (isLoading: boolean) => void;
@@ -138,9 +140,11 @@ export default function GarmentsClient() {
           )} */}
           <animated.div style={opacitySpring}>
             <ThemeToggle />
+            <ApertureToggle />
             <LegalRightsToggle />
             <GarmentCopyrightToggle />
           </animated.div>
+          <BackgroundImageDetailOverlay />
         </>
       )}
 

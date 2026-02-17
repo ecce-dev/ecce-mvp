@@ -2,6 +2,7 @@
 
 import { create } from "zustand"
 import { GarmentNode } from "@/lib/actions/getGarments"
+import type { BackgroundImageData } from "@/lib/actions/getGlobalSettings"
 
 /** User role based on password config keys */
 export type UserRole = "curator" | "designer" | "vc"
@@ -15,6 +16,22 @@ export type ViewMode = "public" | "research"
  * - 'carousel': Camera stays fixed, carousel rotates to bring garment to camera
  */
 export type SelectionAnimationMode = "camera" | "carousel"
+
+/**
+ * Background mode state machine:
+ * - 'backgroundImage': Full-screen blurred background image with logo, UI themed per CMS
+ * - 'light': Standard light mode, no background image
+ * - 'dark': Standard dark mode, no background image
+ * 
+ * Transitions:
+ *   backgroundImage --[theme toggle]--> dark
+ *   backgroundImage --[aperture toggle]--> toggles detail overlay (stays in backgroundImage)
+ *   light --[theme toggle]--> dark
+ *   light --[aperture toggle]--> backgroundImage
+ *   dark --[theme toggle]--> light
+ *   dark --[aperture toggle]--> backgroundImage
+ */
+export type BackgroundMode = "backgroundImage" | "light" | "dark"
 
 interface AppModeState {
   /** Currently selected garment, null if none */
@@ -37,6 +54,12 @@ interface AppModeState {
   publicDomainTextContent: string
   /** Whether to show the garment copyright */
   showGarmentCopyright: boolean
+  /** Current background mode (backgroundImage, light, or dark) */
+  backgroundMode: BackgroundMode
+  /** Whether the background image detail overlay is visible */
+  isDetailOverlayOpen: boolean
+  /** Background image data from WordPress CMS */
+  backgroundImageData: BackgroundImageData | null
 }
 
 interface AppModeActions {
@@ -66,6 +89,14 @@ interface AppModeActions {
   setPublicDomainTextContent: (content: string) => void
   /** Set whether to show the garment copyright */
   setShowGarmentCopyright: (show: boolean) => void
+  /** Handle aperture toggle: switches to backgroundImage mode or toggles detail overlay */
+  toggleAperture: () => void
+  /** Handle theme toggle: cycles between backgroundImage -> dark, light <-> dark */
+  toggleTheme: () => void
+  /** Set background image data from CMS */
+  setBackgroundImageData: (data: BackgroundImageData) => void
+  /** Set the background mode directly (used during initialization) */
+  setBackgroundMode: (mode: BackgroundMode) => void
 }
 
 type AppModeStore = AppModeState & AppModeActions
@@ -123,6 +154,9 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   submitRequestMessage: null,
   publicDomainTextContent: "",
   showGarmentCopyright: false,
+  backgroundMode: "backgroundImage",
+  isDetailOverlayOpen: false,
+  backgroundImageData: null,
 
   // Actions
   selectGarment: (garment) => {
@@ -130,7 +164,7 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
     // Default to public mode when selecting, unless authenticated
     const effectiveMode = isAuthenticated ? viewMode : "public"
     
-    set({ selectedGarment: garment, viewMode: effectiveMode })
+    set({ selectedGarment: garment, viewMode: effectiveMode, isDetailOverlayOpen: false })
     updateUrlParams(garment.slug ?? null, effectiveMode)
     // Reset dialog param when selecting a new garment
     clearDialogUrlParam()
@@ -233,5 +267,38 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   },
   setShowGarmentCopyright: (show) => {
     set({ showGarmentCopyright: show })
+  },
+
+  toggleAperture: () => {
+    const { backgroundMode, isDetailOverlayOpen } = get()
+    if (backgroundMode === "backgroundImage") {
+      // In backgroundImage mode: toggle the detail overlay
+      set({ isDetailOverlayOpen: !isDetailOverlayOpen })
+    } else {
+      // In light or dark mode: switch to backgroundImage mode
+      set({ backgroundMode: "backgroundImage", isDetailOverlayOpen: false })
+    }
+  },
+
+  toggleTheme: () => {
+    const { backgroundMode, backgroundImageData } = get()
+    if (backgroundMode === "backgroundImage") {
+      // From backgroundImage: go to the opposite theme of the background image
+      set({ backgroundMode: backgroundImageData?.theme === "dark" ? "light" : "dark", isDetailOverlayOpen: false })
+    } else if (backgroundMode === "dark") {
+      // From dark: go to light
+      set({ backgroundMode: "light" })
+    } else {
+      // From light: go to dark
+      set({ backgroundMode: "dark" })
+    }
+  },
+
+  setBackgroundImageData: (data) => {
+    set({ backgroundImageData: data })
+  },
+
+  setBackgroundMode: (mode) => {
+    set({ backgroundMode: mode, isDetailOverlayOpen: false })
   },
 }))

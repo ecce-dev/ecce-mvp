@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils/utils";
 import { ApertureIcon } from "@phosphor-icons/react";
 
 export function ApertureToggle() {
-  const { backgroundMode, isDetailOverlayOpen, showGarmentCopyright, selectedGarment, toggleAperture, setShowGarmentCopyright } = useAppModeStore();
+  const { backgroundMode, isDetailOverlayOpen, showGarmentCopyright, selectedGarment, toggleAperture, setShowGarmentCopyright, backgroundImageData } = useAppModeStore();
   const { closeDialog } = useEcceDialog();
 
   // Hide aperture toggle when a garment is selected (encounter/engage mode)
-  if (selectedGarment) return null;
+  if (selectedGarment || !backgroundImageData?.imageUrl) return null;
 
   const isActive = backgroundMode === "backgroundImage" && isDetailOverlayOpen;
 

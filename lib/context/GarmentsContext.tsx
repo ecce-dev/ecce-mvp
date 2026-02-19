@@ -96,38 +96,40 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
   /**
    * Fetch new random garments from server, excluding all previously shown garments
    * Uses React transition for non-blocking updates
-   * 
+   *
    * Memory behavior (deck shuffle without replacement):
    * - Excludes all garments that have been shown since last reset
    * - When new garments include already-shown ones, the deck has cycled through
    * - Memory resets to only the new garments when a cycle is detected
-   * 
+   *
    * @param count - Number of garments to fetch
-   * @param excludeSlugs - All slugs to exclude from selection
+   * @param excludeSlugs - All slugs to exclude from selection (soft constraint)
+   * @param currentSlugs - Slugs currently on screen (hard constraint — never returned)
    * @param shouldUpdateMemory - Whether to update shown garments memory (false for device changes)
    * @returns Promise with previous and current tracking data
    */
   const fetchGarments = useCallback(async (
     count: number,
     excludeSlugs: string[] = [],
+    currentSlugs: string[] = [],
     shouldUpdateMemory: boolean = true
   ): Promise<{ previous: GarmentTrackingData[]; current: GarmentTrackingData[] }> => {
     // Capture previous state before transition
     const previousTrackingData = extractTrackingData(garments);
-    
+
     return new Promise((resolve) => {
       startTransition(async () => {
         try {
-          const newGarments = await getRandomGarments(count, excludeSlugs);
+          const newGarments = await getRandomGarments(count, excludeSlugs, currentSlugs);
           const newSlugs = extractSlugs(newGarments);
-          
+
           setGarments(newGarments);
           setPreviousGarments(previousTrackingData);
-          
+
           // Update memory if this is a user-initiated refresh
           if (shouldUpdateMemory) {
             const currentShown = shownSlugsRef.current;
-            
+
             // Check if any new garments were already shown (cycle completed)
             if (hasOverlap(newSlugs, currentShown)) {
               // Reset memory - start fresh with only the new garments
@@ -137,7 +139,7 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
               newSlugs.forEach((slug) => currentShown.add(slug));
             }
           }
-          
+
           resolve({
             previous: previousTrackingData,
             current: extractTrackingData(newGarments),
@@ -166,8 +168,10 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
   const refreshGarments = useCallback(async (): Promise<{ previous: GarmentTrackingData[]; current: GarmentTrackingData[] }> => {
     // Convert Set to array for the server action
     const excludeSlugs = Array.from(shownSlugsRef.current);
-    return fetchGarments(targetCount, excludeSlugs, true);
-  }, [fetchGarments, targetCount]);
+    // Pass currently displayed slugs as hard exclusion so the server never returns them
+    const currentSlugs = extractSlugs(garments);
+    return fetchGarments(targetCount, excludeSlugs, currentSlugs, true);
+  }, [fetchGarments, targetCount, garments]);
 
   /**
    * Re-fetch the same garments by their slugs
@@ -195,10 +199,14 @@ export function GarmentsProvider({ children, initialGarments }: GarmentsProvider
     // Adjust garments if count differs from target
     if (garments.length > targetCount) {
       // Too many garments - slice to preserve existing garments (especially URL-linked ones at index 0)
-      setGarments(garments.slice(0, targetCount));
+      const sliced = garments.slice(0, targetCount);
+      setGarments(sliced);
+      // Reset shown memory to only the actually displayed garments
+      // Without this, SSR garments that were never shown on mobile pollute the exclusion list
+      shownSlugsRef.current = new Set(extractSlugs(sliced));
     } else if (garments.length < targetCount) {
       // Too few garments - fetch more, don't exclude or update memory on device change
-      fetchGarments(targetCount, [], false);
+      fetchGarments(targetCount, [], [], false);
     }
   }, [targetCount, isInitialized, garments.length, fetchGarments]);
 

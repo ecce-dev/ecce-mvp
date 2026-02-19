@@ -136,29 +136,31 @@ export async function getGarments(): Promise<GetGarmentsQuery | null> {
 
 /**
  * Get random garments for display
- * 
+ *
  * @param count - Number of garments to return (1-10, clamped for safety)
- * @param excludeSlugs - Optional array of garment slugs to exclude from selection
+ * @param excludeSlugs - Optional array of garment slugs to exclude from selection (soft: relaxed when deck is exhausted)
+ * @param currentSlugs - Slugs currently displayed on screen (hard: never returned unless no other option)
  * @returns Array of randomly selected garment nodes
- * 
+ *
  * Security: Uses cryptographically secure randomization
  * Performance: Leverages cached garment list, only shuffles on each call
- * 
- * Exclusion logic:
- * - First tries to select only from non-excluded garments
- * - If not enough non-excluded garments available, fills remaining slots
- *   with shuffled excluded garments to reach the requested count
+ *
+ * Three-tier selection:
+ * 1. Fresh garments (not in excludeSlugs or currentSlugs) — preferred
+ * 2. History garments (in excludeSlugs but not currentSlugs) — used when fresh pool is exhausted
+ * 3. Current garments (in currentSlugs) — only as absolute last resort
  */
 export async function getRandomGarments(
   count: number,
-  excludeSlugs: string[] = []
+  excludeSlugs: string[] = [],
+  currentSlugs: string[] = []
 ): Promise<GarmentNode[]> {
   // Clamp count to valid range for safety
   const safeCount = Math.max(1, Math.min(10, Math.floor(count)));
-  
+
   const isLoggedInResearchMode = await isResearchMode();
   const allGarments = await fetchAllGarmentsCached();
-  
+
   if (allGarments.length === 0) {
     return [];
   }
@@ -176,32 +178,43 @@ export async function getRandomGarments(
     return secureShuffleArray(homepageGarments);
   }
 
-  // Create set for O(1) lookup of excluded slugs
+  // Create sets for O(1) lookup
+  const currentSet = new Set(currentSlugs);
   const excludeSet = new Set(excludeSlugs);
 
-  // Separate garments into available (not excluded) and excluded
-  const availableGarments: GarmentNode[] = [];
-  const excludedGarments: GarmentNode[] = [];
+  // Three-tier separation: fresh > history > current
+  const freshGarments: GarmentNode[] = [];
+  const historyGarments: GarmentNode[] = [];
+  const currentGarments: GarmentNode[] = [];
 
   for (const garment of homepageGarments) {
-    if (garment.slug && excludeSet.has(garment.slug)) {
-      excludedGarments.push(garment);
+    if (garment.slug && currentSet.has(garment.slug)) {
+      currentGarments.push(garment);
+    } else if (garment.slug && excludeSet.has(garment.slug)) {
+      historyGarments.push(garment);
     } else {
-      availableGarments.push(garment);
+      freshGarments.push(garment);
     }
   }
 
-  // Shuffle both arrays
-  const shuffledAvailable = secureShuffleArray(availableGarments);
-  const shuffledExcluded = secureShuffleArray(excludedGarments);
+  // Shuffle all tiers
+  const shuffledFresh = secureShuffleArray(freshGarments);
+  const shuffledHistory = secureShuffleArray(historyGarments);
+  const shuffledCurrent = secureShuffleArray(currentGarments);
 
-  // Take as many as possible from available garments
-  const result: GarmentNode[] = shuffledAvailable.slice(0, safeCount);
+  // Fill from fresh first
+  const result: GarmentNode[] = shuffledFresh.slice(0, safeCount);
 
-  // If we don't have enough, fill from excluded garments
+  // Then from history (seen before, but not currently on screen)
   if (result.length < safeCount) {
     const remaining = safeCount - result.length;
-    result.push(...shuffledExcluded.slice(0, remaining));
+    result.push(...shuffledHistory.slice(0, remaining));
+  }
+
+  // Last resort: currently displayed garments (only if fewer total garments than requested)
+  if (result.length < safeCount) {
+    const remaining = safeCount - result.length;
+    result.push(...shuffledCurrent.slice(0, remaining));
   }
 
   return result;

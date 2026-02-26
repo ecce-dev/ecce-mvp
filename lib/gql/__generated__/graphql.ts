@@ -2660,6 +2660,10 @@ export type GeneralSettings = {
   email?: Maybe<Scalars['String']['output']>;
   /** WordPress locale code. */
   language?: Maybe<Scalars['String']['output']>;
+  /** The media item representing the site icon configured in site settings, used as the site&#039;s favicon and app icon. */
+  siteIcon?: Maybe<GeneralSettingsToMediaItemConnectionEdge>;
+  /** Site icon URL configured in site settings, used as the site&#039;s favicon and app icon. */
+  siteIconUrl?: Maybe<Scalars['String']['output']>;
   /** A day number of the week that the week should start on. */
   startOfWeek?: Maybe<Scalars['Int']['output']>;
   /** A time format for all time strings. */
@@ -2670,6 +2674,21 @@ export type GeneralSettings = {
   title?: Maybe<Scalars['String']['output']>;
   /** Site URL. */
   url?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** The general setting type */
+export type GeneralSettingsSiteIconUrlArgs = {
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Connection between the GeneralSettings type and the MediaItem type */
+export type GeneralSettingsToMediaItemConnectionEdge = Edge & MediaItemConnectionEdge & OneToOneConnection & {
+  __typename?: 'GeneralSettingsToMediaItemConnectionEdge';
+  /** Opaque reference to the nodes position in the connection. Value can be used with pagination args. */
+  cursor?: Maybe<Scalars['String']['output']>;
+  /** The node of the connection, without the edges */
+  node: MediaItem;
 };
 
 /** The &quot;GlobalSettings&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
@@ -2686,7 +2705,7 @@ export type GlobalSettings = AcfFieldGroup & AcfFieldGroupFields & GlobalSetting
   fieldGroupName?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   homepageBackgroundImage?: Maybe<AcfMediaItemConnectionEdge>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  /** See instructions in documentation. */
   homepageBackgroundImagePositioning?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   homepageBackgroundImagePositioningMobile?: Maybe<Scalars['String']['output']>;
@@ -2728,7 +2747,7 @@ export type GlobalSettings_Fields = {
   fieldGroupName?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   homepageBackgroundImage?: Maybe<AcfMediaItemConnectionEdge>;
-  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  /** See instructions in documentation. */
   homepageBackgroundImagePositioning?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   homepageBackgroundImagePositioningMobile?: Maybe<Scalars['String']['output']>;
@@ -10510,6 +10529,8 @@ export type UpdateUserPayload = {
 /** A registered user account. Users can be assigned roles, author content, and have various capabilities within the site. */
 export type User = Commenter & DatabaseIdentifier & Node & UniformResourceIdentifiable & {
   __typename?: 'User';
+  /** The admin color scheme preference for the user. Possible values include &quot;fresh&quot;, &quot;light&quot;, &quot;blue&quot;, &quot;coffee&quot;, &quot;ectoplasm&quot;, &quot;midnight&quot;, &quot;ocean&quot;, &quot;sunrise&quot;. Default is &quot;fresh&quot;. */
+  adminColor?: Maybe<Scalars['String']['output']>;
   /** Avatar object for user. The avatar object can be retrieved in different sizes by specifying the size argument. */
   avatar?: Maybe<Avatar>;
   /** User metadata option name. Usually it will be &quot;wp_capabilities&quot;. */
@@ -10532,6 +10553,12 @@ export type User = Commenter & DatabaseIdentifier & Node & UniformResourceIdenti
   extraCapabilities?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   /** First name of the user. This is equivalent to the WP_User-&gt;user_first_name property. */
   firstName?: Maybe<Scalars['String']['output']>;
+  /** Whether the user has enabled keyboard shortcuts for comment moderation. Defaults to false. */
+  hasCommentShortcutsEnabled?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether the user has enabled the visual editor. When enabled, the WYSIWYG editor is used for content editing. Defaults to true. */
+  hasRichEditingEnabled?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether the user has enabled syntax highlighting when editing code within the post editor. Defaults to true. */
+  hasSyntaxHighlightingEnabled?: Maybe<Scalars['Boolean']['output']>;
   /** The globally unique identifier for the user object. */
   id: Scalars['ID']['output'];
   /** Whether the node is a Comment */

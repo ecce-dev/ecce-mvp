@@ -36,7 +36,7 @@ export default function Background() {
           <img
             src={backgroundImageData.imageUrl!}
             alt={backgroundImageData.altText ?? ""}
-            className="h-full w-full object-cover blur-lg scale-105"
+            className="h-full w-full object-cover blur-lg scale-115"
             style={{ objectPosition: effectivePosition }}
             aria-hidden="true"
           />

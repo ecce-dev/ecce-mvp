@@ -19,13 +19,27 @@ import { useAppModeStore, type UserRole } from "@/lib/stores/appModeStore"
 import { useGarments } from "@/lib/context/GarmentsContext"
 import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react"
 import TurnstileWidget from "../util/TurnstileWidget"
+import { trackEngageLoginEmail } from "@/lib/analytics/tracking"
 
 /**
  * Form validation schema
  */
-const loginFormSchema = z.object({
-  password: z.string().min(1, "Password is required"),
-})
+const isPasswordAuthEnabled = process.env.NEXT_PUBLIC_ENABLE_PASSWORD_AUTH === "true"
+
+const loginFormSchema = z
+  .object({
+    email: z.string().trim().pipe(z.email("Please enter a valid email address")),
+    password: z.string(),
+  })
+  .superRefine((values, context) => {
+    if (isPasswordAuthEnabled && values.password.trim().length === 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["password"],
+        message: "Password is required",
+      })
+    }
+  })
 
 type LoginFormValues = z.infer<typeof loginFormSchema>
 
@@ -33,8 +47,8 @@ type LoginFormValues = z.infer<typeof loginFormSchema>
  * Login modal for research mode authentication
  * 
  * Uses React Hook Form with Zod validation
- * Validates password against WordPress config via API route
- * Sets HttpOnly session cookie on successful login
+ * Active flow: validates email and grants immediate access.
+ * Legacy flow (feature-flagged): validates password via API route.
  */
 export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: string | null }) {
   const {
@@ -48,17 +62,22 @@ export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: s
   const { reloadGarments } = useGarments()
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [isPasswordEntryInfoOpen, setIsPasswordEntryInfoOpen] = useState(false)
+  const [isPasswordEntryInfoOpen, setIsPasswordEntryInfoOpen] = useState(true)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
+      email: "",
       password: "",
     },
   })
 
   const loginMutation = useMutation({
     mutationFn: async (values: LoginFormValues) => {
+      if (!isPasswordAuthEnabled) {
+        return { success: true, role: null as UserRole | null }
+      }
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -73,10 +92,14 @@ export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: s
         throw new Error(data.error || "Authentication failed")
       }
 
-      return data
+      return { success: true, role: data.role as UserRole | null }
     },
-    onSuccess: async (data) => {
-      setAuthenticated(true, data.role as UserRole)
+    onSuccess: async (data, values) => {
+      if (!isPasswordAuthEnabled) {
+        trackEngageLoginEmail(values.email.trim())
+      }
+
+      setAuthenticated(true, data.role)
       setViewMode("research")
       form.reset()
       setLoginModalOpen(false)
@@ -144,31 +167,33 @@ export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: s
               >
                 <FormField
                   control={form.control}
-                  name="password"
+                  name={isPasswordAuthEnabled ? "password" : "email"}
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
                         <div className="relative w-full">
                           <Input
-                            type={isPasswordVisible ? "text" : "password"}
-                            placeholder="Enter password..."
+                            type={isPasswordAuthEnabled ? (isPasswordVisible ? "text" : "password") : "email"}
+                            placeholder={isPasswordAuthEnabled ? "Enter password..." : "Enter email..."}
                             className="w-full rounded-none border-foreground text-foreground placeholder:text-foreground bg-background/70 shadow-none h-12 pr-12"
                             autoFocus
                             disabled={loginMutation.isPending}
                             {...field}
                           />
-                          <button
-                            type="button"
-                            onClick={() => setIsPasswordVisible((prev) => !prev)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground hover:text-foreground/70 transition-colors"
-                            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
-                          >
-                            {isPasswordVisible ? (
-                              <EyeSlashIcon size={20} weight="regular" />
-                            ) : (
-                              <EyeIcon size={20} weight="regular" />
-                            )}
-                          </button>
+                          {isPasswordAuthEnabled && (
+                            <button
+                              type="button"
+                              onClick={() => setIsPasswordVisible((prev) => !prev)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground hover:text-foreground/70 transition-colors"
+                              aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                            >
+                              {isPasswordVisible ? (
+                                <EyeSlashIcon size={20} weight="regular" />
+                              ) : (
+                                <EyeIcon size={20} weight="regular" />
+                              )}
+                            </button>
+                          )}
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -198,7 +223,7 @@ export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: s
               </form>
             </Form>
           </div>
-          <div className="flex w-full justify-end">
+          {/* <div className="flex w-full justify-end">
             <Button
               variant="ecceSecondary"
               className="w-[100px]"
@@ -208,10 +233,10 @@ export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: s
                 INFO
               </span>
             </Button>
-          </div>
+          </div> */}
           <animated.div
             style={passwordInfoSpring}
-            className="wpAcfWysiwyg mt-2 font-zangezi w-full text-sm bg-background/70 border border-foreground p-8 overflow-y-auto w-full"
+            className="wpAcfWysiwyg font-zangezi w-full text-sm bg-background/70 border border-foreground p-8 overflow-y-auto w-full"
             dangerouslySetInnerHTML={{ __html: passwordEntryInfo ?? "" }}
           />
         </animated.div>

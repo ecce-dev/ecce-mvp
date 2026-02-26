@@ -161,6 +161,14 @@ interface RequestSubmittedProperties {
 }
 
 /**
+ * Properties for engage_login_email event
+ */
+interface EngageLoginEmailProperties {
+  engage_login_email: string
+  source: "login_modal"
+}
+
+/**
  * Track when a user submits a request through the Submit Request dialog
  * 
  * @param message - The request message content
@@ -174,6 +182,20 @@ export function trackRequestSubmitted(message: string): void {
   }
   
   postHogCapture("request_submitted", properties)
+}
+
+/**
+ * Track submitted email for login engagement
+ *
+ * @param email - Email entered in login modal
+ */
+export function trackEngageLoginEmail(email: string): void {
+  const properties: EngageLoginEmailProperties = {
+    engage_login_email: email,
+    source: "login_modal",
+  }
+
+  postHogCapture("engage_login_email", properties)
 }
 
 // ============================================

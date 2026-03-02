@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useSpring, animated } from "@react-spring/web";
 import { useAppModeStore } from "@/lib/stores/appModeStore";
 import { useDevice } from "@/lib/hooks/useDevice";
+import { MusicNotesAnimated } from "../icons/MusicNotesAnimated";
 
 /**
  * Background component that handles two visual layers:
@@ -15,8 +17,12 @@ import { useDevice } from "@/lib/hooks/useDevice";
  * The logo sits on top of the blurred image via z-index layering.
  */
 export default function Background() {
-  const { backgroundMode, backgroundImageData, selectedGarment } = useAppModeStore();
+  const { backgroundMode, backgroundImageData, selectedGarment, currentSong, isMusicPlaying } = useAppModeStore();
   const { deviceType } = useDevice();
+  const nowPlayingSpring = useSpring({
+    opacity: isMusicPlaying ? 1 : 0,
+    config: { tension: 210, friction: 26 },
+  });
 
   // No background image when a garment is selected (encounter/engage mode)
   const showBackgroundImage =
@@ -67,6 +73,20 @@ export default function Background() {
           className="hidden dark:block"
         />
       </div>
+      {currentSong && (
+        <animated.div
+          style={nowPlayingSpring}
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-2 max-w-screen w-full text-center flex items-center justify-center gap-2"
+          aria-hidden={!isMusicPlaying}
+        >
+          <MusicNotesAnimated size={16} className="translate-y-0.5" />
+          <p className="text-center text-xs z-10">
+            {currentSong.artist ? `${currentSong.artist} - ` : ""}
+            {currentSong.title ?? "Untitled"}
+          </p>
+          <MusicNotesAnimated size={16} className="translate-y-0.5" />
+        </animated.div>
+      )}
     </div>
   );
 }

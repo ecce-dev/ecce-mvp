@@ -305,4 +305,25 @@
         hue-rotate(360deg) saturate(1.2) brightness(1.1);
     }
   }
+
+  @keyframes nowPlayingPulse {
+    0%, 100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .now-playing-pulse {
+    animation: nowPlayingPulse 2.8s ease-in-out infinite;
+    will-change: opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .now-playing-pulse {
+      animation: none;
+      opacity: 1;
+    }
+  }
 }

@@ -9,14 +9,23 @@ query getGlobalSettings {
       passwordEntryInfo
       homepageBackgroundImage {
         node {
-            altText
-            mediaItemUrl
-          }
+          altText
+          mediaItemUrl
+        }
       }
       homepageBackgroundImageText
       homepageBackgroundImagePositioning
       homepageBackgroundImagePositioningMobile
       homepageBackgroundImageTheme
+      songsList {
+        artist
+        fileMp3 {
+          node {
+            mediaItemUrl
+          }
+        }
+        title
+      }
     }
   }
 }

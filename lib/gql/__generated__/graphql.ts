@@ -2721,6 +2721,8 @@ export type GlobalSettings = AcfFieldGroup & AcfFieldGroupFields & GlobalSetting
   passwordEntryInfo?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   publicDomainTextContent?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  songsList?: Maybe<Array<Maybe<GlobalSettingsSongsList>>>;
 };
 
 export type GlobalSettingsPage = AcfOptionsPage & Node & WithAcfGlobalSettings & {
@@ -2732,6 +2734,37 @@ export type GlobalSettingsPage = AcfOptionsPage & Node & WithAcfGlobalSettings &
   menuTitle?: Maybe<Scalars['String']['output']>;
   pageTitle?: Maybe<Scalars['String']['output']>;
   parentId?: Maybe<Scalars['String']['output']>;
+};
+
+/** The &quot;GlobalSettingsSongsList&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;. */
+export type GlobalSettingsSongsList = AcfFieldGroup & AcfFieldGroupFields & GlobalSettingsSongsList_Fields & {
+  __typename?: 'GlobalSettingsSongsList';
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettingsSongsList&quot; Field Group */
+  artist?: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  fieldGroupName?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GlobalSettingsSongsList&quot; Field Group */
+  fileMp3?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettingsSongsList&quot; Field Group */
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+/** Interface representing fields of the ACF &quot;GlobalSettingsSongsList&quot; Field Group */
+export type GlobalSettingsSongsList_Fields = {
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettingsSongsList&quot; Field Group */
+  artist?: Maybe<Scalars['String']['output']>;
+  /**
+   * The name of the field group
+   * @deprecated Use __typename instead
+   */
+  fieldGroupName?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;file&quot; Field Type added to the schema as part of the &quot;GlobalSettingsSongsList&quot; Field Group */
+  fileMp3?: Maybe<AcfMediaItemConnectionEdge>;
+  /** Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;GlobalSettingsSongsList&quot; Field Group */
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 /** Interface representing fields of the ACF &quot;GlobalSettings&quot; Field Group */
@@ -2763,6 +2796,8 @@ export type GlobalSettings_Fields = {
   passwordEntryInfo?: Maybe<Scalars['String']['output']>;
   /** Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
   publicDomainTextContent?: Maybe<Scalars['String']['output']>;
+  /** Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;GlobalSettings&quot; Field Group */
+  songsList?: Maybe<Array<Maybe<GlobalSettingsSongsList>>>;
 };
 
 /** Saved GraphQL Documents */
@@ -11412,7 +11447,7 @@ export type GetGarmentsQuery = { __typename?: 'RootQuery', garments?: { __typena
 export type GetGlobalSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null, passwordEntryInfo?: string | null, homepageBackgroundImageText?: string | null, homepageBackgroundImagePositioning?: string | null, homepageBackgroundImagePositioningMobile?: string | null, homepageBackgroundImageTheme?: string | null, homepageBackgroundImage?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null } | null } | null };
+export type GetGlobalSettingsQuery = { __typename?: 'RootQuery', globalSettingsPage?: { __typename?: 'GlobalSettingsPage', globalSettings?: { __typename?: 'GlobalSettings', about?: string | null, contact?: string | null, passwordConfig?: string | null, legalAndRightsContent?: string | null, publicDomainTextContent?: string | null, passwordEntryInfo?: string | null, homepageBackgroundImageText?: string | null, homepageBackgroundImagePositioning?: string | null, homepageBackgroundImagePositioningMobile?: string | null, homepageBackgroundImageTheme?: string | null, homepageBackgroundImage?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', altText?: string | null, mediaItemUrl?: string | null } } | null, songsList?: Array<{ __typename?: 'GlobalSettingsSongsList', artist?: string | null, title?: string | null, fileMp3?: { __typename?: 'AcfMediaItemConnectionEdge', node: { __typename?: 'MediaItem', mediaItemUrl?: string | null } } | null } | null> | null } | null } | null };
 
 
 export const GetGarments = gql`
@@ -11474,6 +11509,15 @@ export const GetGlobalSettings = gql`
       homepageBackgroundImagePositioning
       homepageBackgroundImagePositioningMobile
       homepageBackgroundImageTheme
+      songsList {
+        artist
+        fileMp3 {
+          node {
+            mediaItemUrl
+          }
+        }
+        title
+      }
     }
   }
 }

@@ -9,6 +9,7 @@ type LegalRightsContent = NonNullable<NonNullable<GetGlobalSettingsQuery['global
 type PublicDomainTextContent = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['publicDomainTextContent'];
 type PasswordConfig = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordConfig'];
 type PasswordEntryInfo = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['passwordEntryInfo'];
+type SongsList = NonNullable<NonNullable<GetGlobalSettingsQuery['globalSettingsPage']>['globalSettings']>['songsList'];
 
 /** Background image data from WordPress global settings */
 export interface BackgroundImageData {
@@ -18,6 +19,12 @@ export interface BackgroundImageData {
   positioning: string | null
   positioningMobile: string | null
   theme: "dark" | "light"
+}
+
+export interface SongData {
+  title: string | null
+  artist: string | null
+  fileUrl: string
 }
 
 export async function getAboutContent(): Promise<AboutContent | null> {
@@ -135,4 +142,27 @@ export async function getBackgroundImageData(): Promise<BackgroundImageData> {
     positioningMobile: settings?.homepageBackgroundImagePositioningMobile ?? null,
     theme: themeValue === "light" ? "light" : "dark",
   };
+}
+
+export async function getSongsList(): Promise<SongData[]> {
+  const result = await graphQLQuery<GetGlobalSettingsQuery, null>(
+    GetGlobalSettings,
+    null,
+    'getSongsList',
+  );
+
+  const songs = (result?.globalSettingsPage?.globalSettings?.songsList ?? []) as SongsList;
+
+  return songs
+    .map((song) => {
+      const fileUrl = song?.fileMp3?.node?.mediaItemUrl ?? null;
+      if (!fileUrl) return null;
+
+      return {
+        title: song?.title ?? null,
+        artist: song?.artist ?? null,
+        fileUrl,
+      };
+    })
+    .filter((song): song is SongData => song !== null);
 }

@@ -2,7 +2,7 @@
 
 import { create } from "zustand"
 import { GarmentNode } from "@/lib/actions/getGarments"
-import type { BackgroundImageData } from "@/lib/actions/getGlobalSettings"
+import type { BackgroundImageData, SongData } from "@/lib/actions/getGlobalSettings"
 
 /** User role based on password config keys */
 export type UserRole = "curator" | "designer" | "vc"
@@ -60,6 +60,12 @@ interface AppModeState {
   isDetailOverlayOpen: boolean
   /** Background image data from WordPress CMS */
   backgroundImageData: BackgroundImageData | null
+  /** Song list from WordPress CMS */
+  songsList: SongData[]
+  /** Currently active song for UI display */
+  currentSong: SongData | null
+  /** Whether music playback is currently active */
+  isMusicPlaying: boolean
 }
 
 interface AppModeActions {
@@ -95,6 +101,12 @@ interface AppModeActions {
   toggleTheme: () => void
   /** Set background image data from CMS */
   setBackgroundImageData: (data: BackgroundImageData) => void
+  /** Set songs list from CMS */
+  setSongsList: (songs: SongData[]) => void
+  /** Set currently active song from player */
+  setCurrentSong: (song: SongData | null) => void
+  /** Set music playback state from player */
+  setIsMusicPlaying: (isPlaying: boolean) => void
   /** Set the background mode directly (used during initialization) */
   setBackgroundMode: (mode: BackgroundMode) => void
 }
@@ -157,6 +169,9 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
   backgroundMode: "backgroundImage",
   isDetailOverlayOpen: false,
   backgroundImageData: null,
+  songsList: [],
+  currentSong: null,
+  isMusicPlaying: false,
 
   // Actions
   selectGarment: (garment) => {
@@ -296,6 +311,18 @@ export const useAppModeStore = create<AppModeStore>((set, get) => ({
 
   setBackgroundImageData: (data) => {
     set({ backgroundImageData: data })
+  },
+
+  setSongsList: (songs) => {
+    set({ songsList: songs })
+  },
+
+  setCurrentSong: (song) => {
+    set({ currentSong: song })
+  },
+
+  setIsMusicPlaying: (isPlaying) => {
+    set({ isMusicPlaying: isPlaying })
   },
 
   setBackgroundMode: (mode) => {

@@ -18,6 +18,7 @@ import Background from "../shared/Background";
 import { GarmentCopyrightToggle } from "../ui-elements/GarmentCopyrightToggle";
 import { ApertureToggle } from "../ui-elements/ApertureToggle";
 import { BackgroundImageDetailOverlay } from "../shared/BackgroundImageDetailOverlay";
+import { MusicToggle } from "../ui-elements/MusicToggle";
 
 interface GarmentsCanvasProps {
   onLoadingStateChange?: (isLoading: boolean) => void;
@@ -125,6 +126,7 @@ export default function GarmentsClient() {
           3. Models are loading (after canvas is loaded) */}
       <LoadingScreen isModelsLoading={isDataLoading || !shouldLoadCanvas || isModelsLoading} />
       <BlurredOverlay />
+      <MusicToggle />
 
       {!(isDataLoading || !shouldLoadCanvas || isModelsLoading) && <Background />}
 

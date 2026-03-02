@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getAboutContent, getContactContent, getLegalRightsContent, getPasswordEntryInfo, getPublicDomainTextContent, getBackgroundImageData } from "@/lib/actions/getGlobalSettings"
+import { getAboutContent, getContactContent, getLegalRightsContent, getPasswordEntryInfo, getPublicDomainTextContent, getBackgroundImageData, getSongsList } from "@/lib/actions/getGlobalSettings"
 import UIElementsRouter from "./UIElementsRouter"
 import { useAppModeStore } from "@/lib/stores/appModeStore"
 
@@ -33,19 +33,21 @@ export default function UIContentLoader() {
 
   const setPublicDomainTextContent = useAppModeStore((state) => state.setPublicDomainTextContent);
   const setBackgroundImageData = useAppModeStore((state) => state.setBackgroundImageData);
+  const setSongsList = useAppModeStore((state) => state.setSongsList);
 
   useEffect(() => {
     // Fetch content client-side after initial render (non-blocking)
     // Use requestIdleCallback to defer until browser is idle
     const fetchContent = async () => {
       try {
-        const [about, contact, legal, publicDomainTextContent, passwordEntryInfo, backgroundImageData] = await Promise.all([
+        const [about, contact, legal, publicDomainTextContent, passwordEntryInfo, backgroundImageData, songsList] = await Promise.all([
           getAboutContent(),
           getContactContent(),
           getLegalRightsContent(),
           getPublicDomainTextContent(),
           getPasswordEntryInfo(),
           getBackgroundImageData(),
+          getSongsList(),
         ])
 
         setContent({
@@ -59,6 +61,8 @@ export default function UIContentLoader() {
         setPublicDomainTextContent(publicDomainTextContent ?? "")
         // Store background image data for the Background component and state machine
         setBackgroundImageData(backgroundImageData)
+        // Store songs list for audio playback controls
+        setSongsList(songsList)
       } catch (error) {
         console.error("Failed to fetch UI content:", error)
       }
@@ -71,7 +75,7 @@ export default function UIContentLoader() {
       // Fallback for browsers without requestIdleCallback
       setTimeout(fetchContent, 100)
     }
-  }, [])
+  }, [setBackgroundImageData, setPublicDomainTextContent, setSongsList])
 
   // Render UIElementsRouter directly with fetched content
   return (

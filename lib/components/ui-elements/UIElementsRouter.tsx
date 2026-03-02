@@ -49,8 +49,8 @@ export default function UIElementsRouter({
         const response = await fetch("/api/auth/session")
         const data = await response.json()
 
-        if (data.authenticated && data.role) {
-          setAuthenticated(true, data.role as UserRole)
+        if (data.authenticated) {
+          setAuthenticated(true, (data.role as UserRole | null) ?? null)
         }
       } catch (error) {
         console.error("Session check failed:", error)

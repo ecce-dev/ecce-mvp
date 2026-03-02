@@ -75,6 +75,20 @@ export default function LoginModal({ passwordEntryInfo }: { passwordEntryInfo: s
   const loginMutation = useMutation({
     mutationFn: async (values: LoginFormValues) => {
       if (!isPasswordAuthEnabled) {
+        const response = await fetch("/api/auth/email-login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: values.email.trim() }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Authentication failed")
+        }
+
         return { success: true, role: null as UserRole | null }
       }
 

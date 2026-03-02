@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 const SESSION_COOKIE_NAME = "ecce_session"
 
 interface SessionData {
-  role: string
+  role: string | null
   authenticatedAt: number
   expiresAt: number
 }

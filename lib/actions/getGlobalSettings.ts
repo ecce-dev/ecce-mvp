@@ -153,7 +153,7 @@ export async function getSongsList(): Promise<SongData[]> {
 
   const songs = (result?.globalSettingsPage?.globalSettings?.songsList ?? []) as SongsList;
 
-  return songs
+  return (Array.isArray(songs) ? songs : [])
     .map((song) => {
       const fileUrl = song?.fileMp3?.node?.mediaItemUrl ?? null;
       if (!fileUrl) return null;

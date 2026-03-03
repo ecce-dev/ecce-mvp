@@ -5,7 +5,6 @@ import { useTransition, animated } from "@react-spring/web";
 import { useAppModeStore } from "@/lib/stores/appModeStore";
 import { addTargetBlankToLinks } from "@/lib/utils/utils";
 import { transitionConfig } from "@/lib/components/ecce-elements/transition-config";
-import { useCallback, useRef } from "react";
 
 /**
  * Overlay that displays the background image without blur and its associated text.
@@ -13,9 +12,9 @@ import { useCallback, useRef } from "react";
  * Only visible when in backgroundImage mode and the detail overlay is open.
  *
  * Layout:
- * - Image in a bordered frame (max-width constrained)
+ * - Image in a bordered frame (max-width/max-height constrained per breakpoint)
  * - Small gap between image and text (background visible through the gap)
- * - Text box below, can be wider than the image
+ * - Text box below, same width as image via flex layout (no JS sync)
  * - Both anchored to the bottom-right, no scrolling
  *
  * Styled consistently with EcceDialogContent:
@@ -26,8 +25,6 @@ import { useCallback, useRef } from "react";
  */
 export function BackgroundImageDetailOverlay() {
   const { isDetailOverlayOpen, backgroundMode, backgroundImageData, selectedGarment } = useAppModeStore();
-  const imageContainerRef = useRef<HTMLDivElement>(null);
-  const textBoxRef = useRef<HTMLDivElement>(null);
 
   // Hidden when a garment is selected (encounter/engage mode)
   const isVisible =
@@ -35,13 +32,6 @@ export function BackgroundImageDetailOverlay() {
     backgroundMode === "backgroundImage" &&
     !!backgroundImageData?.imageUrl &&
     !selectedGarment;
-
-  const syncTextWidth = useCallback(() => {
-    if (imageContainerRef.current && textBoxRef.current) {
-      textBoxRef.current.style.width = `${imageContainerRef.current.offsetWidth}px`;
-    }
-  }, []);
-
 
   const transitions = useTransition(isVisible, transitionConfig);
 
@@ -53,36 +43,32 @@ export function BackgroundImageDetailOverlay() {
           style={styles}
           className="safe-area-content fixed bottom-40 top-50 md:top-24 md:bottom-42 right-14 md:right-20 z-40 pointer-events-auto flex flex-col items-end justify-end gap-2"
         >
-          {/* Image frame — image fits within max dimensions per breakpoint, preserving proportions */}
-          <div
-            ref={imageContainerRef}
-            className="max-w-[280px] max-h-[400px] md:max-w-[500px] lg:max-h-[600px] bg-background/70 border border-foreground flex items-center justify-center overflow-hidden"
-          >
-            <Image
-              src={backgroundImageData.imageUrl}
-              alt={backgroundImageData.altText ?? "Background image"}
-              width={0}
-              height={0}
-              sizes="(max-width: 768px) 260px, 320px"
-              className="max-w-full max-h-full w-auto h-auto block object-contain"
-              onLoad={syncTextWidth}
-            />
-          </div>
-
-          {/* Text caption — separate element, can be wider than the image */}
-          {backgroundImageData.text && (
-            <div
-              ref={textBoxRef}
-              className="max-h-18 overflow-y-auto bg-background/70 border border-foreground p-4"
-            >
-              <div
-                className="text-xs leading-relaxed text-foreground prose prose-sm wpAcfWysiwyg"
-                dangerouslySetInnerHTML={{
-                  __html: addTargetBlankToLinks(backgroundImageData.text),
-                }}
+          {/* Wrapper: width = image container; text box matches via w-full; align block to the right */}
+          <div className="flex flex-col items-end gap-2 w-max max-w-[280px] md:max-w-[500px] self-end">
+            {/* Image frame — shrink-wraps image exactly; max dimensions constrain the image; align right */}
+            <div className="w-fit max-w-[280px] max-h-[400px] md:max-w-[500px] lg:max-h-[600px] bg-background/70 border border-foreground overflow-hidden ml-auto">
+              <Image
+                src={backgroundImageData.imageUrl}
+                alt={backgroundImageData.altText ?? "Background image"}
+                width={0}
+                height={0}
+                sizes="(max-width: 768px) 260px, 320px"
+                className="max-w-[280px] max-h-[400px] md:max-w-[500px] lg:max-h-[600px] w-auto h-auto block object-contain"
               />
             </div>
-          )}
+
+            {/* Text caption — w-0 min-w-full so wrapper width = image only; text box then fills that width */}
+            {backgroundImageData.text && (
+              <div className="w-0 min-w-full max-h-18 overflow-y-auto overflow-x-hidden bg-background/70 border border-foreground p-4 break-words">
+                <div
+                  className="text-xs leading-relaxed text-foreground prose prose-sm wpAcfWysiwyg break-words"
+                  dangerouslySetInnerHTML={{
+                    __html: addTargetBlankToLinks(backgroundImageData.text),
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </animated.div>
       )
   );
